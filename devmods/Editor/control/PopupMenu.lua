@@ -5,7 +5,7 @@ local UIFactory = require("core.UIFactory")
 ---__init
 ---@param parent UINode
 ---@param dataList table
-function PopupMenu:__init(parent, location, config, dataList, level)
+function PopupMenu:__init(parent, config, dataList, location, level)
     self._parent = parent
     self._root = nil ---@type:UINode
     self._config = config
@@ -145,9 +145,11 @@ function PopupMenu:setSelect(idx)
 
     local data = self._dataList[idx]
     if data.Children and #data.Children > 0 then
+        local elementLocation = { self._root.positionX + self._root.width, self._root.positionY + self._elements[idx].positionY }
         self._subPopupMenu = PopupMenu.new(self._parent,
-                { self._root.positionX + self._root.width, self._root.positionY + self._elements[idx].positionY },
-                self._config, data.Children, self._level + 1)
+                self._config, data.Children,
+                elementLocation,
+                self._level + 1)
     end
 end
 

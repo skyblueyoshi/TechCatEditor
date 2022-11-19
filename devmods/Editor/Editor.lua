@@ -86,6 +86,11 @@ function Editor:_initCanvas()
     --panel.sprite.color = Color.new(45, 45, 48)
     self._canvas:addChild(panel)
 
+    local data0 = {
+
+    }
+    self._wd = require("control.Window").new(panel, {}, data0, { 0, 0 })
+
     local data = {
         {
             Text = "新建模组...",
@@ -181,7 +186,23 @@ function Editor:_initCanvas()
             }
         },
     }
-    self._pp = require("control.PopupMenu").new(panel, { 64, 64 }, {}, data, 0)
+    self._pp = require("control.PopupMenu").new(panel, {}, data, { 64, 64 }, 0)
+
+    local data2 = {
+        {
+            Text = "aaa",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "ccc asd asds dvrev",
+        },
+        {
+            Text = "dddd",
+        },
+    }
+    self._mb = require("control.MenuBar").new(panel, {}, data2, { 0, 0, 32, 26 })
 end
 
 function Editor:_initDebugCanvas()
