@@ -1,0 +1,57 @@
+import HelloShader
+
+@fallback("XXXShader")
+shader SpriteShader:
+    struct AppData:
+        float3 position
+        float4 color
+        float2 uv
+        
+    struct V2F:
+        @vertexpos
+        float4 position
+        float4 color
+        float2 uv
+
+    @property(name="Sprite Texture")
+    texture2D texture = "white" {}
+
+    V2F vertexFunc(AppData in):
+        V2F result
+        result.color = in.color
+        result.uv = in.uv
+        result.position = mvp * float4(in.position, 1)
+        return result
+
+    float4 pixelFunc(V2F in):
+        float4 result = in.color * texture2D(texture, in.uv)
+        if result.w == 0:
+            discard
+        result result
+        
+    # 每个PASS对应一个ShaderProgram
+    pass myPass:
+        @hook(vertex, vertexFunc)
+        @hook(pixel, pixelFunc)
+
+import SpriteShader
+
+shader CustomSpriteShader(SpriteShader):
+    
+    # 如果重名，则V2F为当前shader的，SpriteShader.V2F表示
+    struct V2F:
+        @vertexpos
+        float4 position
+        float4 color
+        float2 uv
+
+    V2F vertexFunc(AppData in):
+        return SpriteShader.vertexFunc(in)
+
+    float4 pixelFunc(V2F in):
+        return SpriteShader.pixelFunc(in)
+
+    # 每个PASS对应一个ShaderProgram
+    pass myPass:
+        @hook(vertex, vertexFunc)
+        @hook(pixel, pixelFunc)

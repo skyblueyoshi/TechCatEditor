@@ -1,0 +1,36 @@
+{
+	"glsl": {
+		"vertexShaderFileName": "LightCubeVertex.glsl",
+		"pixelShaderFileName": "LightCubePixel.glsl"
+	},
+	"hlsl": {
+		"vertexShaderFileName": "",
+		"pixelShaderFileName": ""
+	},
+	"vertexAttributes": [
+		{
+			"name": "vs_position",
+			"format": "Vector3",
+			"usage": "Position",
+			"usageIndex": 0
+		},
+		{
+			"name": "vs_normal",
+			"format": "Vector3",
+			"usage": "Normal",
+			"usageIndex": 0
+		}
+	],
+	"samplers": [],
+	"constantBuffers": [
+		{
+			"name": "mat_mvp",
+			"format": "Matrix",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		}
+	],
+  "vertexShaderCBuffers": [0],
+  "pixelShaderCBuffers": []
+}

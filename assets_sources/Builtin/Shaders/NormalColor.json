@@ -1,0 +1,36 @@
+{
+	"glsl": {
+		"vertexShaderFileName": "NormalColorVertex.glsl",
+		"pixelShaderFileName": "NormalColorPixel.glsl"
+	},
+	"hlsl": {
+		"vertexShaderFileName": "",
+		"pixelShaderFileName": ""
+	},
+	"vertexAttributes": [
+		{
+			"name": "vs_position",
+			"format": "Vector3",
+			"usage": "Position",
+			"usageIndex": 0
+		},
+		{
+			"name": "vs_color",
+			"format": "Color",
+			"usage": "Color",
+			"usageIndex": 0
+		}
+	],
+	"samplers": [],
+	"constantBuffers": [
+		{
+			"name": "mat_mvp",
+			"format": "Matrix",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		}
+	],
+  "vertexShaderCBuffers": [0],
+  "pixelShaderCBuffers": []
+}

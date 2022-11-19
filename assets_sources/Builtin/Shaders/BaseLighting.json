@@ -1,0 +1,154 @@
+{
+	"glsl": {
+		"vertexShaderFileName": "BaseLightingVertex.glsl",
+		"pixelShaderFileName": "BaseLightingPixel.glsl"
+	},
+	"hlsl": {
+		"vertexShaderFileName": "",
+		"pixelShaderFileName": ""
+	},
+	"vertexAttributes": [
+		{
+			"name": "vs_position",
+			"format": "Vector3",
+			"usage": "Position",
+			"usageIndex": 0
+		},
+		{
+			"name": "vs_normal",
+			"format": "Vector3",
+			"usage": "Normal",
+			"usageIndex": 0
+		},
+		{
+			"name": "vs_texCoords",
+			"format": "Vector2",
+			"usage": "TextureCoordinate",
+			"usageIndex": 0
+		}
+	],
+	
+	"samplers": [
+		{
+			"name": "material.diffuse",
+			"type": "Sampler2D",
+			"textureSlot": 0,
+			"samplerSlot": 0
+		},
+		{
+			"name": "material.specular",
+			"type": "Sampler2D",
+			"textureSlot": 1,
+			"samplerSlot": 0
+		}
+	],
+	"constantBuffers": [
+		{
+			"name": "mat_model",
+			"format": "Matrix",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "mat_vp",
+			"format": "Matrix",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "viewPos",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "material.shininess",
+			"format": "Float",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.position",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.constant",
+			"format": "Float",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.linear",
+			"format": "Float",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.quadratic",
+			"format": "Float",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.ambient",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.diffuse",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "pointLight.specular",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "dirLight.direction",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "dirLight.ambient",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "dirLight.diffuse",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		},
+		{
+			"name": "dirLight.specular",
+			"format": "Float3",
+			"count": 1,
+			"parameterIndexs": [],
+			"parameterOffsets": []
+		}
+	],
+  "vertexShaderCBuffers": [0, 1],
+  "pixelShaderCBuffers": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+}

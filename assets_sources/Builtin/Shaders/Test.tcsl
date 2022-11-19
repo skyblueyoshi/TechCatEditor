@@ -1,0 +1,45 @@
+import HelloShader
+
+@fallback("XXXShader")
+shader CustomShader:
+    struct AppData:
+        float3 position
+        float3 normal
+        float2 uv
+        
+    struct V2F:
+        float4 position
+        float2 uv
+
+    # 全局变量
+    float globalVar
+    # 常量
+    const float2 myConstValue
+
+    @property(name="Dissolve")
+    float dissolve = 1.0
+
+    @property(name="My Texture", usage=2D)
+    texture2D texture = "white" {}
+
+    V2F hello(AppData in):
+        V2F result
+        result.position = in.position
+        result.uv = in.uv
+        return result
+        
+    float4 world(V2F in): 
+        return float4(1,1,1,1)
+
+    float4 world2(V2F in): 
+        return in.position
+        
+    # 多PASS
+    # 每个PASS对应一个ShaderProgram
+    pass pass1:
+        @hook(pixel, world)
+        @hook(vertex, hello)
+
+    pass pass2:
+        @hook(pixel, world2)
+        @hook(vertex, hello)

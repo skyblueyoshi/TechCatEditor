@@ -1,0 +1,22 @@
+{
+  "devMode": true,
+  "autoGenerateAssets": false,
+  "autoGeneratePacks": false,
+  "assetsSources": [
+    {
+      "sourcePath": "assets_sources",
+      "mappingPath": ""
+    }
+  ],
+  "assetPacksSources": [
+    {
+      "isPersistenceSource": true,
+      "sourcePath": "devmods",
+      "mappingPath": "mods"
+    },
+    {
+      "sourcePath": "devmods",
+      "mappingPath": "mods"
+    }
+  ]
+}
