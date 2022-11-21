@@ -77,8 +77,9 @@ function Editor:render()
 end
 
 function Editor:_initCanvas()
+    self._canvasDbg.touchable = false
     local panel = UIPanel.new("panel")
-    panel.enableRenderTarget = true
+    panel.enableRenderTarget = false
     panel:setMarginEnabled(true, true, true, true)
     panel.autoStretchWidth = true
     panel.autoStretchHeight = true
@@ -86,123 +87,13 @@ function Editor:_initCanvas()
     --panel.sprite.color = Color.new(45, 45, 48)
     self._canvas:addChild(panel)
 
-    local data0 = {
+    local TestData = require("config.TestData")
+    self._wd = require("control.Window").new(self, TestData, nil)
 
-    }
-    self._wd = require("control.Window").new(panel, {}, data0, { 0, 0 })
+end
 
-    local data = {
-        {
-            Text = "新建模组...",
-        },
-        {
-            Text = "打开...",
-            HotKeys = {
-                "Ctrl", "Shift", "Q"
-            }
-        },
-        {
-            Text = "测试内容",
-            HotKeys = {
-                "Ctrl", "Q"
-            },
-            Children = {
-                {
-                    Text = "测试...",
-                },
-                {
-                    Text = "测试222...",
-                    Children = {
-                        {
-                            Text = "模组测试1...",
-                            HotKeys = {
-                                "Ctrl", "Shift", "Q"
-                            }
-                        },
-                        {
-                            Text = "模组测试123...",
-                            HotKeys = {
-                                "Ctrl", "Shift", "Q"
-                            }
-                        },
-                    }
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-                {
-                    Text = "测试3333...",
-                },
-            }
-        },
-        {
-            Text = "测试...",
-        },
-        {
-            Text = "测试222...",
-            Children = {
-                {
-                    Text = "模组测试1...",
-                    HotKeys = {
-                        "Ctrl", "Shift", "Q"
-                    }
-                },
-                {
-                    Text = "模组测试123...",
-                    HotKeys = {
-                        "Ctrl", "Shift", "Q"
-                    }
-                },
-            }
-        },
-        {
-            Text = "测试3333...",
-        },
-        {
-            Text = "保存",
-        },
-        {
-            Text = "退出",
-            HotKeys = {
-                "Ctrl", "R"
-            }
-        },
-    }
-    self._pp = require("control.PopupMenu").new(panel, {}, data, { 64, 64 }, 0)
-
-    local data2 = {
-        {
-            Text = "aaa",
-        },
-        {
-            Text = "bbb",
-        },
-        {
-            Text = "ccc asd asds dvrev",
-        },
-        {
-            Text = "dddd",
-        },
-    }
-    self._mb = require("control.MenuBar").new(panel, {}, data2, { 0, 0, 32, 26 })
+function Editor:getRoot()
+    return self._canvas:getChild("panel")
 end
 
 function Editor:_initDebugCanvas()

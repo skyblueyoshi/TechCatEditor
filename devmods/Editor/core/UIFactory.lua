@@ -28,14 +28,21 @@ end
 ---@param name string
 ---@param location table
 ---@param cfg table
+---@param cacheRT boolean
+---@param touchable boolean
 ---@return UIPanel
-function UIFactory.newPanel(parent, name, location, cfg)
+function UIFactory.newPanel(parent, name, location, cfg, cacheRT, touchable)
     local node = UIPanel.new(name)
     UIFactory.setLocation(node, location)
     parent:addChild(node)
     UIFactory.setCommonByCfg(node, cfg)
     UIFactory.setImageByCfg(node, cfg)
-    node.enableRenderTarget = true
+    if cacheRT ~= nil  then
+        node.enableRenderTarget = cacheRT
+    end
+    if touchable ~= nil then
+        node.touchable = touchable
+    end
     return node
 end
 
@@ -57,6 +64,21 @@ function UIFactory.setCommonByCfg(node, cfg)
     end
     if cfg.touchable ~= nil then
         node.touchable = cfg.touchable
+    end
+    if cfg.layout then
+        if cfg.layout == "CENTER" then
+            cfg.margins = { 0, 0, 0, 0, false, false }
+        elseif cfg.layout == "CENTER_W" then
+            cfg.margins = { 0, nil, 0, nil, false, false }
+        elseif cfg.layout == "CENTER_H" then
+            cfg.margins = { nil, 0, nil, 0, false, false }
+        elseif cfg.layout == "FULL" then
+            cfg.margins = { 0, 0, 0, 0, true, true }
+        elseif cfg.layout == "FULL_W" then
+            cfg.margins = { 0, nil, 0, nil, true, false }
+        elseif cfg.layout == "FULL_H" then
+            cfg.margins = { nil, 0, nil, 0, false, true }
+        end
     end
     if cfg.margins ~= nil then
         local autoStretchWidth = nil
@@ -133,6 +155,23 @@ function UIFactory.setImageByCfg(node, cfg)
         imgBorder.sprite = UISpritePool.getInstance():get("white_border")
         imgBorder.sprite.color = ThemeUtil.getColor(cfg.borderColor)
         node:addChild(imgBorder)
+    end
+end
+
+function UIFactory.setPanelColor(panel, bgColor)
+    UIPanel.cast(panel).sprite.color = ThemeUtil.getColor(bgColor)
+end
+
+function UIFactory.setPanelDisplay(panel, selected, pointed)
+    local sd = panel:getChild("sd")
+    if selected then
+        sd.visible = true
+        UIFactory.setPanelColor(sd, "SD")
+    elseif pointed then
+        sd.visible = true
+        UIFactory.setPanelColor(sd, "BD")
+    else
+        sd.visible = false
     end
 end
 

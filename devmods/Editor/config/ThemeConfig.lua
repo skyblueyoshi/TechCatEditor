@@ -1,10 +1,10 @@
 local ThemeConfig = {
     Colors = {
-        BD = "#666A84",     -- window border
+        BD = "#213252",     -- window border
         SD = "#4E5164",     -- selected
-        A = "#2D3252",      -- light
-        B = "#23253E",      -- middle
-        C = "#171928",      -- dark
+        A = "#22253D",      -- light
+        B = "#1D1F33",      -- middle
+        C = "#171828",      -- dark
     },
 
     --Colors = {

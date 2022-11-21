@@ -1,29 +1,15 @@
----@class TCE.Window:TCE.BaseControl
-local Window = class("MenuBar", require("BaseControl"))
-local UIFactory = require("core.UIFactory")
+---@class TCE.Window:TCE.Container
+local Window = class("MenuBar", require("Container"))
 
-function Window:__init(parent, config, data, location)
-    Window.super.__init(self, parent, config, data)
-    self._root = nil ---@type:UINode
+function Window:__init(parent, data, location)
+    Window.super.__init(self, parent, data, location)
+    self.isWindow = true
 
-    self:_initContent(location)
+    self:_initWindowContent(location)
 end
 
-function Window:destroy()
-    if self:isDestroyed() then
-        return
-    end
+function Window:_initWindowContent(location)
 
-    Window.super.destroy(self)
-end
-
-function Window:_initContent(location)
-
-    local name = "window"
-    self._root = UIFactory.newPanel(self._parent, name, { 0, 0 }, {
-        margins = { 0, 0, 0, 0, true, true },
-        bgColor = "C",
-    })
 end
 
 return Window
