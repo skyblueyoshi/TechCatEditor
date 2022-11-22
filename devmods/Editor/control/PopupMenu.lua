@@ -1,12 +1,12 @@
 ---@class TCE.PopupMenu:TCE.BaseControl
 local PopupMenu = class("PopupMenu", require("BaseControl"))
-local UIFactory = require("core.UIFactory")
+local UIUtil = require("core.UIUtil")
 local PopupMenuElement = require("PopupMenuElement")
 
 ---__init
 ---
-function PopupMenu:__init(parent, data, location, level)
-    PopupMenu.super.__init(self, parent, data)
+function PopupMenu:__init(parent, parentRoot, data, location, level)
+    PopupMenu.super.__init(self, parent, parentRoot, data)
     self._level = level or 0
 
     self._selectedIndex = 0
@@ -28,7 +28,7 @@ function PopupMenu:_destroySubPopupMenu()
 end
 
 function PopupMenu:_initContent(location)
-    self._root = UIFactory.newPanel(self._parent:getRoot(),
+    self._root = UIUtil.newPanel(self._parentRoot,
             "popup", { location[1], location[2] }, {
                 bgColor = "A",
                 borderColor = "BD",
@@ -37,7 +37,7 @@ function PopupMenu:_initContent(location)
     local offsetY = 0
     local maxWidth = 0
     for idx, data in ipairs(self._data) do
-        local element = PopupMenuElement.new(self, data, { 0, offsetY }, idx)
+        local element = PopupMenuElement.new(self, self._root, data, { 0, offsetY }, idx)
         offsetY = offsetY + element:getRoot().height
         maxWidth = math.max(maxWidth, element:getRoot().width)
         self:addChild(element)

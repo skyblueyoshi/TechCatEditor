@@ -1,6 +1,6 @@
----@class TCE.Button:TCE.BaseControl
-local Button = class("Button", require("BaseControl"))
-local UIFactory = require("core.UIFactory")
+---@class TCE.Button:TCE.ActivePanel
+local Button = class("Button", require("ActivePanel"))
+local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 
 --[[
@@ -12,10 +12,8 @@ local Constant = require("config.Constant")
 }
 --]]
 
-function Button:__init(parent, data, location, tag)
-    Button.super.__init(self, parent, data)
-    self._pointed = false
-    self._selected = false
+function Button:__init(parent, parentRoot, data, location, tag)
+    Button.super.__init(self, parent, parentRoot, data, location)
     self._tag = tag
     self._subPopupMenu = nil
 
@@ -35,46 +33,17 @@ function Button:_destroySubPopupMenu()
 end
 
 function Button:_initContent(location)
-    local name = string.format("btn")
-    self._root = UIFactory.newPanel(self._parent:getRoot(),
-            name, location, nil, true, true)
-    UIFactory.newPanel(self._root, "sd", nil, {
-        layout = "FULL",
-        bgColor = "BD",
-    }, false, false)
-    self._root:getChild("sd").visible = false
+    Button.super._initContent(self, location)
+
     local data = self._data
     if data.Text then
-        local text = UIFactory.newText(self._root, "cap", nil, data.Text, {
+        local text = UIUtil.newText(self._root, "cap", nil, data.Text, {
             layout = "CENTER",
         })
         self._root.width = math.max(self._root.width, text.width + Constant.TEXT_SIDE_OFFSET * 2)
     end
 
-    self._root:addMousePointedEnterListener({ self._onMouseEnter, self })
-    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
-    self._root:addTouchDownListener({ self._onMouseDown, self })
     self._root:applyMargin(true)
-end
-
-function Button:setPointed(pointed)
-    if self._pointed == pointed then
-        return
-    end
-    self._pointed = pointed
-    self:_updateDisplay()
-end
-
-function Button:setSelected(selected)
-    if self._selected == selected then
-        return
-    end
-    self._selected = selected
-    self:_updateDisplay()
-end
-
-function Button:_updateDisplay()
-    UIFactory.setPanelDisplay(self._root, self._selected, self._pointed)
 end
 
 function Button:_onMouseEnter(_)
@@ -83,7 +52,7 @@ function Button:_onMouseEnter(_)
             self._parent:setSelected(self._tag)
         end
     end
-    self:setPointed(true)
+    Button.super._onMouseEnter(self, _)
 end
 
 function Button:_onMouseLeave(_)
@@ -95,6 +64,7 @@ function Button:_onMouseDown(_)
         self._parent.showPopupWhenPointed = true
         self._parent:setSelected(self._tag)
     end
+    Button.super._onMouseDown(self, _)
 end
 
 function Button:tryShowPopupMenu()
@@ -102,7 +72,8 @@ function Button:tryShowPopupMenu()
     if self._data.PopupMenu then
         local PopupMenu = require("PopupMenu")
         local wx, wy = self:getPositionInWindow()
-        self._subPopupMenu = PopupMenu.new(self:getWindow(), self._data.PopupMenu,
+        self._subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot(),
+                self._data.PopupMenu,
                 { wx, wy + self._root.height })
     end
     return self._subPopupMenu

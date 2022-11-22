@@ -1,10 +1,10 @@
 ---@class TCE.Container:TCE.BaseControl
 local Container = class("MenuBar", require("BaseControl"))
-local UIFactory = require("core.UIFactory")
+local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 
-function Container:__init(parent, data, location)
-    Container.super.__init(self, parent, data)
+function Container:__init(parent, parentRoot, data, location)
+    Container.super.__init(self, parent, parentRoot, data)
     self.isContainer = true
     self:_initContent(location)
 end
@@ -21,18 +21,24 @@ function Container:_initContent(location)
     if location == nil then
         cfg.layout = "FULL"
     end
-    self._root = UIFactory.newPanel(self._parent:getRoot(), name, location, cfg, true)
+    self._root = UIUtil.newPanel(self._parentRoot, name, location, cfg, true)
+    self:getRoot():applyMargin(true)
 
     local areaTop, areaLeft = 0, 0
     if data.MenuBar then
-        local menuBar = require("control.MenuBar").new(self,
+        local menuBar = require("MenuBar").new(self, self._root,
                 data.MenuBar, { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
         self:addMap("MenuBar", menuBar)
         areaTop = areaTop + menuBar:getRoot().height
     end
 
-    self:getRoot():applyMargin(true)
-    print(self:getRoot().width, self:getRoot().height)
+    if data.TreeView then
+        local treeView = require("TreeView").new(self, self._root,
+                data.TreeView, { 0, 0, 200, 200 }
+        )
+        self:addMap("TreeView", treeView)
+    end
+
     local containers = data.Containers
     if containers then
         local LT = containers.LT
@@ -43,13 +49,13 @@ function Container:_initContent(location)
 
         local SIDE_WIDTH = 200
         if LT then
-            local container = Container.new(self, LT, { 0, areaTop, SIDE_WIDTH, 32 })
-            UIFactory.setMarginsTB(container:getRoot(), areaTop, 300)
+            local container = Container.new(self, self._parentRoot, LT, { 0, areaTop, SIDE_WIDTH, 32 })
+            UIUtil.setMarginsTB(container:getRoot(), areaTop, 300)
             self:addMap("LT", container)
         end
         if R then
-            local container = Container.new(self, R, { 0, areaTop, SIDE_WIDTH, 32 })
-            UIFactory.setMargins(container:getRoot(), nil, areaTop, 0, 0, false, true)
+            local container = Container.new(self, self._parentRoot,R, { 0, areaTop, SIDE_WIDTH, 32 })
+            UIUtil.setMargins(container:getRoot(), nil, areaTop, 0, 0, false, true)
             self:addMap("R", container)
         end
     end

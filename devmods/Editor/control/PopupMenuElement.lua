@@ -1,6 +1,6 @@
 ---@class TCE.PopupMenuElement:TCE.BaseControl
 local PopupMenuElement = class("PopupMenuElement", require("BaseControl"))
-local UIFactory = require("core.UIFactory")
+local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 
 local RIGHT_RESERVE_SIZE = 16
@@ -8,26 +8,26 @@ local HK_RESERVE_SIZE = 32
 
 ---__init
 ---
-function PopupMenuElement:__init(parent, data, location, index)
-    PopupMenuElement.super.__init(self, parent, data)
+function PopupMenuElement:__init(parent, parentRoot, data, location, index)
+    PopupMenuElement.super.__init(self, parent, parentRoot, data)
     self._index = index
     self:_initContent(location)
 end
 
 function PopupMenuElement:_initContent(location)
-    self._root = UIFactory.newPanel(self._parent:getRoot(),
+    self._root = UIUtil.newPanel(self._parentRoot,
             string.format("e_%d", self._index),
             { location[1], location[2], Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
 
     if self._data.Text ~= nil then
-        local selectBg = UIFactory.newPanel(self._root, "sd", nil, {
+        local selectBg = UIUtil.newPanel(self._root, "sd", nil, {
             margins = { 3, 3, 3, 3, true, true },
             bgColor = "SD",
         })
         selectBg.visible = false
 
         local rx = 16
-        local text = UIFactory.newText(self._root, "cap", { rx, 0 }, self._data.Text, {
+        local text = UIUtil.newText(self._root, "cap", { rx, 0 }, self._data.Text, {
             margins = { nil, 0, nil, 0, false, false },
         })
         rx = rx + text.width
@@ -42,7 +42,7 @@ function PopupMenuElement:_initContent(location)
                     hkContent = hkContent .. "+" .. hk
                 end
             end
-            local hkText = UIFactory.newText(self._root, "hk", { rx, 0 }, hkContent, {
+            local hkText = UIUtil.newText(self._root, "hk", { rx, 0 }, hkContent, {
                 margins = { nil, 0, nil, 0, false, false },
             })
             rx = rx + hkText.width
@@ -69,7 +69,7 @@ function PopupMenuElement:_onPointedIn(_)
 end
 
 function PopupMenuElement:setSelect(selected)
-    UIFactory.setPanelDisplay(self._root, selected, false)
+    UIUtil.setPanelDisplay(self._root, selected, false)
 end
 
 function PopupMenuElement:tryShowSubPopupMenu()
@@ -79,7 +79,7 @@ function PopupMenuElement:tryShowSubPopupMenu()
         local posInWindowX, posInWindowY = self:getPositionInWindow()
 
         local PopupMenu = require("PopupMenu")
-        local subPopupMenu = PopupMenu.new(self:getWindow(),
+        local subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot(),
                 data.Children,
                 { posInWindowX + self._root.width, posInWindowY },
                 parent:getLevel() + 1)

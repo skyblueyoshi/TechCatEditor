@@ -1,8 +1,9 @@
 ---@class TCE.BaseControl
 local BaseControl = class("BaseControl")
 
-function BaseControl:__init(parent, data)
+function BaseControl:__init(parent, parentRoot, data)
     self._parent = parent ---@type TCE.BaseControl
+    self._parentRoot = parentRoot ---@type UINode
     self._root = nil ---@type UINode
 
     self._data = data ---@type table
@@ -35,7 +36,8 @@ function BaseControl:onDestroy()
     end
     self._childrenMap = {}
 
-    self._parent:getRoot():removeChild(self._root)
+    self._parentRoot:removeChild(self._root)
+    self._parentRoot = nil
     self._parent = nil
     self._root = nil
 

@@ -121,8 +121,26 @@ local menuBar = {
     }
 }
 
+local TestTree = {
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+}
+
 local ContainerLT = {
-    IsSide = true
+    IsSide = true,
+    TreeView = TestTree,
 }
 
 local window = {

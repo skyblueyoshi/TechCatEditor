@@ -88,7 +88,7 @@ function Editor:_initCanvas()
     self._canvas:addChild(panel)
 
     local TestData = require("config.TestData")
-    self._wd = require("control.Window").new(self, TestData, nil)
+    self._wd = require("control.Window").new(self, self:getRoot(), TestData, nil)
 
 end
 
