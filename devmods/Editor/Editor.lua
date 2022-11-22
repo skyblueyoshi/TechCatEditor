@@ -64,8 +64,6 @@ function Editor:update()
             lbText.text = "[UI Debug Mode]"
         end
         lbText.visible = true
-
-        lbText.visible = false
     else
         self._canvasDbg.visible = false
     end
@@ -107,6 +105,7 @@ function Editor:_initDebugCanvas()
     self._canvasDbg:addChild(panel)
 
     local textDebug = UIText.new("text", 0, 0, 32, 32)
+    textDebug:setBottomMargin(24, true)
     textDebug.fontSize = 20
     textDebug.horizontalOverflow = TextHorizontalOverflow.Overflow
     textDebug.color = Color.White

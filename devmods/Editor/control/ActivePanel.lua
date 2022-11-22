@@ -7,8 +7,6 @@ function ActivePanel:__init(parent, parentRoot, data, location)
     ActivePanel.super.__init(self, parent, parentRoot, data)
     self._pointed = false
     self._selected = false
-
-    self:_initContent(location)
 end
 
 function ActivePanel:_initContent(location)
