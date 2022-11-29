@@ -45,4 +45,19 @@ end
 function UIScrollView:StopScrolling()
 end
 
+---@return Vector2
+function UIScrollView:getViewPosition()
+end
+
+---
+---@param listener table|function
+---@return ListenerID
+function UIScrollView:addScrollingListener(listener)
+end
+
+---
+---@param listenerID ListenerID
+function UIScrollView:removeScrollingListener(listenerID)
+end
+
 return UIScrollView

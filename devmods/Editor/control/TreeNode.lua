@@ -8,13 +8,18 @@ function TreeNode:__init(parent, parentRoot, data, location)
 
     self:_initContent(location)
 end
-local s = 1
+local s = 0
 function TreeNode:_initContent(location)
     TreeNode.super._initContent(self, location)
     s = s + 1
-    local text = UIUtil.newText(self._root, "cap", nil, string.format("k%d", s), {
+    local t = string.format("k%d", s)
+    if not self._root:getChild("cap"):valid() then
+        local text = UIUtil.newText(self._root, "cap", nil, t, {
             layout = "CENTER",
         })
+    else
+        UIText.cast(self._root:getChild("cap")).text = t
+    end
 end
 
 return TreeNode

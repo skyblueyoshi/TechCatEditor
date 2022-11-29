@@ -148,7 +148,7 @@ local window = {
     Containers = {
         LT = ContainerLT,
         LB = ContainerLT,
-        R = ContainerLT,
+        --R = ContainerLT,
         CB = ContainerLT,
         CT = ContainerLT,
     }

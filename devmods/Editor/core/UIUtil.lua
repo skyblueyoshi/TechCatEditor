@@ -37,7 +37,7 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     parent:addChild(node)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setImageByCfg(node, cfg)
-    if cacheRT ~= nil  then
+    if cacheRT ~= nil then
         --node.enableRenderTarget = cacheRT
     end
     if touchable ~= nil then
@@ -267,8 +267,284 @@ function UIUtil.setMarginsTB(node, top, bottom, autoStretch)
     UIUtil.setMargins(node, nil, top, nil, bottom, nil, autoStretch)
 end
 
----setTable
----
+---@param panelList UINode
+---@param proxy any
+---@param isReload boolean
+---@param isVertical boolean
+---@return boolean
+function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
+    local sv = UIScrollView.cast(panelList)
+    local panelItem = sv:getChild("panel_item")
+    if not panelItem:valid() then
+        assert(false)
+        return false
+    end
+    panelItem.visible = false
+    local pw, ph = panelItem.width, panelItem.height
+
+    if not sv:getChild("__inner"):valid() then
+        local temp = UIPanel.new("__inner")
+        sv:addChild(temp)
+        isReload = true
+    end
+    local innerPanel = sv:getChild("__inner")
+
+    -- 列表元素总数
+    local count = 0
+    if proxy._getTableElementCount ~= nil then
+        count = proxy:_getTableElementCount()
+    end
+    ---@param node UINode
+    local function _getNodeLocation(node)
+        return node.positionX, node.positionY, node.width, node.height
+    end
+
+    local existIndexStart, existIndexEnd = 0, 0
+    local existNodeStart, existNodeEnd = nil, nil
+    local ex, ey, ew, eh = 0, 0, 0, 0
+    local ex2, ey2, ew2, eh2 = 0, 0, 0, 0
+    -- 获取已经存在的元素，索引范围
+    for i = 1, innerPanel:getChildrenCount() do
+        local tempItem = innerPanel:getChildByIndex(i - 1)
+        local tag = tempItem.tag
+        if tag > 0 then
+            if existIndexStart == 0 then
+                existIndexStart, existIndexEnd = tag, tag
+                existNodeStart, existNodeEnd = tempItem, tempItem
+                ex, ey, ew, eh = _getNodeLocation(tempItem)
+                ex2, ey2, ew2, eh2 = ex, ey, ew, eh
+            else
+                if tag < existIndexStart then
+                    existIndexStart = tag
+                    existNodeStart = tempItem
+                    ex, ey, ew, eh = _getNodeLocation(tempItem)
+                end
+                if tag > existIndexEnd then
+                    existIndexEnd = tag
+                    existNodeEnd = tempItem
+                    ex2, ey2, ew2, eh2 = _getNodeLocation(tempItem)
+                end
+            end
+        end
+    end
+    local existAny = existIndexStart ~= 0
+    local changed = false
+
+    local vx, vy = -sv:getViewPosition().x, -sv:getViewPosition().y
+    local vw, vh = sv.width, sv.height
+    local vx2, vy2 = vx + vw, vy + vh
+
+    local reserveNodeList = {}
+    for i = 1, innerPanel:getChildrenCount() do
+        local tempItem = innerPanel:getChildByIndex(i - 1)
+        if tempItem.tag == 0 then
+            table.insert(reserveNodeList, tempItem)
+        end
+    end
+
+    ---@param node UINode
+    local function _moveToReserve(node)
+        node.visible = false
+        if node.tag ~= 0 then
+            node.tag = 0
+            table.insert(reserveNodeList, node)
+            changed = true
+        end
+    end
+
+    local function _saveNode(index, node)
+        print("del:", index)
+        _moveToReserve(node)
+    end
+
+    ---@return UINode
+    local function _tryGetReserve()
+        if #reserveNodeList > 0 then
+            local tempItem = reserveNodeList[#reserveNodeList]
+            table.remove(reserveNodeList, #reserveNodeList)
+            return tempItem
+        end
+        return nil
+    end
+
+    local function _tryGetTargetItem(index)
+        for i = 1, innerPanel:getChildrenCount() do
+            local tempItem = innerPanel:getChildByIndex(i - 1)
+            if tempItem.tag == index then
+                return tempItem
+            end
+        end
+        return nil
+    end
+
+    local function _ensureItem(index, x, y, w, h)
+        local tempNode = _tryGetReserve()
+        if tempNode == nil then
+            tempNode = panelItem:clone()
+            tempNode.name = "__item"
+            innerPanel:addChild(tempNode)
+        end
+        tempNode.tag = index
+        tempNode:setAnchorPoint(0, 0)
+        tempNode.visible = true
+        tempNode:setSize(w, h)
+        tempNode:setPosition(x, y)
+        tempNode:applyMargin()
+
+        return tempNode
+    end
+
+    local function _setItem(index, x, y, w, h)
+        print("new:", index)
+        changed = true
+        local tempItem = _ensureItem(index, x, y, w, h)
+        if proxy._setTableElement ~= nil then
+            proxy:_setTableElement(tempItem, index)
+        end
+    end
+
+    -- 判断子区域是不是在可显示区域内
+    local function _isLocationInDisplayArea(x, y, w, h)
+        return x < vx2 and x + w > vx and y < vy2 and y + h > vy
+    end
+
+    local function _getElementSize(index)
+        local w, h = pw, ph
+        if proxy._getTableElementSize ~= nil then
+            w, h = proxy:_getTableElementSize(index)
+        end
+        return w, h
+    end
+
+    local function _testLocation(testIndex, refX, refY, refWidth, refHeight, isRefNext)
+        local x, y = 0.0, 0.0
+        local w, h = _getElementSize(testIndex)
+        if isVertical then
+            x = refX
+            if isRefNext then
+                y = refY - h
+            else
+                y = refY + refHeight
+            end
+        else
+            y = refY
+            if isRefNext then
+                x = refX - w
+            else
+                x = refX + refWidth
+            end
+        end
+        return x, y, w, h
+    end
+
+    local showStart, showEnd = false, false
+    if existAny then
+        showStart = _isLocationInDisplayArea(ex, ey, ew, eh)
+        showEnd = _isLocationInDisplayArea(ex2, ey2, ew2, eh2)
+        if not showStart and not showEnd then
+            isReload = true
+        end
+    end
+
+    local showIndexStart, showIndexEnd = 0, 0
+    if isReload or not existAny then
+        for i = 1, innerPanel:getChildrenCount() do
+            _saveNode(i, innerPanel:getChildByIndex(i - 1))
+        end
+
+        local refX, refY, refWidth, refHeight = 0, 0, 0, 0
+        for i = 1, count do
+            if i == 1 then
+                refWidth, refHeight = _getElementSize(i)
+            else
+                refX, refY, refWidth, refHeight = _testLocation(i, refX, refY, refWidth, refHeight, false)
+            end
+
+            if _isLocationInDisplayArea(refX, refY, refWidth, refHeight) then
+                if showIndexStart == 0 then
+                    showIndexStart = i
+                end
+                showIndexEnd = i
+                _setItem(i, refX, refY, refWidth, refHeight)
+
+            elseif not isReload and showIndexEnd > 0 then
+                break
+            end
+        end
+
+        if isReload then
+            local fullWidth, fullHeight = refX + refWidth, refY + refHeight
+            innerPanel:setSize(fullWidth, fullHeight)
+            sv.viewSize = Size.new(fullWidth, fullHeight)
+            print(sv.viewSize)
+        end
+    else
+        if not showStart then
+            _saveNode(existIndexStart, existNodeStart)
+        end
+        if not showEnd then
+            _saveNode(existIndexEnd, existNodeEnd)
+        end
+
+        local justAddStart, justAddEnd = false, false
+        if showStart and showEnd then
+            justAddStart, justAddEnd = true, true
+        elseif showStart then
+            justAddEnd = true
+        else
+            justAddStart = true
+        end
+
+        local function _innerCheck(_begin, _end, _dir, justAdd, _ex, _ey, _ew, _eh)
+            local refX, refY, refWidth, refHeight = _ex, _ey, _ew, _eh
+            local isRefNext = _dir == -1
+            for i = _begin, _end, _dir do
+                refX, refY, refWidth, refHeight = _testLocation(i, refX, refY, refWidth, refHeight, isRefNext)
+                local ok = _isLocationInDisplayArea(refX, refY, refWidth, refHeight)
+                local stop = true
+                if justAdd then
+                    if ok then
+                        local tempItem = _tryGetTargetItem(i)
+                        if tempItem == nil then
+                            _setItem(i, refX, refY, refWidth, refHeight)
+                            stop = false
+                        end
+                    end
+                else
+                    if not ok then
+                        local tempItem = _tryGetTargetItem(i)
+                        if tempItem ~= nil then
+                            _saveNode(i, tempItem)
+                            stop = false
+                        end
+                    end
+                end
+                if stop then
+                    break
+                end
+            end
+        end
+
+        local function _check(borderIndex, minIndex, maxIndex, justAdd, _ex, _ey, _ew, _eh)
+            _innerCheck(borderIndex - 1, minIndex, -1, justAdd, _ex, _ey, _ew, _eh)
+            _innerCheck(borderIndex + 1, maxIndex, 1, justAdd, _ex, _ey, _ew, _eh)
+        end
+
+        --print("----------------")
+        --print("_check", existIndexStart, 1, existIndexEnd, justAddStart)
+        --print("_check", existIndexEnd, existIndexStart, count, justAddEnd)
+        _check(existIndexStart, 1, existIndexEnd, justAddStart, ex, ey, ew, eh)
+        _check(existIndexEnd, existIndexStart, count, justAddEnd, ex2, ey2, ew2, eh2)
+
+    end
+
+    if changed then
+        print("all:", innerPanel:getChildrenCount())
+    end
+
+    return true
+end
+
 ---_getTableElementSize(i)->Size
 ---_setTableElement(node, i)
 ---_getTableElementCount()->int
@@ -277,117 +553,20 @@ end
 ---@param panelList UINode
 ---@param proxy any
 ---@param isVertical boolean
----@param countPreLine number
 ---@return boolean
-function UIUtil.setTable(panelList, proxy, isVertical, countPreLine)
-    if not panelList:getChild("panel_item"):valid() then
-        return false
+function UIUtil.createTableView(panelList, proxy, isVertical)
+    if isVertical == nil then
+        isVertical = true
     end
-    isVertical = isVertical or true
-    countPreLine = countPreLine or 1
 
     local sv = UIScrollView.cast(panelList)
-    sv:ScrollToLeft()
-    sv:ScrollToTop()
-
-    local count = 0
-    local panelItem = panelList:getChild("panel_item")
-    panelItem.visible = false
-    local lastCount = panelList:getChildrenCount()
-    local childrenToRemoved = {}
-    for i = 1, lastCount do
-        local child = panelList:getChildByIndex(i - 1)
-        if child.name ~= "panel_item" then
-            table.insert(childrenToRemoved, child)
-        end
-    end
-    ---@param child UINode
-    for _, child in pairs(childrenToRemoved) do
-        panelList:removeChild(child)
-    end
-    childrenToRemoved = {}
-
-    if proxy._getTableElementCount == nil then
-        count = 0
-    else
-        count = proxy:_getTableElementCount()
-    end
-    local offsetX = 0
-    local offsetY = 0
-    local maxX = 0
-    local maxY = 0
-    local indexPreLine = 1
-    for i = 1, count do
-        local itemName = string.format("panel_item_%d", i)
-        local tempItem = panelList:getChild(itemName)
-        local needCreate = false
-
-        if tempItem:valid() then
-            panelList:removeChild(tempItem)
-            needCreate = true
-        else
-            needCreate = true
-        end
-
-        if needCreate then
-            tempItem = panelItem:clone()
-            tempItem.name = itemName
-            panelList:addChild(tempItem, i)
-        end
-        tempItem:setAnchorPoint(0, 0)
-        tempItem.visible = true
-        if proxy._getTableElementSize ~= nil then
-            local size = proxy:_getTableElementSize(i)
-            if size ~= nil then
-                tempItem.size = size
-                tempItem:applyMargin()
-            end
-        end
-        tempItem:setPosition(offsetX, offsetY)
-        if proxy._setTableElement ~= nil then
-            proxy:_setTableElement(tempItem, i)
-        end
-        local offsetWidth = tempItem.width
-        local offsetHeight = tempItem.height
-        if proxy._getTableElementPositionOffset ~= nil then
-            local size = proxy:_getTableElementPositionOffset(i)
-            offsetWidth, offsetHeight = size.width, size.height
-        end
-        maxX = tempItem.positionX + offsetWidth
-        maxY = tempItem.positionY + offsetHeight
-        if indexPreLine >= countPreLine then
-            indexPreLine = 1
-            if isVertical then
-                offsetY = offsetY + offsetHeight
-                offsetX = 0
-            else
-                offsetX = offsetX + offsetWidth
-                offsetY = 0
-            end
-        else
-            indexPreLine = indexPreLine + 1
-            if isVertical then
-                offsetX = offsetX + offsetWidth
-            else
-                offsetY = offsetY + offsetHeight
-            end
-        end
-    end
-    maxX = math.max(maxX, sv.width)
-    maxY = math.max(maxY, sv.height)
-    sv.viewSize = Size.new(maxX, maxY)
 
     sv:ScrollToLeft()
     sv:ScrollToTop()
 
-    return true
-end
+    UIUtil._updateTableView(sv, proxy, true, isVertical)
+    sv:addScrollingListener({ UIUtil._updateTableView, sv, proxy, false, isVertical })
 
----getTableElement
----@param uiTable UIScrollView
----@param index number
-function UIUtil.getTableElement(uiTable, index)
-    return uiTable:getChildByTag(index)
 end
 
 return UIUtil
