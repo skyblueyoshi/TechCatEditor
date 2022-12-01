@@ -24,6 +24,7 @@
 ---@field autoStretchWidth boolean 是否根据左右侧边距自动拉伸适配宽度，若为false，则为根据左右侧边距水平居中。
 ---@field autoStretchHeight boolean 是否根据上下侧边距自动拉伸适配高度，若为false，则为根据上下侧边距竖直居中。
 ---@field touchable boolean 节点是否可被触碰。
+---@field touchBlockable boolean 节点被触碰时，是否吞噬下层节点的触碰事件。
 ---@field tag number 节点附加值。
 ---@field childTag number 节点作为子节点时的附加值。
 ---@field isContainer boolean 节点是否作为裁切容器。

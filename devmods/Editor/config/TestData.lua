@@ -130,6 +130,111 @@ local TestTree = {
             },
             {
                 Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+                Children = {
+                    {
+                        Text = "Hat1",
+                    },
+                    {
+                        Text = "Hat2",
+                    },
+                    {
+                        Text = "Hat3",
+                    },
+                    {
+                        Text = "Hat4",
+                    },
+                }
+            },
+        }
+    },
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
             },
             {
                 Text = "Cup3",

@@ -1,5 +1,6 @@
 ---@class TCE.BaseControl
 local BaseControl = class("BaseControl")
+local EventManager = require("core.EventManager")
 
 function BaseControl:__init(parent, parentRoot, data)
     self._parent = parent ---@type TCE.BaseControl
@@ -13,6 +14,7 @@ function BaseControl:__init(parent, parentRoot, data)
 
     self.isWindow = false
     self._destroyed = false
+    self._eventListenerIDs = {}
 end
 
 function BaseControl:isDestroyed()
@@ -27,6 +29,12 @@ function BaseControl:destroy()
 end
 
 function BaseControl:onDestroy()
+    local eventManager = EventManager.getInstance()
+    for _, id in ipairs(self._eventListenerIDs) do
+        eventManager:removeListener(id)
+    end
+    self._eventListenerIDs = {}
+
     for _, child in ipairs(self._children) do
         child:destroy()
     end
@@ -56,6 +64,15 @@ function BaseControl:addMap(key, child)
     else
         assert(false)
     end
+end
+
+function BaseControl:addEventListener(eventID, func)
+    local id = EventManager.getInstance():addListener(eventID, func)
+    table.insert(self._eventListenerIDs, id)
+end
+
+function BaseControl:triggerEvent(eventID, args)
+    EventManager.getInstance():triggerEvent(eventID, args)
 end
 
 function BaseControl:getRoot()

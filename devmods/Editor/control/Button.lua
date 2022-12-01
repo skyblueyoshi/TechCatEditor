@@ -2,20 +2,21 @@
 local Button = class("Button", require("ActivePanel"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
+local EventDef = require("config.EventDef")
 
 --[[
+data格式：
 {
-    Text = "",
-    IsTab = bool,
-    Children = {},
-    PopupMenu = {},
+    str Text  按钮描述的文字
+    PopupMenu PopupMenu  弹出菜单栏数据
 }
 --]]
 
-function Button:__init(parent, parentRoot, data, location, tag)
+function Button:__init(parent, parentRoot, data, location, params)
     Button.super.__init(self, parent, parentRoot, data, location)
-    self._tag = tag
     self._subPopupMenu = nil
+    self._style = params.style or "None"
+    self._tag = params.tag or 0
 
     self:_initContent(location)
 end
@@ -43,11 +44,19 @@ function Button:_initContent(location)
         self._root.width = math.max(self._root.width, text.width + Constant.TEXT_SIDE_OFFSET * 2)
     end
 
+    if self._data.PopupMenu then
+        self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
+    end
+
     self._root:applyMargin(true)
 end
 
+function Button:_isStyle(name)
+    return self._style == name
+end
+
 function Button:_onMouseEnter(_)
-    if self._data.IsTab then
+    if self:_isStyle("Tab") then
         if self._parent.showPopupWhenPointed then
             self._parent:setSelected(self._tag)
         end
@@ -60,7 +69,7 @@ function Button:_onMouseLeave(_)
 end
 
 function Button:_onMouseDown(_)
-    if self._data.IsTab then
+    if self:_isStyle("Tab") then
         self._parent.showPopupWhenPointed = true
         self._parent:setSelected(self._tag)
     end
@@ -72,7 +81,7 @@ function Button:tryShowPopupMenu()
     if self._data.PopupMenu then
         local PopupMenu = require("PopupMenu")
         local wx, wy = self:getPositionInWindow()
-        self._subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot(),
+        self._subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
                 self._data.PopupMenu,
                 { wx, wy + self._root.height })
     end
@@ -81,6 +90,10 @@ end
 
 function Button:hidePopupMenu()
     self:_destroySubPopupMenu()
+end
+
+function Button:_onPopupOutsideEvent(_)
+    self:hidePopupMenu()
 end
 
 return Button

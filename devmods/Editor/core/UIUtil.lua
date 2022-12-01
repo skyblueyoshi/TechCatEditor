@@ -14,6 +14,7 @@ function UIUtil.newText(parent, name, location, content, cfg)
     local node = UIText.new(name)
     UIUtil.setLocation(node, location)
     node.text = content
+    node.color = Color.new(240, 240, 240)
     node.fontSize = 20
     node.horizontalOverflow = TextHorizontalOverflow.Overflow
     node.autoAdaptSize = true
@@ -162,14 +163,16 @@ function UIUtil.setPanelColor(panel, bgColor)
     UIPanel.cast(panel).sprite.color = ThemeUtil.getColor(bgColor)
 end
 
-function UIUtil.setPanelDisplay(panel, selected, pointed)
+function UIUtil.setPanelDisplay(panel, selected, pointed, selectedColor, pointedColor)
     local sd = panel:getChild("sd")
     if selected then
         sd.visible = true
-        UIUtil.setPanelColor(sd, "SD")
+        selectedColor = selectedColor or "SD"
+        UIUtil.setPanelColor(sd, selectedColor)
     elseif pointed then
         sd.visible = true
-        UIUtil.setPanelColor(sd, "BD")
+        pointedColor = pointedColor or "BD"
+        UIUtil.setPanelColor(sd, pointedColor)
     else
         sd.visible = false
     end
@@ -346,6 +349,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
     local function _moveToReserve(node)
         node.visible = false
         if node.tag ~= 0 then
+            node:removeAllListeners()
             node.tag = 0
             table.insert(reserveNodeList, node)
             changed = true
@@ -353,7 +357,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
     end
 
     local function _saveNode(index, node)
-        print("del:", index)
+        --print("del:", index)
         _moveToReserve(node)
     end
 
@@ -395,7 +399,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
     end
 
     local function _setItem(index, x, y, w, h)
-        print("new:", index)
+        --print("new:", index)
         changed = true
         local tempItem = _ensureItem(index, x, y, w, h)
         if proxy._setTableElement ~= nil then
@@ -476,7 +480,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
             local fullWidth, fullHeight = refX + refWidth, refY + refHeight
             innerPanel:setSize(fullWidth, fullHeight)
             sv.viewSize = Size.new(fullWidth, fullHeight)
-            print(sv.viewSize)
+            --print(sv.viewSize)
         end
     else
         if not showStart then
@@ -539,7 +543,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
     end
 
     if changed then
-        print("all:", innerPanel:getChildrenCount())
+        --print("all:", innerPanel:getChildrenCount())
     end
 
     return true
@@ -567,6 +571,21 @@ function UIUtil.createTableView(panelList, proxy, isVertical)
     UIUtil._updateTableView(sv, proxy, true, isVertical)
     sv:addScrollingListener({ UIUtil._updateTableView, sv, proxy, false, isVertical })
 
+end
+
+---getAllValidElements
+---@param panelList UINode
+---@return UINode[]
+function UIUtil.getAllValidElements(panelList)
+    local results = {}
+    local innerPanel = panelList:getChild("__inner")
+    for i = 1, innerPanel:getChildrenCount() do
+        local tempItem = innerPanel:getChildByIndex(i - 1)
+        if tempItem.tag > 0 then
+            table.insert(results, tempItem)
+        end
+    end
+    return results
 end
 
 return UIUtil

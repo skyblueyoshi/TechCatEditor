@@ -49,12 +49,12 @@ function Container:_initContent(location)
 
         local SIDE_WIDTH = 200
         if LT then
-            local container = Container.new(self, self._parentRoot, LT, { 0, areaTop, SIDE_WIDTH, 32 })
+            local container = Container.new(self, self._root, LT, { 0, areaTop, SIDE_WIDTH, 32 })
             UIUtil.setMarginsTB(container:getRoot(), areaTop, 300)
             self:addMap("LT", container)
         end
         if R then
-            local container = Container.new(self, self._parentRoot,R, { 0, areaTop, SIDE_WIDTH, 32 })
+            local container = Container.new(self, self._root,R, { 0, areaTop, SIDE_WIDTH, 32 })
             UIUtil.setMargins(container:getRoot(), nil, areaTop, 0, 0, false, true)
             self:addMap("R", container)
         end
