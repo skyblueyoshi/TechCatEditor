@@ -48,7 +48,7 @@ function TreeView:_initContent(location)
     local name = "tree"
     self._root = UIUtil.newPanel(self._parentRoot, name,
             { x, y, 200, 400 }, {
-                --layout = "FULL",
+                layout = "FULL",
                 bgColor = "A",
             }, true)
     self._sv = UIScrollView.new("panel_list", 0, 0, 200, 333)

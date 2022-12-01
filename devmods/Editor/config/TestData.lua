@@ -251,11 +251,18 @@ local ContainerLT = {
 local window = {
     MenuBar = menuBar,
     Containers = {
-        LT = ContainerLT,
-        LB = ContainerLT,
-        --R = ContainerLT,
-        CB = ContainerLT,
-        CT = ContainerLT,
+        {
+            Place = {1},
+            Container = ContainerLT,
+        },
+        {
+            Place = {4, 5},
+            Container = ContainerLT,
+        },
+        {
+            Place = {3, 6},
+            Container = ContainerLT,
+        },
     }
 }
 

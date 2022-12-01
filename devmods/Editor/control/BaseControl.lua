@@ -62,6 +62,7 @@ function BaseControl:addMap(key, child)
     if self._childrenMap[key] == nil then
         self._childrenMap[key] = child
     else
+        print("fail map:", key)
         assert(false)
     end
 end
