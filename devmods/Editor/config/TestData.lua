@@ -248,6 +248,14 @@ local ContainerLT = {
     TreeView = TestTree,
 }
 
+local ContainerB = {
+    IsSide = true,
+}
+
+local ContainerR = {
+    IsSide = true,
+}
+
 local window = {
     MenuBar = menuBar,
     Containers = {
@@ -257,11 +265,11 @@ local window = {
         },
         {
             Place = {4, 5},
-            Container = ContainerLT,
+            Container = ContainerB,
         },
         {
             Place = {3, 6},
-            Container = ContainerLT,
+            Container = ContainerR,
         },
     }
 }

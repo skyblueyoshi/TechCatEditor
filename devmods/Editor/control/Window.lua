@@ -11,9 +11,9 @@ function Window:__init(parent, parentRoot, data, location)
 end
 
 function Window:_initWindowContent(location)
-    --local popupArea = UIUtil.newPanel(self._root, "popup_area", location, { layout = "FULL" }, false)
-    --popupArea.touchBlockable = false
-    --popupArea:addTouchDownListener({ self._onPopupOutsideClicked, self })
+    local popupArea = UIUtil.newPanel(self._root, "popup_area", location, { layout = "FULL" }, false)
+    popupArea.touchBlockable = false
+    popupArea:addTouchDownListener({ self._onPopupOutsideClicked, self })
 end
 
 function Window:_onPopupOutsideClicked(_, _)

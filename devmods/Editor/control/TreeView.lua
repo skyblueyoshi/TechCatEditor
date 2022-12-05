@@ -2,7 +2,7 @@
 local TreeView = class("TreeView", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
-
+local ScrollBar = require("ScrollBar")
 
 --[[
 TreeNode：{
@@ -17,6 +17,7 @@ function TreeView:__init(parent, parentRoot, data, location)
     self._sv = nil
     self._mappingList = {}
     self._selectIndex = 0
+    self._scrollBar = nil  ---@type TCE.ScrollBar
     self:_initContent(location)
 end
 
@@ -56,7 +57,7 @@ function TreeView:_initContent(location)
     self._root:addChild(self._sv)
 
     local panelItem = UIUtil.newPanel(self._sv, "panel_item",
-            { x, y, 198, Constant.DEFAULT_ELEMENT_HEIGHT }, {
+            { x, y, 200, Constant.DEFAULT_ELEMENT_HEIGHT }, {
                 bgColor = "B",
             }, false)
     UIUtil.newPanel(panelItem, "sd", nil, {
@@ -70,7 +71,11 @@ function TreeView:_initContent(location)
     })
     self:_reloadMappingList()
     self._sv:applyMargin(true)
-    UIUtil.createTableView(self._sv, self, true, true)
+    UIUtil.createTableView(self._sv, self, true, {
+        isItemFillWidth = true,
+    })
+
+    self._scrollBar = ScrollBar.new(self, self._root, true)
 end
 
 function TreeView:_getTableElementCount()
@@ -93,7 +98,7 @@ function TreeView:_setTableElement(node, index)
     node:applyMargin(true)
     node:addMousePointedEnterListener({ self._onElementMouseEnter, self })
     node:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
-    node:addTouchUpListener({ self._onElementClicked, self })
+    node:addTouchDownListener({ self._onElementClicked, self })
 
     --local treeNode = TreeNode.new(self, node, {}, {0,0})
     UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)

@@ -2,6 +2,7 @@
 local UIUtil = class("UIUtil")
 local ThemeUtil = require("core.ThemeUtil")
 local UISpritePool = require("core.UISpritePool")
+local Constant = require("config.Constant")
 
 ---newText
 ---@param parent UINode
@@ -14,8 +15,8 @@ function UIUtil.newText(parent, name, location, content, cfg)
     local node = UIText.new(name)
     UIUtil.setLocation(node, location)
     node.text = content
-    node.color = Color.new(240, 240, 240)
-    node.fontSize = 20
+    node.color = Constant.DEFAULT_TEXT_COLOR
+    node.fontSize = Constant.DEFAULT_FONT_SIZE
     node.horizontalOverflow = TextHorizontalOverflow.Overflow
     node.autoAdaptSize = true
     parent:addChild(node)
@@ -39,7 +40,7 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setImageByCfg(node, cfg)
     if cacheRT ~= nil then
-        --node.enableRenderTarget = cacheRT
+        node.enableRenderTarget = cacheRT
     end
     if touchable ~= nil then
         node.touchable = touchable
@@ -159,8 +160,16 @@ function UIUtil.setImageByCfg(node, cfg)
     end
 end
 
+---setPanelColor
+---@param panel UINode
+---@param bgColor string
 function UIUtil.setPanelColor(panel, bgColor)
-    UIPanel.cast(panel).sprite.color = ThemeUtil.getColor(bgColor)
+    local sprite = UIPanel.cast(panel).sprite
+    local targetColor = ThemeUtil.getColor(bgColor)
+    if sprite.color ~= targetColor then
+        sprite.color = targetColor
+        panel:flushRender()
+    end
 end
 
 function UIUtil.setPanelDisplay(panel, selected, pointed, selectedColor, pointedColor)
@@ -274,8 +283,9 @@ end
 ---@param proxy any
 ---@param isReload boolean
 ---@param isVertical boolean
+---@param cfg table
 ---@return boolean
-function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
+function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     local sv = UIScrollView.cast(panelList)
     local panelItem = sv:getChild("panel_item")
     if not panelItem:valid() then
@@ -284,6 +294,10 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
     end
     panelItem.visible = false
     local pw, ph = panelItem.width, panelItem.height
+
+    --print(sv:getViewPosition())
+    local isItemFillWidth = cfg.isItemFillWidth
+    local isItemFillHeight = cfg.isItemFillHeight
 
     if not sv:getChild("__inner"):valid() then
         local temp = UIPanel.new("__inner")
@@ -416,6 +430,13 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
         local w, h = pw, ph
         if proxy._getTableElementSize ~= nil then
             w, h = proxy:_getTableElementSize(index)
+        else
+            if isItemFillWidth then
+                w = vw
+            end
+            if isItemFillHeight then
+                h = vh
+            end
         end
         return w, h
     end
@@ -480,7 +501,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
             local fullWidth, fullHeight = refX + refWidth, refY + refHeight
             innerPanel:setSize(fullWidth, fullHeight)
             sv.viewSize = Size.new(fullWidth, fullHeight)
-            --print(sv.viewSize)
+            print(sv.viewSize)
         end
     else
         if not showStart then
@@ -494,9 +515,9 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
         if showStart and showEnd then
             justAddStart, justAddEnd = true, true
         elseif showStart then
-            justAddEnd = true
-        else
             justAddStart = true
+        else
+            justAddEnd = true
         end
 
         local function _innerCheck(_begin, _end, _dir, justAdd, _ex, _ey, _ew, _eh)
@@ -535,8 +556,8 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical)
         end
 
         --print("----------------")
-        --print("_check", existIndexStart, 1, existIndexEnd, justAddStart)
-        --print("_check", existIndexEnd, existIndexStart, count, justAddEnd)
+        --print("_check", showStart, existIndexStart, 1, existIndexEnd, justAddStart)
+        --print("_check", showEnd, existIndexEnd, existIndexStart, count, justAddEnd)
         _check(existIndexStart, 1, existIndexEnd, justAddStart, ex, ey, ew, eh)
         _check(existIndexEnd, existIndexStart, count, justAddEnd, ex2, ey2, ew2, eh2)
 
@@ -557,8 +578,9 @@ end
 ---@param panelList UINode
 ---@param proxy any
 ---@param isVertical boolean
+---@param cfg table
 ---@return boolean
-function UIUtil.createTableView(panelList, proxy, isVertical)
+function UIUtil.createTableView(panelList, proxy, isVertical, cfg)
     if isVertical == nil then
         isVertical = true
     end
@@ -568,9 +590,13 @@ function UIUtil.createTableView(panelList, proxy, isVertical)
     sv:ScrollToLeft()
     sv:ScrollToTop()
 
-    UIUtil._updateTableView(sv, proxy, true, isVertical)
-    sv:addScrollingListener({ UIUtil._updateTableView, sv, proxy, false, isVertical })
+    UIUtil._updateTableView(sv, proxy, true, isVertical, cfg)
 
+    local listener = { UIUtil._updateTableView, sv, proxy, false, isVertical, cfg }
+    local reloadListener = { UIUtil._updateTableView, sv, proxy, true, isVertical, cfg }
+
+    sv:addScrollingListener(listener)
+    sv:addResizeListener(reloadListener)
 end
 
 ---getAllValidElements

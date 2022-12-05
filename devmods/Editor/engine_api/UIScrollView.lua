@@ -1,10 +1,18 @@
----@class UIScrollView:UINode
----@field sprite UISprite
----@field viewSize Size
----@field isScrollVertical boolean
----@field isScrollHorizontal boolean
----@field isScrollable boolean
----@field isScrolling boolean
+---@API
+
+---@class UIScrollView:UINode 滚动容器节点。
+---@field sprite UISprite 滚动容器的精灵资源。
+---@field viewSize Size 内容尺寸。
+---@field isScrollVertical boolean 是否开启了纵向滚动。
+---@field isScrollHorizontal boolean 是否开启了横向滚动。
+---@field isScrollable boolean 当前内容尺寸是否可以激活滚动。
+---@field canScrollVertical boolean 当前内容高度是否可以激活纵向滚动。
+---@field canScrollHorizontal boolean 当前内容宽度是否可以激活横向滚动。
+---@field isScrolling boolean 当前是否正在滚动。
+---@field scrollRateVertical number 当前纵向滚动比例。
+---@field scrollRateHorizontal number 当前横向滚动比例。
+---@field mouseScrollMoveTime number 鼠标滚轮滚动后内部容器滚动动画总时长。
+---@field mouseScrollMoveDistance number 单次鼠标滚轮滚动后内部容器滚动距离。
 local UIScrollView = {}
 
 ---new
@@ -30,19 +38,37 @@ end
 function UIScrollView.cast(uiNode)
 end
 
-function UIScrollView:ScrollToTop()
+function UIScrollView:scrollToTop()
 end
 
-function UIScrollView:ScrollToBottom()
+function UIScrollView:scrollToBottom()
 end
 
-function UIScrollView:ScrollToLeft()
+function UIScrollView:scrollToLeft()
 end
 
-function UIScrollView:ScrollToRight()
+function UIScrollView:scrollToRight()
 end
 
-function UIScrollView:StopScrolling()
+function UIScrollView:stopScrolling()
+end
+
+---滚动内部容器。
+---@overload fun(moveX:number,moveY:number)
+---@param moveX number 横向滚动距离。
+---@param moveY number 纵向滚动距离。
+---@param clampInArea boolean 滚动后是否限制边界。
+function UIScrollView:scroll(moveX, moveY, clampInArea)
+end
+
+---纵向滚动到指定比例。
+---@param rate number
+function UIScrollView:scrollToRateVertical(rate)
+end
+
+---横向滚动到指定比例。
+---@param rate number
+function UIScrollView:scrollToRateHorizontal(rate)
 end
 
 ---@return Vector2

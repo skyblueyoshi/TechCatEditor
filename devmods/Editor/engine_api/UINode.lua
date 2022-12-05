@@ -48,19 +48,19 @@ end
 function UINode:valid()
 end
 
----setAnchorPoint
+---设置锚点。
 ---@param x number
 ---@param y number
 function UINode:setAnchorPoint(x, y)
 end
 
----setPosition
+---设置坐标。
 ---@param x number
 ---@param y number
 function UINode:setPosition(x, y)
 end
 
----setLocation
+---设置坐标和尺寸。
 ---@param x number
 ---@param y number
 ---@param width number
@@ -68,57 +68,53 @@ end
 function UINode:setLocation(x, y, width, height)
 end
 
----setSize
+---设置尺寸。
 ---@param width number
 ---@param height number
 function UINode:setSize(width, height)
 end
 
----addChild
+---添加一个孩子节点。
 ---@overload fun(node:UINode)
 ---@param node UINode
 ---@param childTag number
 function UINode:addChild(node, childTag)
 end
 
----removeChild
+---当前节点删除指定孩子节点。
 ---@param node UINode
 function UINode:removeChild(node)
 end
 
+---移除当前节点的所有孩子节点。
 function UINode:removeAllChildren()
 end
 
----applyMargin
----@param applyAllChildren boolean
+---根据当前设定的边距数据调整位置和尺寸。
+---@param applyAllChildren boolean 是否对所有孩子节点执行相同操作。
 function UINode:applyMargin(applyAllChildren)
 end
 
----setLeftMargin
 ---@param offset number
 ---@param enabled boolean
 function UINode:setLeftMargin(offset, enabled)
 end
 
----setRightMargin
 ---@param offset number
 ---@param enabled boolean
 function UINode:setRightMargin(offset, enabled)
 end
 
----setTopMargin
 ---@param offset number
 ---@param enabled boolean
 function UINode:setTopMargin(offset, enabled)
 end
 
----setBottomMargin
 ---@param offset number
 ---@param enabled boolean
 function UINode:setBottomMargin(offset, enabled)
 end
 
----setMarginEnabled
 ---@param left boolean
 ---@param top boolean
 ---@param right boolean
@@ -126,75 +122,68 @@ end
 function UINode:setMarginEnabled(left, top, right, bottom)
 end
 
----setAutoStretch
 ---@param widthEnabled boolean
 ---@param heightEnabled boolean
 function UINode:setAutoStretch(widthEnabled, heightEnabled)
 end
 
----getChildByTag
 ---@param childTag number
 ---@return UINode
 function UINode:getChildByTag(childTag)
 end
 
----getChild
+---由路径名称获得孩子节点。
 ---@param name string
 ---@return UINode
 function UINode:getChild(name)
 end
 
----
+---添加一个触碰按下监听器。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addTouchDownListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeTouchDownListener(listenerID)
 end
 
----
+---添加一个触碰双击监听器。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addTouchDoubleDownListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeTouchDoubleDownListener(listenerID)
 end
 
----
+---添加一个触碰拖动监听器，在存在触碰按下后生效。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addTouchMoveListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeTouchMoveListener(listenerID)
 end
 
----
+---添加一个触碰拖动监听器，任意触碰在上方移动均生效。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addTouchPointedMoveListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeTouchPointedMoveListener(listenerID)
 end
 
----
+---添加一个触碰松开监听器，在存在触碰按下后生效。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addTouchUpListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeTouchUpListener(listenerID)
 end
@@ -210,7 +199,7 @@ end
 function UINode:removeTouchUpAfterMoveListener(listenerID)
 end
 
----
+---添加一个触碰松开监听器，任意触碰都生效。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addTouchPointedUpListener(listener)
@@ -221,73 +210,99 @@ end
 function UINode:removeTouchPointedUpListener(listenerID)
 end
 
----
+---添加一个鼠标指针持续指着的监听器。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addMousePointedListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeMousePointedListener(listenerID)
 end
 
----
+---添加一个鼠标指针进入的监听器。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addMousePointedEnterListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeMousePointedEnterListener(listenerID)
 end
 
----
+---添加一个鼠标指针离开的监听器。
 ---@param listener table|function
 ---@return ListenerID
 function UINode:addMousePointedLeaveListener(listener)
 end
 
----
 ---@param listenerID ListenerID
 function UINode:removeMousePointedLeaveListener(listenerID)
 end
 
----getPreDrawLayer
+---添加一个尺寸变化监听器。
+---@param listener table|function
+---@return ListenerID
+function UINode:addResizeListener(listener)
+end
+
+---@param listenerID ListenerID
+function UINode:removeResizeListener(listenerID)
+end
+
+---返回前绘制层。
 ---@param layer number
 ---@return UINodeDrawLayer
 function UINode:getPreDrawLayer(layer)
 end
 
----getPostDrawLayer
+---返回后绘制层。
 ---@param layer number
 ---@return UINodeDrawLayer
 function UINode:getPostDrawLayer(layer)
 end
 
+---返回当前节点拥有的孩子总数。
 ---@return number
 function UINode:getChildrenCount()
 end
 
----getChildByIndex
+---由孩子索引获得孩子节点。
 ---@param index number
 ---@return UINode
 function UINode:getChildByIndex(index)
 end
 
----getPointedNode
+---返回当前节点的父节点。
+---@return UINode
+function UINode:getParent()
+end
+
+---返回画布空间中指定坐标所指向的节点。
 ---@overload fun(canvasPosition:Vector2):UINode
----@param canvasPosition Vector2
----@param isTouching boolean
+---@param canvasPosition Vector2 画布空间坐标。
+---@param isTouching boolean 是否模拟触碰。
 ---@return UINode
 function UINode:getPointedNode(canvasPosition, isTouching)
 end
 
+---返回画布空间中指定坐标所指向的所有节点。（忽略遮挡和吞噬）
+---@param canvasPosition Vector2
+---@return UINode[]
+function UINode:getAllPointedNodes(canvasPosition)
+end
+
+---更新渲染信息。
 function UINode:flushRender()
 end
 
+---移除全部挂接的监听器。
 function UINode:removeAllListeners()
+end
+
+---返回当前节点具体类型。
+---@return string
+function UINode:getTypeName()
 end
 
 return UINode

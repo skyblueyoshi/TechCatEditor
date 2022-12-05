@@ -39,8 +39,8 @@ function Container:_initContent(location)
         self:addMap("TreeView", treeView)
     end
 
-    local splitLeftX = 200
-    local splitRightX = 200
+    local splitLeftX = 250
+    local splitRightX = 250
     local splitTopY = 400
 
     local containers = data.Containers
@@ -111,7 +111,7 @@ function Container:_initContent(location)
             end
             if hasLB and hasCB then
                 l = 0
-                t = 0
+                t = splitTopY
                 r = splitRightX
                 b = 0
                 w = 0
@@ -125,7 +125,7 @@ function Container:_initContent(location)
             local container = Container.new(self, self._root, data.Container, { 0, areaTop, 32, 32 })
             --UIUtil.setMarginsTB(container:getRoot(), areaTop, 300)
             UIUtil.setMargins(container:getRoot(), l, t, r, b, w == 0, h == 0)
-            print("margins", l, t, r, b, w == 0, h == 0)
+
             if w > 0 then
                 container:getRoot().width = w
             end

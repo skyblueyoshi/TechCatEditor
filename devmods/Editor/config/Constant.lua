@@ -2,6 +2,9 @@ local Constant = {
     DEFAULT_BAR_HEIGHT = 32,
     DEFAULT_ELEMENT_HEIGHT = 26,
     ELEMENT_MIN_WIDTH = 32,
+
+    DEFAULT_FONT_SIZE = 20,
+    DEFAULT_TEXT_COLOR = Color.new(220, 220, 220),
     TEXT_SIDE_OFFSET = 8,
 }
 
