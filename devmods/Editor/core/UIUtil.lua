@@ -281,6 +281,72 @@ end
 
 ---@param panelList UINode
 ---@param proxy any
+---@param isVertical boolean
+---@param cfg table
+---@return Size
+function UIUtil.getTableViewInnerSize(panelList, proxy, isVertical, cfg)
+    local sv = UIScrollView.cast(panelList)
+    local panelItem = sv:getChild("panel_item")
+    local pw, ph = panelItem.width, panelItem.height
+    local isItemFillWidth = cfg.isItemFillWidth
+    local isItemFillHeight = cfg.isItemFillHeight
+    local count = 0
+    if proxy._getTableElementCount ~= nil then
+        count = proxy:_getTableElementCount()
+    end
+    local vw, vh = sv.width, sv.height
+
+    local function _getElementSize(index)
+        local w, h = pw, ph
+        if proxy._getTableElementSize ~= nil then
+            w, h = proxy:_getTableElementSize(index)
+        else
+            if isItemFillWidth then
+                w = vw
+            end
+            if isItemFillHeight then
+                h = vh
+            end
+        end
+        return w, h
+    end
+
+    local function _testLocation(testIndex, refX, refY, refWidth, refHeight, isRefNext)
+        local x, y = 0.0, 0.0
+        local w, h = _getElementSize(testIndex)
+        if isVertical then
+            x = refX
+            if isRefNext then
+                y = refY - h
+            else
+                y = refY + refHeight
+            end
+        else
+            y = refY
+            if isRefNext then
+                x = refX - w
+            else
+                x = refX + refWidth
+            end
+        end
+        return x, y, w, h
+    end
+
+    local refX, refY, refWidth, refHeight = 0, 0, 0, 0
+    for i = 1, count do
+        if i == 1 then
+            refWidth, refHeight = _getElementSize(i)
+        else
+            refX, refY, refWidth, refHeight = _testLocation(i, refX, refY, refWidth, refHeight, false)
+        end
+    end
+
+    local fullWidth, fullHeight = refX + refWidth, refY + refHeight
+    return Size.new(fullWidth, fullHeight)
+end
+
+---@param panelList UINode
+---@param proxy any
 ---@param isReload boolean
 ---@param isVertical boolean
 ---@param cfg table
@@ -501,7 +567,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
             local fullWidth, fullHeight = refX + refWidth, refY + refHeight
             innerPanel:setSize(fullWidth, fullHeight)
             sv.viewSize = Size.new(fullWidth, fullHeight)
-            print(sv.viewSize)
+            --print(sv.viewSize)
         end
     else
         if not showStart then
@@ -593,10 +659,10 @@ function UIUtil.createTableView(panelList, proxy, isVertical, cfg)
     UIUtil._updateTableView(sv, proxy, true, isVertical, cfg)
 
     local listener = { UIUtil._updateTableView, sv, proxy, false, isVertical, cfg }
-    local reloadListener = { UIUtil._updateTableView, sv, proxy, true, isVertical, cfg }
+    --local reloadListener = { UIUtil._updateTableView, sv, proxy, true, isVertical, cfg }
 
     sv:addScrollingListener(listener)
-    sv:addResizeListener(reloadListener)
+    --sv:addResizeListener(reloadListener)
 end
 
 ---getAllValidElements

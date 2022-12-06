@@ -1,8 +1,7 @@
----@class TCE.TreeView:TCE.BaseControl
-local TreeView = class("TreeView", require("BaseControl"))
+---@class TCE.TreeView:TCE.ScrollContainer
+local TreeView = class("TreeView", require("ScrollContainer"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
-local ScrollBar = require("ScrollBar")
 
 --[[
 TreeNode：{
@@ -14,7 +13,6 @@ TreeNode：{
 
 function TreeView:__init(parent, parentRoot, data, location)
     TreeView.super.__init(self, parent, parentRoot, data)
-    self._sv = nil
     self._mappingList = {}
     self._selectIndex = 0
     self._scrollBar = nil  ---@type TCE.ScrollBar
@@ -45,21 +43,15 @@ function TreeView:_reloadMappingList()
 end
 
 function TreeView:_initContent(location)
-    local x, y = location[1], location[2]
-    local name = "tree"
-    self._root = UIUtil.newPanel(self._parentRoot, name,
-            { x, y, 200, 400 }, {
-                layout = "FULL",
-                bgColor = "A",
-            }, true)
-    self._sv = UIScrollView.new("panel_list", 0, 0, 200, 333)
-    UIUtil.setMargins(self._sv, 0, 0, 0, 0, true, true)
-    self._root:addChild(self._sv)
+    self:_preInitScrollContainer(location)
 
-    local panelItem = UIUtil.newPanel(self._sv, "panel_item",
-            { x, y, 200, Constant.DEFAULT_ELEMENT_HEIGHT }, {
-                bgColor = "B",
-            }, false)
+
+    self:_reloadMappingList()
+    self:_postInitScrollContainer()
+end
+
+function TreeView:_onCreatePanelItem()
+    local panelItem = TreeView.super._onCreatePanelItem(self)
     UIUtil.newPanel(panelItem, "sd", nil, {
         layout = "FULL",
         bgColor = "BD",
@@ -69,13 +61,8 @@ function TreeView:_initContent(location)
     local text = UIUtil.newText(panelItem, "cap", nil, "1", {
         layout = "CENTER_H",
     })
-    self:_reloadMappingList()
-    self._sv:applyMargin(true)
-    UIUtil.createTableView(self._sv, self, true, {
-        isItemFillWidth = true,
-    })
 
-    self._scrollBar = ScrollBar.new(self, self._root, true)
+    return panelItem
 end
 
 function TreeView:_getTableElementCount()

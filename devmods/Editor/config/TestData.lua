@@ -254,6 +254,12 @@ local ContainerB = {
 
 local ContainerR = {
     IsSide = true,
+    TabWindows = {
+        {
+            Name = "GameObjectList",
+            TreeView = TestTree,
+        },
+    },
 }
 
 local window = {

@@ -1,6 +1,7 @@
 ---@class TCE.ScrollBar:TCE.BaseControl
 local ScrollBar = class("ScrollBar", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
+local Constant = require("config.Constant")
 
 ---__init
 ---@param parent TCE.BaseControl
@@ -31,11 +32,11 @@ function ScrollBar:_initContent()
         margins = { 0, nil, 0, 0, true, false }
     end
 
-    self._root = UIUtil.newPanel(self._parentRoot, name, { 0, 0, 16, 16 }, {
+    self._root = UIUtil.newPanel(self._parentRoot, name, { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH }, {
         margins = margins,
         bgColor = "A",
     })
-    self._slider = UIUtil.newPanel(self._root, "slider", { 0, 0, 16, 16 })
+    self._slider = UIUtil.newPanel(self._root, "slider", { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH })
     UIUtil.newPanel(self._slider, "sd", { 0, 0, 12, 12 }, {
         bgColor = "SD",
         margins = { 4, 4, 4, 4, true, true },
@@ -152,6 +153,10 @@ function ScrollBar:_onTouchUp(_, _)
     self._curTouchPos = nil
     self._lastSliderPosValue = 0
     self._isMovingByMouse = false
+end
+
+function ScrollBar:setVisible(visible)
+    self._root.visible = visible
 end
 
 return ScrollBar
