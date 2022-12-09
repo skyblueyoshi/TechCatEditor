@@ -5,8 +5,9 @@ local Constant = {
     SCROLL_BAR_WIDTH = 16,
 
     DEFAULT_FONT_SIZE = 20,
-    DEFAULT_TEXT_COLOR = Color.new(220, 220, 220),
+    DEFAULT_TEXT_COLOR = Color.new(204, 206, 211),
     TEXT_SIDE_OFFSET = 8,
+    TAB_VIEW_SIDE_OFFSET = 4,
 }
 
 return Constant

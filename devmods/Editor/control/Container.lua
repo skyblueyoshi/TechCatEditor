@@ -3,6 +3,11 @@ local Container = class("MenuBar", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 
+local KEY_MENU_BAR = "MenuBar"
+local KEY_TREE_VIEW = "TreeView"
+local KEY_GRID_VIEW = "GridView"
+local KEY_TAB_VIEW = "TabView"
+
 function Container:__init(parent, parentRoot, data, location)
     Container.super.__init(self, parent, parentRoot, data)
     self.isContainer = true
@@ -18,17 +23,17 @@ function Container:_initContent(location)
     if data.IsSide then
         cfg.bgColor = "B"
     end
-    if location == nil then
+    if location == nil or #location == 0 then
         cfg.layout = "FULL"
     end
     self._root = UIUtil.newPanel(self._parentRoot, name, location, cfg, true)
-    self:getRoot():applyMargin(true)
+    self._root:applyMargin(true)
 
     local areaTop, areaLeft = 0, 0
     if data.MenuBar then
         local menuBar = require("MenuBar").new(self, self._root,
                 data.MenuBar, { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
-        self:addMap("MenuBar", menuBar)
+        self:addChildToMap(KEY_MENU_BAR, menuBar)
         areaTop = areaTop + menuBar:getRoot().height
     end
 
@@ -36,19 +41,26 @@ function Container:_initContent(location)
         local treeView = require("TreeView").new(self, self._root,
                 data.TreeView, { 0, 0, 32, 32 }
         )
-        self:addMap("TreeView", treeView)
+        self:addChildToMap(KEY_TREE_VIEW, treeView)
+    end
+
+    if data.GridView then
+        local gridView = require("GridView").new(self, self._root,
+                data.GridView, { 0, 0, 32, 32 }
+        )
+        self:addChildToMap(KEY_GRID_VIEW, gridView)
     end
 
     if data.TabView then
         local tabView = require("TabView").new(self, self._root,
                 data.TabView, { 0, 0, 32, 32 }
         )
-        self:addMap("TabView", tabView)
+        self:addChildToMap(KEY_TAB_VIEW, tabView)
     end
 
     local splitLeftX = 250
     local splitRightX = 250
-    local splitTopY = 400
+    local splitBottomY = 300
 
     local containers = data.Containers
     if containers then
@@ -65,7 +77,7 @@ function Container:_initContent(location)
             local place = data.Place
             local l, r, t, b
             local w, h = 0, 0
-            local key = ""
+            local key = "Container_"
             local hasLT = _hasPlace(place, 1)
             if hasLT then
                 key = key .. "1"
@@ -95,9 +107,12 @@ function Container:_initContent(location)
                 l = 0
                 if not (hasLT and hasLB) then
                     if hasLT then
-                        h = splitTopY
+                        t = 0
+                        b = splitBottomY
+                        h = 0
                     else
-                        t = splitTopY
+                        b = 0
+                        h = splitBottomY
                     end
                 end
             end
@@ -105,10 +120,12 @@ function Container:_initContent(location)
                 w = splitRightX
                 r = 0
                 if not (hasRB and hasRT) then
-                    if hasRT then
-                        h = splitTopY
+                    if hasLT then
+                        b = splitBottomY
+                        h = 0
                     else
-                        t = splitTopY
+                        b = 0
+                        h = splitBottomY
                     end
                 else
                     t = 0
@@ -118,11 +135,11 @@ function Container:_initContent(location)
             end
             if hasLB and hasCB then
                 l = 0
-                t = splitTopY
+                t = nil
                 r = splitRightX
                 b = 0
                 w = 0
-                h = 0
+                h = splitBottomY
             end
 
             if t ~= nil then
@@ -139,7 +156,7 @@ function Container:_initContent(location)
             if h > 0 then
                 container:getRoot().height = h
             end
-            self:addMap(key, container)
+            self:addChildToMap(key, container)
         end
 
         --local LT = containers.LT
@@ -152,12 +169,12 @@ function Container:_initContent(location)
         --if LT then
         --    local container = Container.new(self, self._root, LT, { 0, areaTop, SIDE_WIDTH, 32 })
         --    UIUtil.setMarginsTB(container:getRoot(), areaTop, 300)
-        --    self:addMap("LT", container)
+        --    self:addChildToMap("LT", container)
         --end
         --if R then
         --    local container = Container.new(self, self._root, R, { 0, areaTop, SIDE_WIDTH, 32 })
         --    UIUtil.setMargins(container:getRoot(), nil, areaTop, 0, 0, false, true)
-        --    self:addMap("R", container)
+        --    self:addChildToMap("R", container)
         --end
     end
 end

@@ -290,17 +290,32 @@ function UIUtil.getTableViewInnerSize(panelList, proxy, isVertical, cfg)
     local pw, ph = panelItem.width, panelItem.height
     local isItemFillWidth = cfg.isItemFillWidth
     local isItemFillHeight = cfg.isItemFillHeight
+    local isGrid = cfg.isGrid
     local count = 0
     if proxy._getTableElementCount ~= nil then
         count = proxy:_getTableElementCount()
     end
+    if count == 0 then
+        return Size.new(0, 0)
+    end
+    
     local vw, vh = sv.width, sv.height
+
+    if isGrid then
+        local gridPreLineCount = math.max(1, math.floor(vw / pw))
+        if count <= gridPreLineCount then
+            return Size.new(pw * count, ph)
+        else
+            local lines = math.ceil(count / gridPreLineCount)
+            return Size.new(pw * gridPreLineCount, ph * lines)
+        end
+    end
 
     local function _getElementSize(index)
         local w, h = pw, ph
         if proxy._getTableElementSize ~= nil then
             w, h = proxy:_getTableElementSize(index)
-        else
+        elseif not isGrid then
             if isItemFillWidth then
                 w = vw
             end
@@ -360,10 +375,15 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     end
     panelItem.visible = false
     local pw, ph = panelItem.width, panelItem.height
+    local vx, vy = -sv:getViewPosition().x, -sv:getViewPosition().y
+    local vw, vh = sv.width, sv.height
+    local vx2, vy2 = vx + vw, vy + vh
 
     --print(sv:getViewPosition())
     local isItemFillWidth = cfg.isItemFillWidth
     local isItemFillHeight = cfg.isItemFillHeight
+    local isGrid = cfg.isGrid
+    local gridPreLineCount = math.max(1, math.floor(vw / pw))
 
     if not sv:getChild("__inner"):valid() then
         local temp = UIPanel.new("__inner")
@@ -412,10 +432,6 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     end
     local existAny = existIndexStart ~= 0
     local changed = false
-
-    local vx, vy = -sv:getViewPosition().x, -sv:getViewPosition().y
-    local vw, vh = sv.width, sv.height
-    local vx2, vy2 = vx + vw, vy + vh
 
     local reserveNodeList = {}
     for i = 1, innerPanel:getChildrenCount() do
@@ -496,7 +512,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
         local w, h = pw, ph
         if proxy._getTableElementSize ~= nil then
             w, h = proxy:_getTableElementSize(index)
-        else
+        elseif not isGrid then
             if isItemFillWidth then
                 w = vw
             end
@@ -510,19 +526,25 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     local function _testLocation(testIndex, refX, refY, refWidth, refHeight, isRefNext)
         local x, y = 0.0, 0.0
         local w, h = _getElementSize(testIndex)
-        if isVertical then
-            x = refX
-            if isRefNext then
-                y = refY - h
-            else
-                y = refY + refHeight
-            end
+        if isGrid then
+            local xi = (testIndex - 1) % gridPreLineCount
+            local yi = math.floor((testIndex - 1) / gridPreLineCount)
+            return xi * w, yi * h, w, h
         else
-            y = refY
-            if isRefNext then
-                x = refX - w
+            if isVertical then
+                x = refX
+                if isRefNext then
+                    y = refY - h
+                else
+                    y = refY + refHeight
+                end
             else
-                x = refX + refWidth
+                y = refY
+                if isRefNext then
+                    x = refX - w
+                else
+                    x = refX + refWidth
+                end
             end
         end
         return x, y, w, h

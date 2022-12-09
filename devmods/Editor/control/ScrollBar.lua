@@ -34,13 +34,15 @@ function ScrollBar:_initContent()
 
     self._root = UIUtil.newPanel(self._parentRoot, name, { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH }, {
         margins = margins,
-        bgColor = "A",
+        bgColor = "A2",
     })
     self._slider = UIUtil.newPanel(self._root, "slider", { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH })
     UIUtil.newPanel(self._slider, "sd", { 0, 0, 12, 12 }, {
         bgColor = "SD",
         margins = { 4, 4, 4, 4, true, true },
     }, false, false)
+    self._root:applyMargin(true)
+
     local listener = { self._onScrollDataChanged, self }
     self._panelList:addScrollingListener(listener)
     self._panelList:addResizeListener(listener)

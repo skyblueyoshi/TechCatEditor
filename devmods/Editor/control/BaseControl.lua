@@ -58,12 +58,23 @@ function BaseControl:addChild(child)
     table.insert(self._children, child)
 end
 
-function BaseControl:addMap(key, child)
+function BaseControl:addChildToMap(key, child)
     if self._childrenMap[key] == nil then
         self._childrenMap[key] = child
     else
         print("fail map:", key)
         assert(false)
+    end
+end
+
+function BaseControl:getChildFromMap(key)
+    return self._childrenMap[key]
+end
+
+function BaseControl:removeChildFromMap(key)
+    if self._childrenMap[key] ~= nil then
+        self._childrenMap[key]:destroy()
+        self._childrenMap[key] = nil
     end
 end
 

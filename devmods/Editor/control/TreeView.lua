@@ -12,10 +12,9 @@ TreeNode：{
 --]]
 
 function TreeView:__init(parent, parentRoot, data, location)
-    TreeView.super.__init(self, parent, parentRoot, data)
+    TreeView.super.__init(self, parent, parentRoot, data, {})
     self._mappingList = {}
     self._selectIndex = 0
-    self._scrollBar = nil  ---@type TCE.ScrollBar
     self:_initContent(location)
 end
 
@@ -44,7 +43,6 @@ end
 
 function TreeView:_initContent(location)
     self:_preInitScrollContainer(location)
-
 
     self:_reloadMappingList()
     self:_postInitScrollContainer()
@@ -78,7 +76,7 @@ function TreeView:_setTableElement(node, index)
     local data, level = mapping[1], mapping[2]
     local cap = UIText.cast(node:getChild("cap"))
     cap.text = data.Text
-    cap.positionX = level * 24
+    cap.positionX = 20 + level * 24
 
     node:getChild("sd").visible = false
 

@@ -7,6 +7,8 @@ function ActivePanel:__init(parent, parentRoot, data, location)
     ActivePanel.super.__init(self, parent, parentRoot, data)
     self._pointed = false
     self._selected = false
+    self._selectedColor = "SD"
+    self._pointedColor = "BD"
 end
 
 function ActivePanel:_initContent(location)
@@ -42,7 +44,7 @@ function ActivePanel:setSelected(selected)
 end
 
 function ActivePanel:_updateDisplay()
-    UIUtil.setPanelDisplay(self._root, self._selected, self._pointed)
+    UIUtil.setPanelDisplay(self._root, self._selected, self._pointed, self._selectedColor, self._pointedColor)
 end
 
 function ActivePanel:_onMouseEnter(_)

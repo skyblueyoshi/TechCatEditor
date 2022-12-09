@@ -243,13 +243,283 @@ local TestTree = {
     },
 }
 
+local TestTree2 = {
+    {
+        Text = "GameObject",
+        Children = {
+            {
+                Text = "Cup",
+            },
+            {
+                Text = "Cup2",
+                CanExpand = true,
+            },
+            {
+                Text = "Cup3",
+            },
+        }
+    },
+}
+
+local TestGrid = {
+    Children = {
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+        {
+            Text = "AAA",
+        },
+        {
+            Text = "bbb",
+        },
+        {
+            Text = "cc cc",
+        },
+        {
+            Text = "DDD dd",
+        },
+    }
+}
+
 local ContainerLT = {
     IsSide = true,
-    TreeView = TestTree,
+    TabView = {
+        {
+            Tab = {
+                Text = "Level",
+            },
+            Container = {
+                TreeView = TestTree,
+            },
+        },
+    },
 }
 
 local ContainerB = {
     IsSide = true,
+    TabView = {
+        {
+            Tab = {
+                Text = "Resouce",
+            },
+            Container = {
+                GridView = TestGrid,
+            },
+        },
+    },
 }
 
 local ContainerR = {
@@ -268,7 +538,7 @@ local ContainerR = {
                 Text = "BBB",
             },
             Container = {
-                TreeView = TestTree,
+                TreeView = TestTree2,
             },
         },
     },
@@ -278,15 +548,15 @@ local window = {
     MenuBar = menuBar,
     Containers = {
         {
-            Place = {1},
+            Place = { 1 },
             Container = ContainerLT,
         },
         {
-            Place = {4, 5},
+            Place = { 4, 5 },
             Container = ContainerB,
         },
         {
-            Place = {3, 6},
+            Place = { 3, 6 },
             Container = ContainerR,
         },
     }

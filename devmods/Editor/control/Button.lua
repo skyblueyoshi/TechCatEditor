@@ -18,6 +18,13 @@ function Button:__init(parent, parentRoot, data, location, params)
     self._style = params.style or "None"
     self._tag = params.tag or 0
 
+    if params.selectedColor ~= nil then
+        self._selectedColor = params.selectedColor
+    end
+    if params.pointedColor ~= nil then
+        self._pointedColor = params.pointedColor
+    end
+
     self:_initContent(location)
 end
 
