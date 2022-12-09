@@ -70,7 +70,9 @@ end
 
 function Button:_onMouseDown(_)
     if self:_isStyle("Tab") then
-        self._parent.showPopupWhenPointed = true
+        if self._parent.showPopupWhenPointed ~= nil then
+            self._parent.showPopupWhenPointed = true
+        end
         self._parent:setSelected(self._tag)
     end
     Button.super._onMouseDown(self, _)

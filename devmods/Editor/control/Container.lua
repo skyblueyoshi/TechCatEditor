@@ -34,9 +34,16 @@ function Container:_initContent(location)
 
     if data.TreeView then
         local treeView = require("TreeView").new(self, self._root,
-                data.TreeView, { 0, 0, 200, 200 }
+                data.TreeView, { 0, 0, 32, 32 }
         )
         self:addMap("TreeView", treeView)
+    end
+
+    if data.TabView then
+        local tabView = require("TabView").new(self, self._root,
+                data.TabView, { 0, 0, 32, 32 }
+        )
+        self:addMap("TabView", tabView)
     end
 
     local splitLeftX = 250

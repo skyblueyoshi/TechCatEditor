@@ -1,5 +1,5 @@
 ---@class TCE.Window:TCE.Container
-local Window = class("MenuBar", require("Container"))
+local Window = class("Window", require("Container"))
 local UIUtil = require("core.UIUtil")
 local EventDef = require("config.EventDef")
 
