@@ -3,6 +3,7 @@ local GridView = class("GridView", require("ScrollContainer"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 local UISpritePool = require("core.UISpritePool")
+local ThemeUtil = require("core.ThemeUtil")
 
 --[[
 GridNode：{
@@ -53,7 +54,7 @@ function GridView:_onCreatePanelItem()
         layout = "CENTER_W",
     }, false, false)
     img.sprite = UISpritePool.getInstance():get("icon_folder")
-    img.sprite.color = Color.new(130, 160, 210)
+    img.sprite.color = ThemeUtil.getColor("ICON_COLOR")
 
     local text = UIUtil.newText(panelItem, "cap", { 0, 80, 32, 32 }, "1", {
         layout = "CENTER_W",

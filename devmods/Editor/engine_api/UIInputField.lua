@@ -6,6 +6,8 @@
 ---@field fontSize number
 ---@field color Color
 ---@field lineType TextEditLineType_Value
+---@field isEditing boolean
+---@field isSelectAllFirstClicked boolean
 local UIInputField = {}
 
 ---new
@@ -31,6 +33,18 @@ end
 function UIInputField.cast(uiNode)
 end
 
+function UIInputField:cancelSelection()
+end
+
+function UIInputField:setAllSelection()
+end
+
+function UIInputField:setCaretToStart()
+end
+
+function UIInputField:setCaretToEnd()
+end
+
 ---
 ---@param listener table|function
 ---@return ListenerID
@@ -40,6 +54,28 @@ end
 ---
 ---@param listenerID ListenerID
 function UIInputField:removeTextChangedListener(listenerID)
+end
+
+---
+---@param listener table|function
+---@return ListenerID
+function UIInputField:addBeginEditingListener(listener)
+end
+
+---
+---@param listenerID ListenerID
+function UIInputField:removeBeginEditingListener(listenerID)
+end
+
+---
+---@param listener table|function
+---@return ListenerID
+function UIInputField:addFinishedEditingListener(listener)
+end
+
+---
+---@param listenerID ListenerID
+function UIInputField:removeFinishedEditingListener(listenerID)
 end
 
 return UIInputField

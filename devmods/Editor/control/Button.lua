@@ -3,6 +3,8 @@ local Button = class("Button", require("ActivePanel"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 local EventDef = require("config.EventDef")
+local UISpritePool = require("core.UISpritePool")
+local ThemeUtil = require("core.ThemeUtil")
 
 --[[
 data格式：
@@ -44,12 +46,24 @@ function Button:_initContent(location)
     Button.super._initContent(self, location)
 
     local data = self._data
-    if data.Text then
-        local text = UIUtil.newText(self._root, "cap", nil, data.Text, {
-            layout = "CENTER",
+    local curX = Constant.BTN_SIDE_OFFSET
+    if data.Icon then
+        local img = UIUtil.newPanel(self._root, "icon", { curX, 0, 16, 16 }, {
+            layout = "CENTER_H",
         })
-        self._root.width = math.max(self._root.width, text.width + Constant.TEXT_SIDE_OFFSET * 2)
+        img.sprite = UISpritePool.getInstance():get(data.Icon)
+        img.sprite.color = ThemeUtil.getColor("ICON_COLOR")
+        curX = curX + img.width + Constant.BTN_SIDE_OFFSET
     end
+    if data.Text then
+        local text = UIUtil.newText(self._root, "cap", { curX, 0 }, data.Text, {
+            layout = "CENTER_H",
+        })
+        curX = curX + text.width
+
+    end
+    curX = curX + Constant.BTN_SIDE_OFFSET
+    self._root.width = math.max(self._root.width, curX)
 
     if self._data.PopupMenu then
         self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })

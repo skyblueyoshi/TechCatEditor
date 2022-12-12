@@ -2,6 +2,8 @@
 local TreeView = class("TreeView", require("ScrollContainer"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
+local UISpritePool = require("core.UISpritePool")
+local ThemeUtil = require("core.ThemeUtil")
 
 --[[
 TreeNode：{
@@ -34,8 +36,8 @@ end
 
 function TreeView:_reloadMappingList()
     self._mappingList = {}
-    if #self._data > 0 then
-        for _, subData in ipairs(self._data) do
+    if #self._data.Children > 0 then
+        for _, subData in ipairs(self._data.Children) do
             self:_loadMappingDataRecursively(subData, 0)
         end
     end
@@ -56,7 +58,13 @@ function TreeView:_onCreatePanelItem()
     }, false, false)
     panelItem:getChild("sd").visible = false
 
-    local text = UIUtil.newText(panelItem, "cap", nil, "1", {
+    UIUtil.newPanel(panelItem, "img_arr", { 0, 0, 16, 16 }, {
+        layout = "CENTER_H",
+    }, false, false)
+    UIUtil.newPanel(panelItem, "img_icon", { 0, 0, 16, 16 }, {
+        layout = "CENTER_H",
+    }, false, false)
+    UIUtil.newText(panelItem, "cap", nil, "1", {
         layout = "CENTER_H",
     })
 
@@ -74,9 +82,48 @@ function TreeView:_setTableElement(node, index)
     --print("TreeView:_setTableElement", index, node.position, node.size)
     local mapping = self._mappingList[index]
     local data, level = mapping[1], mapping[2]
+    local arr = UIPanel.cast(node:getChild("img_arr"))
+    local icon = UIPanel.cast(node:getChild("img_icon"))
     local cap = UIText.cast(node:getChild("cap"))
+
+    local curX = level * 10
+    local isParentNode = false
+    if data.CanExpand then
+        arr.sprite = UISpritePool.getInstance():get("icon_arr_folded")
+        isParentNode = true
+    elseif data.Children and #data.Children > 0 then
+        arr.sprite = UISpritePool.getInstance():get("icon_arr_unfolded")
+        isParentNode = true
+    end
+    if isParentNode then
+        arr.sprite.color = ThemeUtil.getColor("ICON_COLOR")
+    end
+    arr.visible = isParentNode
+    arr.positionX = curX
+    curX = curX + 16
+
+    local iconName
+    if self._data.IconList and #self._data.IconList >= 2 then
+        if isParentNode then
+            iconName = self._data.IconList[1]
+        else
+            iconName = self._data.IconList[2]
+        end
+    end
+
+    if iconName ~= nil then
+        icon.sprite = UISpritePool.getInstance():get(iconName)
+        icon.sprite.color = ThemeUtil.getColor("ICON_COLOR")
+        icon.visible = true
+        icon.positionX = curX
+        curX = curX + 16
+    else
+        icon.visible = false
+    end
+    curX = curX + 2
+
     cap.text = data.Text
-    cap.positionX = 20 + level * 24
+    cap.positionX = curX
 
     node:getChild("sd").visible = false
 

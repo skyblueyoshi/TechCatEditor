@@ -121,144 +121,260 @@ local menuBar = {
     }
 }
 
+local TestProperty = {
+    Config = {
+        [1] = {
+            Type = "Boolean",
+        },
+        [2] = {
+            Type = "ComboBox",
+            Children = {
+                {
+                    Text = "Blend",
+                },
+                {
+                    Text = "Alpha",
+                },
+                {
+                    Text = "Probe",
+                },
+                {
+                    Text = "Canvas",
+                },
+            },
+        },
+        [3] = {
+            Type = "Int",
+        },
+        [4] = {
+            Type = "Float",
+        },
+    },
+    Children = {
+        {
+            "Enable", 1, true,
+        },
+        {
+            "Flag", 1, false,
+        },
+        {
+            "ComboBox", 2, 2,
+        },
+        {
+            "Value", 3, 1, { 1, 100 }
+        },
+        {
+            "Speed", 4, 3.14159, { 1, 100 }
+        },
+        {
+            "Enable", 1, true,
+        },
+        {
+            "Flag", 1, false,
+        },
+        {
+            "ComboBox", 2, 2,
+        },
+        {
+            "Value", 3, 1, { 1, 100 }
+        },
+        {
+            "Speed", 4, 3.14159, { 1, 100 }
+        },
+        {
+            "Enable", 1, true,
+        },
+        {
+            "Flag", 1, false,
+        },
+        {
+            "ComboBox", 2, 2,
+        },
+        {
+            "Value", 3, 1, { 1, 100 }
+        },
+        {
+            "Speed", 4, 3.14159, { 1, 100 }
+        },
+        {
+            "Enable", 1, true,
+        },
+        {
+            "Flag", 1, false,
+        },
+        {
+            "ComboBox", 2, 2,
+        },
+        {
+            "Value", 3, 1, { 1, 100 }
+        },
+        {
+            "Speed", 4, 3.14159, { 1, 100 }
+        },
+        {
+            "Enable", 1, true,
+        },
+        {
+            "Flag", 1, false,
+        },
+        {
+            "ComboBox", 2, 2,
+        },
+        {
+            "Value", 3, 1, { 1, 100 }
+        },
+        {
+            "Speed", 4, 3.14159, { 1, 100 }
+        },
+    },
+}
+
 local TestTree = {
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
+    IconList = {
+        "icon_go",
+        "icon_go",
     },
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-                Children = {
-                    {
-                        Text = "Hat1",
-                    },
-                    {
-                        Text = "Hat2",
-                    },
-                    {
-                        Text = "Hat3",
-                    },
-                    {
-                        Text = "Hat4",
-                    },
-                }
-            },
-        }
-    },
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
-    },
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
-    },
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
-    },
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
-    },
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
+    Children = {
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                    Children = {
+                        {
+                            Text = "Hat1",
+                        },
+                        {
+                            Text = "Hat2",
+                        },
+                        {
+                            Text = "Hat3",
+                        },
+                        {
+                            Text = "Hat4",
+                        },
+                    }
+                },
+            }
+        },
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
     },
 }
 
 local TestTree2 = {
-    {
-        Text = "GameObject",
-        Children = {
-            {
-                Text = "Cup",
-            },
-            {
-                Text = "Cup2",
-                CanExpand = true,
-            },
-            {
-                Text = "Cup3",
-            },
-        }
-    },
+    Children = {
+        {
+            Text = "GameObject",
+            Children = {
+                {
+                    Text = "Cup",
+                },
+                {
+                    Text = "Cup2",
+                    CanExpand = true,
+                },
+                {
+                    Text = "Cup3",
+                },
+            }
+        },
+    }
 }
 
 local TestGrid = {
@@ -499,7 +615,8 @@ local ContainerLT = {
     TabView = {
         {
             Tab = {
-                Text = "Level",
+                Text = "Hierarchy",
+                Icon = "icon_level",
             },
             Container = {
                 TreeView = TestTree,
@@ -513,10 +630,22 @@ local ContainerB = {
     TabView = {
         {
             Tab = {
-                Text = "Resouce",
+                Text = "Resource",
+                Icon = "icon_folder_16",
             },
             Container = {
-                GridView = TestGrid,
+                Containers = {
+                    {
+                        Place = { 1, 4 },
+                        Container = ContainerLT,
+                    },
+                    {
+                        Place = { 2, 3, 5, 6 },
+                        Container = {
+                            GridView = TestGrid,
+                        },
+                    },
+                }
             },
         },
     },
@@ -527,15 +656,17 @@ local ContainerR = {
     TabView = {
         {
             Tab = {
-                Text = "GameObjectList",
+                Text = "Inspector",
+                Icon = "icon_inspector",
             },
             Container = {
-                TreeView = TestTree,
+                PropertyList = TestProperty,
             },
         },
         {
             Tab = {
-                Text = "BBB",
+                Text = "Class",
+                Icon = "icon_go",
             },
             Container = {
                 TreeView = TestTree2,

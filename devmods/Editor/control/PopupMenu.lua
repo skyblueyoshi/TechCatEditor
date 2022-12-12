@@ -3,6 +3,7 @@ local PopupMenuElement = class("PopupMenuElement", require("BaseControl"))
 local PopupMenu = class("PopupMenu", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
+local EventDef = require("config.EventDef")
 
 local RIGHT_RESERVE_SIZE = 16
 local HK_RESERVE_SIZE = 32
@@ -32,7 +33,7 @@ function PopupMenuElement:_initContent(location)
         local selectBg = UIUtil.newPanel(self._root, "sd", nil, {
             margins = { 3, 3, 3, 3, true, true },
             bgColor = "SD",
-        })
+        }, false, false)
         selectBg.visible = false
 
         local rx = 16
@@ -59,12 +60,13 @@ function PopupMenuElement:_initContent(location)
 
         self._root.width = rx + RIGHT_RESERVE_SIZE
         self._root:addMousePointedEnterListener({ self._onPointedIn, self })
+        self._root:addTouchDownListener({ self._onClicked, self })
 
     end
 
 end
 
-function PopupMenuElement:fixWidth(newWidth)
+function PopupMenuElement:adjustWidth(newWidth)
     self._root.width = newWidth
     local hkText = self._root:getChild("hk")
     if hkText:valid() then
@@ -75,6 +77,10 @@ end
 function PopupMenuElement:_onPointedIn(_)
     self._parent:clearSelect()
     self._parent:setSelect(self._index)
+end
+
+function PopupMenuElement:_onClicked(_, _)
+    self._parent:onElementClicked(self._index)
 end
 
 function PopupMenuElement:setSelect(selected)
@@ -97,12 +103,20 @@ function PopupMenuElement:tryShowSubPopupMenu()
     return nil
 end
 
-function PopupMenu:__init(parent, parentRoot, data, location, level)
+function PopupMenu:__init(parent, parentRoot, data, location, level, params)
     PopupMenu.super.__init(self, parent, parentRoot, data)
     self._level = level or 0
 
     self._selectedIndex = 0
     self._subPopupMenu = nil
+    self._fixWidth = location[3]
+
+    self._clickCallback = nil
+    if params then
+        if params.clickCallback then
+            self._clickCallback = params.clickCallback
+        end
+    end
 
     self:_initContent(location)
 end
@@ -128,17 +142,22 @@ function PopupMenu:_initContent(location)
 
     local offsetY = 0
     local maxWidth = 0
+    if self._fixWidth then
+        maxWidth = self._fixWidth
+    end
     for idx, data in ipairs(self._data) do
         local element = PopupMenuElement.new(self, self._root, data, { 0, offsetY }, idx)
         offsetY = offsetY + element:getRoot().height
-        maxWidth = math.max(maxWidth, element:getRoot().width)
+        if not self._fixWidth then
+            maxWidth = math.max(maxWidth, element:getRoot().width)
+        end
         self:addChild(element)
     end
     self._root.height = offsetY
     self._root.width = maxWidth
 
     for _, child in ipairs(self._children) do
-        child:fixWidth(maxWidth)
+        child:adjustWidth(maxWidth)
     end
 
     self._root:applyMargin(true)
@@ -181,6 +200,13 @@ end
 
 function PopupMenu:getLevel()
     return self._level
+end
+
+function PopupMenu:onElementClicked(index)
+    if self._clickCallback then
+        self._clickCallback[1](self._clickCallback[2], index)
+    end
+    self:triggerEvent(EventDef.ALL_POPUP_CLOSE)
 end
 
 return PopupMenu

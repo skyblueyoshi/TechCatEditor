@@ -5,6 +5,7 @@ local Constant = require("config.Constant")
 
 local KEY_MENU_BAR = "MenuBar"
 local KEY_TREE_VIEW = "TreeView"
+local KEY_PROPERTY_LIST = "PropertyList"
 local KEY_GRID_VIEW = "GridView"
 local KEY_TAB_VIEW = "TabView"
 
@@ -31,31 +32,38 @@ function Container:_initContent(location)
 
     local areaTop, areaLeft = 0, 0
     if data.MenuBar then
-        local menuBar = require("MenuBar").new(self, self._root,
+        local ui = require("MenuBar").new(self, self._root,
                 data.MenuBar, { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
-        self:addChildToMap(KEY_MENU_BAR, menuBar)
-        areaTop = areaTop + menuBar:getRoot().height
+        self:addChildToMap(KEY_MENU_BAR, ui)
+        areaTop = areaTop + ui:getRoot().height
     end
 
     if data.TreeView then
-        local treeView = require("TreeView").new(self, self._root,
+        local ui = require("TreeView").new(self, self._root,
                 data.TreeView, { 0, 0, 32, 32 }
         )
-        self:addChildToMap(KEY_TREE_VIEW, treeView)
+        self:addChildToMap(KEY_TREE_VIEW, ui)
+    end
+
+    if data.PropertyList then
+        local ui = require("PropertyList").new(self, self._root,
+                data.PropertyList, { 0, 0, 32, 32 }
+        )
+        self:addChildToMap(KEY_PROPERTY_LIST, ui)
     end
 
     if data.GridView then
-        local gridView = require("GridView").new(self, self._root,
+        local ui = require("GridView").new(self, self._root,
                 data.GridView, { 0, 0, 32, 32 }
         )
-        self:addChildToMap(KEY_GRID_VIEW, gridView)
+        self:addChildToMap(KEY_GRID_VIEW, ui)
     end
 
     if data.TabView then
-        local tabView = require("TabView").new(self, self._root,
+        local ui = require("TabView").new(self, self._root,
                 data.TabView, { 0, 0, 32, 32 }
         )
-        self:addChildToMap(KEY_TAB_VIEW, tabView)
+        self:addChildToMap(KEY_TAB_VIEW, ui)
     end
 
     local splitLeftX = 250
@@ -128,18 +136,23 @@ function Container:_initContent(location)
                         h = splitBottomY
                     end
                 else
-                    t = 0
-                    b = 0
+                    t, b = 0, 0
                     h = 0
                 end
             end
             if hasLB and hasCB then
-                l = 0
-                t = nil
-                r = splitRightX
-                b = 0
-                w = 0
-                h = splitBottomY
+                l, t, r, b = 0, nil, splitRightX, 0
+                w, h = 0, splitBottomY
+            end
+
+            if hasLT and hasLB and not hasCT then
+                l, t, r, b = 0, 0, nil, 0
+                w, h = splitLeftX, 0
+            end
+
+            if hasCB and hasCT and hasRB and not hasLT then
+                l, t, r, b = splitLeftX, 0, 0, 0
+                w, h = 0, 0
             end
 
             if t ~= nil then

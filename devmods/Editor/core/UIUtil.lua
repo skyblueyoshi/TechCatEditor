@@ -15,13 +15,34 @@ function UIUtil.newText(parent, name, location, content, cfg)
     local node = UIText.new(name)
     UIUtil.setLocation(node, location)
     node.text = content
-    node.color = Constant.DEFAULT_TEXT_COLOR
+    node.color = ThemeUtil.getColor("FONT_COLOR")
     node.fontSize = Constant.DEFAULT_FONT_SIZE
     node.horizontalOverflow = TextHorizontalOverflow.Overflow
     node.autoAdaptSize = true
     parent:addChild(node)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setTextByCfg(node, cfg)
+    return node
+end
+
+---newInputField
+---@param parent UINode
+---@param name string
+---@param location table
+---@param content string
+---@param cfg table
+---@return UIInputField
+function UIUtil.newInputField(parent, name, location, content, cfg)
+    local node = UIInputField.new(name)
+    UIUtil.setLocation(node, location)
+    node.text = content
+    node.color = ThemeUtil.getColor("FONT_COLOR")
+    node.fontSize = Constant.DEFAULT_FONT_SIZE
+
+    parent:addChild(node)
+    UIUtil.setCommonByCfg(node, cfg)
+    UIUtil.setTextByCfg(node, cfg)
+    UIUtil.setInputFieldByCfg(node, cfg)
     return node
 end
 
@@ -40,7 +61,7 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setImageByCfg(node, cfg)
     if cacheRT ~= nil then
-        node.enableRenderTarget = cacheRT
+        --node.enableRenderTarget = cacheRT
     end
     if touchable ~= nil then
         node.touchable = touchable
@@ -131,6 +152,15 @@ function UIUtil.setTextByCfg(node, cfg)
     end
     if cfg.horizontalOverflow ~= nil then
         node.horizontalOverflow = cfg.horizontalOverflow
+    end
+end
+
+function UIUtil.setInputFieldByCfg(node, cfg)
+    if cfg == nil then
+        return
+    end
+    if cfg.isSelectAllFirstClicked ~= nil then
+        node.isSelectAllFirstClicked = cfg.isSelectAllFirstClicked
     end
 end
 
@@ -454,6 +484,9 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
 
     local function _saveNode(index, node)
         --print("del:", index)
+        if proxy._recycleTableElement ~= nil then
+            proxy:_recycleTableElement(node, index)
+        end
         _moveToReserve(node)
     end
 
@@ -700,6 +733,22 @@ function UIUtil.getAllValidElements(panelList)
         end
     end
     return results
+end
+
+---getItemAtIndex
+---@param panelList UINode
+---@param index number
+---@return UINode
+function UIUtil.getItemAtIndex(panelList, index)
+    local innerPanel = panelList:getChild("__inner")
+    for i = 1, innerPanel:getChildrenCount() do
+        local tempItem = innerPanel:getChildByIndex(i - 1)
+        local tag = tempItem.tag
+        if tag > 0 and index == tag then
+            return tempItem
+        end
+    end
+    return nil
 end
 
 return UIUtil
