@@ -60,7 +60,18 @@ function GridView:_onCreatePanelItem()
         layout = "CENTER_W",
     })
 
+    local rt = UIRenderTargetNode.new("rt", 0, 0, 32, 32)
+    panelItem:addChild(rt)
+
     return panelItem
+end
+
+function GridView:_testRT(n, w, h)
+    --Sprite.beginBatch()
+    --
+    --Sprite.draw(UISpritePool.getInstance():get("white").textureLocation, Vector2.new(1,1), Rect.new(0,0,32,32),Color.Black,0)
+    --
+    --Sprite.endBatch()
 end
 
 function GridView:_getTableElementCount()
@@ -82,6 +93,10 @@ function GridView:_setTableElement(node, index)
     node:addMousePointedEnterListener({ self._onElementMouseEnter, self })
     node:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
     node:addTouchDownListener({ self._onElementClicked, self })
+
+    if index == 1 then
+        UIRenderTargetNode.cast(node:getChild("rt")):addRenderTargetListener({ self._testRT, self })
+    end
 
     --local treeNode = TreeNode.new(self, node, {}, {0,0})
     UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
