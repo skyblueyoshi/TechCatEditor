@@ -5,6 +5,8 @@ local EditorDebug = require("ui_debug.EditorDebug")
 
 function Editor:__init()
 
+    TextureManager.setGcEnabled(false)
+
     self._cameraGo = GameObject.instantiate()
     self._cameraGo.camera:init()
 
@@ -29,6 +31,7 @@ end
 
 function Editor:update()
     self._uiDebug:update()
+    --self:getRoot():getChild("rt"):flushRender()
     collectgarbage()
 end
 
@@ -49,6 +52,20 @@ function Editor:_initCanvas()
     local TestData = require("config.TestData")
     self._wd = require("control.Window").new(self, self:getRoot(), TestData, nil)
 
+    --local rt = UIRenderTargetNode.new("rt", 0, 0, 128, 128)
+    --self:getRoot():addChild(rt)
+    --
+    --local function _testRender(_, w, h)
+    --    --Sprite.flush()
+    --    Sprite.draw(UISpritePool.getInstance():get("check_box_true").textureLocation,
+    --            Vector2.new(1, 1), Rect.new(0, 0, 32, 32), Color.White, 0)
+    --
+    --end
+    --rt:addRenderTargetListener(_testRender)
+    --
+    --local img = UIImage.new("img")
+    --img.sprite = UISpritePool.getInstance():get("icon_go")
+    --self:getRoot():addChild(img)
 end
 
 function Editor:getRoot()

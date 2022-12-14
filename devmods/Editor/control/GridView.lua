@@ -67,11 +67,7 @@ function GridView:_onCreatePanelItem()
 end
 
 function GridView:_testRT(n, w, h)
-    --Sprite.beginBatch()
-    --
-    --Sprite.draw(UISpritePool.getInstance():get("white").textureLocation, Vector2.new(1,1), Rect.new(0,0,32,32),Color.Black,0)
-    --
-    --Sprite.endBatch()
+    Sprite.draw(UISpritePool.getInstance():get("check_box_true").textureLocation, Vector2.new(1,1), Rect.new(0,0,32,32),Color.White,0)
 end
 
 function GridView:_getTableElementCount()

@@ -66,6 +66,7 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     if touchable ~= nil then
         node.touchable = touchable
     end
+    node.textBatchRendering = false
     return node
 end
 

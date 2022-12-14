@@ -19,7 +19,7 @@ function UISpritePool:loadResources(searchPath)
     for _, texPath in pairs(texNames) do
         local absPath = Path.join(searchPath, texPath) .. ".png"
         local texName = texPath
-        UITexturePool.register(texName, TextureManager.load(absPath))
+        UITexturePool.register(texName, TextureManager.loadImmediately(absPath))
     end
 
     for _, texPath in pairs(texNames) do
