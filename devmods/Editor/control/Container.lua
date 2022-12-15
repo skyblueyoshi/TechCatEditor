@@ -8,6 +8,7 @@ local KEY_TREE_VIEW = "TreeView"
 local KEY_PROPERTY_LIST = "PropertyList"
 local KEY_GRID_VIEW = "GridView"
 local KEY_TAB_VIEW = "TabView"
+local KEY_RENDER_TARGET_VIEW = "RenderTargetView"
 
 function Container:__init(parent, parentRoot, data, location)
     Container.super.__init(self, parent, parentRoot, data)
@@ -64,6 +65,13 @@ function Container:_initContent(location)
                 data.TabView, { 0, 0, 32, 32 }
         )
         self:addChildToMap(KEY_TAB_VIEW, ui)
+    end
+
+    if data.RenderTargetView then
+        local ui = require("RenderTargetView").new(self, self._root,
+                data.RenderTargetView, { 0, 0, 32, 32 }
+        )
+        self:addChildToMap(KEY_RENDER_TARGET_VIEW, ui)
     end
 
     local splitLeftX = 250
@@ -152,6 +160,11 @@ function Container:_initContent(location)
 
             if hasCB and hasCT and hasRB and not hasLT then
                 l, t, r, b = splitLeftX, 0, 0, 0
+                w, h = 0, 0
+            end
+
+            if hasCT and not hasLT and not hasRT and not hasCB then
+                l, t, r, b = splitLeftX, 0, splitRightX, splitBottomY
                 w, h = 0, 0
             end
 

@@ -454,6 +454,34 @@ local TestGrid = {
     }
 }
 
+local TestRenderTarget = {
+
+}
+
+local ContainerT = {
+    IsSide = true,
+    TabView = {
+        {
+            Tab = {
+                Text = "Editor",
+                Icon = "icon_level",
+            },
+            Container = {
+                RenderTargetView = TestRenderTarget,
+            },
+        },
+        {
+            Tab = {
+                Text = "Game",
+                Icon = "icon_level",
+            },
+            Container = {
+                RenderTargetView = TestRenderTarget,
+            },
+        },
+    },
+}
+
 local ContainerLT = {
     IsSide = true,
     TabView = {
@@ -533,6 +561,10 @@ local window = {
         {
             Place = { 3, 6 },
             Container = ContainerR,
+        },
+        {
+            Place = {2},
+            Container = ContainerT,
         },
     }
 }

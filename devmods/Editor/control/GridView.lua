@@ -61,13 +61,17 @@ function GridView:_onCreatePanelItem()
     })
 
     local rt = UIRenderTargetNode.new("rt", 0, 0, 32, 32)
+    rt.visible = false
     panelItem:addChild(rt)
 
     return panelItem
 end
 
 function GridView:_testRT(n, w, h)
-    Sprite.draw(UISpritePool.getInstance():get("check_box_true").textureLocation, Vector2.new(1,1), Rect.new(0,0,32,32),Color.White,0)
+    GraphicsDevice.drawRect2D(RectFloat.new(0, 0, w, h), Color.Blue)
+    Sprite.beginBatch()
+    Sprite.draw(UISpritePool.getInstance():get("check_box_true").textureLocation, Vector2.new(8, 8), Rect.new(0, 0, 16, 16), Color.White, 0)
+    Sprite.endBatch()
 end
 
 function GridView:_getTableElementCount()
