@@ -27,6 +27,23 @@ end
 function TextureManager.loadAsynchronousWhenAwake(filePath)
 end
 
+---获取指定纹理位置所指向的纹理。如果纹理位置描述的是单独的纹理，则返回整个纹理对象；如果纹理位置描述的是图集里的区域，则返回这个图集的纹理对象。
+---@param textureLocation TextureLocation 纹理位置。
+---@return Texture 纹理对象。
+function TextureManager.getTargetTextureByLocation(textureLocation)
+end
+
+---由资源ID获取纹理对象。
+---@param resourceID number 资源ID。
+---@return Texture 纹理对象。
+function TextureManager.getTextureByID(resourceID)
+end
+
+---释放指定资源ID的纹理对象。
+---@param resourceID number 资源ID。
+function TextureManager.releaseTextureByID(resourceID)
+end
+
 ---获取指定纹理位置在实际纹理中的裁切区域。如果纹理位置描述的是单独的纹理，则返回整个纹理区域；如果纹理位置描述的是图集里的区域，则返回这个图集中的区域。
 ---@field textureLocation TextureLocation 纹理位置。
 ---@return Rect 在实际纹理中的裁切区域。

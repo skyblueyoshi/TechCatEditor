@@ -18,7 +18,7 @@ function UIUtil.newText(parent, name, location, content, cfg)
     node.color = ThemeUtil.getColor("FONT_COLOR")
     node.fontSize = Constant.DEFAULT_FONT_SIZE
     node.horizontalOverflow = TextHorizontalOverflow.Overflow
-    node.autoAdaptSize = true
+    node.isBatchMode = false
     parent:addChild(node)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setTextByCfg(node, cfg)
@@ -61,7 +61,7 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setImageByCfg(node, cfg)
     if cacheRT ~= nil then
-        --node.enableRenderTarget = cacheRT
+        node.enableRenderTarget = cacheRT
     end
     if touchable ~= nil then
         node.touchable = touchable
@@ -70,6 +70,9 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     return node
 end
 
+---setCommonByCfg
+---@param node UINode
+---@param cfg table
 function UIUtil.setCommonByCfg(node, cfg)
     if cfg == nil then
         return
@@ -130,6 +133,12 @@ function UIUtil.setCommonByCfg(node, cfg)
         end
         UIUtil.setMarginsTB(node, cfg.marginsTB[1], cfg.marginsTB[2], autoStretch)
     end
+    if cfg.widthRate ~= nil then
+        node.widthRate = cfg.widthRate
+    end
+    if cfg.heightRate ~= nil then
+        node.heightRate = cfg.heightRate
+    end
     if cfg.visible ~= nil then
         node.visible = cfg.visible
     end
@@ -153,6 +162,11 @@ function UIUtil.setTextByCfg(node, cfg)
     end
     if cfg.horizontalOverflow ~= nil then
         node.horizontalOverflow = cfg.horizontalOverflow
+    end
+    if cfg.autoAdaptSize == nil then
+        node.autoAdaptSize = true
+    else
+        node.autoAdaptSize = cfg.autoAdaptSize
     end
 end
 

@@ -61,14 +61,14 @@ function GridView:_onCreatePanelItem()
     })
 
     local rt = UIRenderTargetNode.new("rt", 0, 0, 32, 32)
-    rt.visible = false
+    rt.visible = true
     panelItem:addChild(rt)
 
     return panelItem
 end
 
 function GridView:_testRT(n, w, h)
-    GraphicsDevice.drawRect2D(RectFloat.new(0, 0, w, h), Color.Blue)
+    --GraphicsDevice.drawRect2D(RectFloat.new(0, 0, w, h), Color.Blue)
     Sprite.beginBatch()
     Sprite.draw(UISpritePool.getInstance():get("check_box_true").textureLocation, Vector2.new(8, 8), Rect.new(0, 0, 16, 16), Color.White, 0)
     Sprite.endBatch()
@@ -100,6 +100,11 @@ function GridView:_setTableElement(node, index)
 
     --local treeNode = TreeNode.new(self, node, {}, {0,0})
     UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
+
+    node:getChild("img"):getPostDrawLayer(0):removeSpriteAnimation()
+    if data.OnCreated ~= nil then
+        data.OnCreated[1](node, index, table.unpack(data.OnCreated[2]))
+    end
 end
 
 function GridView:setSelected(index)

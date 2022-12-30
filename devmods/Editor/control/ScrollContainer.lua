@@ -32,9 +32,10 @@ function ScrollContainer:_preInitScrollContainer(location)
             { x, y, 200, 400 }, {
                 layout = "FULL",
                 bgColor = self._bgColor,
+                borderColor = "BD",
             }, true)
     self._sv = UIScrollView.new("panel_list", 0, 0, 200, 333)
-    UIUtil.setMargins(self._sv, 0, 0, 0, 0, true, true)
+    UIUtil.setMargins(self._sv, 1, 1, 1, 1, true, true)
     self._root:addChild(self._sv)
     self._root:applyMargin(true)
 

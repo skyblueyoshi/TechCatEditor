@@ -84,9 +84,13 @@ function PropertyList:_onCreatePanelItem()
         }, false, false)
         UIUtil.newText(panelCheck, "cap", { 4, 0, 32, 32 }, "Cap", {
             layout = "CENTER_H",
+            widthRate = 0.38,
+            autoAdaptSize = false,
+            horizontalOverflow = TextHorizontalOverflow.Discard,
         })
         local subPanel = UIUtil.newPanel(panelCheck, "sub", { 0, 0, 140, 32 }, {
             margins = { nil, 0, 0, 0, false, true },
+            widthRate = 0.6,
         }, false, false)
 
         return subPanel

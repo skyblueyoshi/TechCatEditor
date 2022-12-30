@@ -7,6 +7,7 @@ local Constant = {
     DEFAULT_FONT_SIZE = 20,
     BTN_SIDE_OFFSET = 8,
     TAB_VIEW_SIDE_OFFSET = 4,
+    DRAG_AREA_SIZE = 8,
 }
 
 return Constant

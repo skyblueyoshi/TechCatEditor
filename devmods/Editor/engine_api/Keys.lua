@@ -4,10 +4,10 @@
 local Keys_Value = {}
 
 ---@class Keys 键盘键值枚举类。
----@field None Keys_Value
----@field Back Keys_Value
+---@field None Keys_Value 预留。
+---@field Back Keys_Value BACKSPACE。
 ---@field Tab Keys_Value
----@field Enter Keys_Value
+---@field Enter Keys_Value ECS。
 ---@field CapsLock Keys_Value
 ---@field Escape Keys_Value
 ---@field Space Keys_Value
@@ -66,16 +66,16 @@ local Keys_Value = {}
 ---@field RightWindows Keys_Value
 ---@field Apps Keys_Value
 ---@field Sleep Keys_Value
----@field NumPad0 Keys_Value
----@field NumPad1 Keys_Value
----@field NumPad2 Keys_Value
----@field NumPad3 Keys_Value
----@field NumPad4 Keys_Value
----@field NumPad5 Keys_Value
----@field NumPad6 Keys_Value
----@field NumPad7 Keys_Value
----@field NumPad8 Keys_Value
----@field NumPad9 Keys_Value
+---@field NumPad0 Keys_Value 数字按键0。
+---@field NumPad1 Keys_Value 数字按键1。
+---@field NumPad2 Keys_Value 数字按键2。
+---@field NumPad3 Keys_Value 数字按键3。
+---@field NumPad4 Keys_Value 数字按键4。
+---@field NumPad5 Keys_Value 数字按键5。
+---@field NumPad6 Keys_Value 数字按键6。
+---@field NumPad7 Keys_Value 数字按键7。
+---@field NumPad8 Keys_Value 数字按键8。
+---@field NumPad9 Keys_Value 数字按键9。
 ---@field Multiply Keys_Value
 ---@field Add Keys_Value
 ---@field Separator Keys_Value
@@ -127,43 +127,43 @@ local Keys_Value = {}
 ---@field MediaNextTrack Keys_Value
 ---@field MediaPreviousTrack Keys_Value
 ---@field MediaStop Keys_Value
----@field MediaPlayPause Keys_Value
----@field LaunchMail Keys_Value
+---@field MediaPlayPause Keys_Value Play/Pause Media.
+---@field LaunchMail Keys_Value Start Mail.
 ---@field SelectMedia Keys_Value
----@field LaunchApplication1 Keys_Value
----@field LaunchApplication2 Keys_Value
----@field OemSemicolon Keys_Value
----@field OemPlus Keys_Value
----@field OemComma Keys_Value
----@field OemMinus Keys_Value
----@field OemPeriod Keys_Value
----@field OemQuestion Keys_Value
----@field OemTilde Keys_Value
----@field OemOpenBrackets Keys_Value
----@field OemPipe Keys_Value
----@field OemCloseBrackets Keys_Value
----@field OemQuotes Keys_Value
----@field Oem8 Keys_Value
----@field OemBackslash Keys_Value
----@field ProcessKey Keys_Value
+---@field LaunchApplication1 Keys_Value Start Application 1.
+---@field LaunchApplication2 Keys_Value Start Application 2.
+---@field OemSemicolon Keys_Value The OEM Semicolon key on a US standard keyboard.
+---@field OemPlus Keys_Value For any country/region, the '+'.
+---@field OemComma Keys_Value For any country/region, the ','.
+---@field OemMinus Keys_Value For any country/region, the '-'.
+---@field OemPeriod Keys_Value For any country/region, the '.'.
+---@field OemQuestion Keys_Value The OEM question mark key on a US standard keyboard.
+---@field OemTilde Keys_Value The OEM tilde key on a US standard keyboard.
+---@field OemOpenBrackets Keys_Value The OEM open bracket key on a US standard keyboard.
+---@field OemPipe Keys_Value The OEM pipe key on a US standard keyboard.
+---@field OemCloseBrackets Keys_Value The OEM close bracket key on a US standard keyboard.
+---@field OemQuotes Keys_Value The OEM singled/double quote key on a US standard keyboard.
+---@field Oem8 Keys_Value Used for miscellaneous characters; it can vary by keyboard.
+---@field OemBackslash Keys_Value The OEM angle bracket or backslash key on the RT 102 key keyboard.
+---@field ProcessKey Keys_Value IME PROCESS.
 ---@field Attn Keys_Value
----@field Crsel Keys_Value
----@field Exsel Keys_Value
----@field EraseEof Keys_Value
+---@field Crsel Keys_Value CrSel.
+---@field Exsel Keys_Value ExSel.
+---@field EraseEof Keys_Value Erase EOF.
 ---@field Play Keys_Value
 ---@field Zoom Keys_Value
 ---@field Pa1 Keys_Value
 ---@field OemClear Keys_Value
----@field ChatPadGreen Keys_Value
----@field ChatPadOrange Keys_Value
+---@field ChatPadGreen Keys_Value Green ChatPad.
+---@field ChatPadOrange Keys_Value Orange ChatPad.
 ---@field Pause Keys_Value
----@field ImeConvert Keys_Value
----@field ImeNoConvert Keys_Value
----@field Kana Keys_Value
----@field Kanji Keys_Value
----@field OemAuto Keys_Value
----@field OemCopy Keys_Value
----@field OemEnlW Keys_Value
+---@field ImeConvert Keys_Value IME Convert.
+---@field ImeNoConvert Keys_Value IME NoConvert.
+---@field Kana Keys_Value Kana key on Japanese keyboards.
+---@field Kanji Keys_Value Kanji key on Japanese keyboards.
+---@field OemAuto Keys_Value OEM Auto.
+---@field OemCopy Keys_Value OEM Copy.
+---@field OemEnlW Keys_Value OEM Enlarge Window.
 local Keys = {}
 
 return Keys

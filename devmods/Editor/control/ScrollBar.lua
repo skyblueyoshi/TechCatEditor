@@ -27,14 +27,18 @@ function ScrollBar:_initContent()
     local name = self._isVertical and "bar_v" or "bar_h"
     local margins
     if self._isVertical then
-        margins = { nil, 0, 0, 0, false, true }
+        margins = { nil, 1, 1, 1, false, true }
     else
-        margins = { 0, nil, 0, 0, true, false }
+        margins = { 1, nil, 1, 1, true, false }
     end
 
     self._root = UIUtil.newPanel(self._parentRoot, name, { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH }, {
         margins = margins,
         bgColor = "A2",
+    })
+    UIUtil.newPanel(self._root, "mask", { 0, 0, 12, 12 }, {
+        bgColor = "A",
+        margins = { 6, 12, 6, 12, true, true },
     })
     self._slider = UIUtil.newPanel(self._root, "slider", { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH })
     UIUtil.newPanel(self._slider, "sd", { 0, 0, 12, 12 }, {

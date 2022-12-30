@@ -10,9 +10,22 @@ local KEY_GRID_VIEW = "GridView"
 local KEY_TAB_VIEW = "TabView"
 local KEY_RENDER_TARGET_VIEW = "RenderTargetView"
 
+local LEFT_AREA_SIZE = 250
+local RIGHT_AREA_SIZE = 250
+local BOTTOM_AREA_SIZE = 300
+
 function Container:__init(parent, parentRoot, data, location)
     Container.super.__init(self, parent, parentRoot, data)
     self.isContainer = true
+    self._leftAreaSize = LEFT_AREA_SIZE
+    self._rightAreaSize = RIGHT_AREA_SIZE
+    self._bottomAreaSize = BOTTOM_AREA_SIZE
+    self._areaTop = 0
+
+    self._leftAreaSizeDragOrigin = 0
+    self._rightAreaSizeDragOrigin = 0
+    self._bottomAreaSizeDragOrigin = 0
+
     self:_initContent(location)
 end
 
@@ -31,12 +44,11 @@ function Container:_initContent(location)
     self._root = UIUtil.newPanel(self._parentRoot, name, location, cfg, true)
     self._root:applyMargin(true)
 
-    local areaTop, areaLeft = 0, 0
     if data.MenuBar then
         local ui = require("MenuBar").new(self, self._root,
                 data.MenuBar, { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
         self:addChildToMap(KEY_MENU_BAR, ui)
-        areaTop = areaTop + ui:getRoot().height
+        self._areaTop = self._areaTop + ui:getRoot().height
     end
 
     if data.TreeView then
@@ -74,106 +86,168 @@ function Container:_initContent(location)
         self:addChildToMap(KEY_RENDER_TARGET_VIEW, ui)
     end
 
-    local splitLeftX = 250
-    local splitRightX = 250
-    local splitBottomY = 300
-
     local containers = data.Containers
     if containers then
-        local function _hasPlace(_place, targetPlace)
-            for _, place in ipairs(_place) do
-                if place == targetPlace then
-                    return true
+        for _, subData in ipairs(containers) do
+            local place = subData.Place
+
+            local numStr, l, t, r, b, w, h = self:_getPlaceKeyAndLayout(place)
+            local key = "Container_" .. numStr
+            local dragKey = "Drag_" .. numStr
+
+            local container = Container.new(self, self._root, subData.Container, { 0, self._areaTop, 32, 32 })
+
+            self:addChildToMap(key, container)
+
+            local function _makeDrag(targetNumStr, isVertical, func)
+                if numStr == targetNumStr then
+                    local drag = require("DraggableArea").new(self, self._root, isVertical, { func, self })
+                    self:addChildToMap(dragKey, drag)
                 end
             end
-            return false
+
+            _makeDrag("36", false, self._onDragRightArea)
+            _makeDrag("1", false, self._onDragLeftArea)
+            _makeDrag("45", true, self._onDragBottomArea)
         end
+    end
+    self:_updateLayout()
+end
 
-        for _, data in ipairs(containers) do
-            local place = data.Place
-            local l, r, t, b
-            local w, h = 0, 0
-            local key = "Container_"
-            local hasLT = _hasPlace(place, 1)
+function Container:_getPlaceKeyAndLayout(place)
+    local function _hasPlace(_place, targetPlace)
+        for _, placeElement in ipairs(_place) do
+            if placeElement == targetPlace then
+                return true
+            end
+        end
+        return false
+    end
+    local l, r, t, b
+    local w, h = 0, 0
+    local numStr = ""
+    local hasLT = _hasPlace(place, 1)
+    if hasLT then
+        numStr = numStr .. "1"
+    end
+    local hasCT = _hasPlace(place, 2)
+    if hasCT then
+        numStr = numStr .. "2"
+    end
+    local hasRT = _hasPlace(place, 3)
+    if hasRT then
+        numStr = numStr .. "3"
+    end
+    local hasLB = _hasPlace(place, 4)
+    if hasLB then
+        numStr = numStr .. "4"
+    end
+    local hasCB = _hasPlace(place, 5)
+    if hasCB then
+        numStr = numStr .. "5"
+    end
+    local hasRB = _hasPlace(place, 6)
+    if hasRB then
+        numStr = numStr .. "6"
+    end
+    if hasLT or hasLB then
+        w = self._leftAreaSize
+        l = 0
+        if not (hasLT and hasLB) then
             if hasLT then
-                key = key .. "1"
+                t = 0
+                b = self._bottomAreaSize + Constant.DRAG_AREA_SIZE
+                h = 0
+            else
+                b = 0
+                h = self._bottomAreaSize
             end
-            local hasCT = _hasPlace(place, 2)
-            if hasCT then
-                key = key .. "2"
+        end
+    end
+    if hasRT or hasRB then
+        w = self._rightAreaSize
+        r = 0
+        if not (hasRB and hasRT) then
+            if hasLT then
+                b = self._bottomAreaSize + Constant.DRAG_AREA_SIZE
+                h = 0
+            else
+                b = 0
+                h = self._bottomAreaSize
             end
-            local hasRT = _hasPlace(place, 3)
-            if hasRT then
-                key = key .. "3"
-            end
-            local hasLB = _hasPlace(place, 4)
-            if hasLB then
-                key = key .. "4"
-            end
-            local hasCB = _hasPlace(place, 5)
-            if hasCB then
-                key = key .. "5"
-            end
-            local hasRB = _hasPlace(place, 6)
-            if hasRB then
-                key = key .. "6"
-            end
-            if hasLT or hasLB then
-                w = splitLeftX
-                l = 0
-                if not (hasLT and hasLB) then
-                    if hasLT then
-                        t = 0
-                        b = splitBottomY
-                        h = 0
-                    else
-                        b = 0
-                        h = splitBottomY
-                    end
-                end
-            end
-            if hasRT or hasRB then
-                w = splitRightX
-                r = 0
-                if not (hasRB and hasRT) then
-                    if hasLT then
-                        b = splitBottomY
-                        h = 0
-                    else
-                        b = 0
-                        h = splitBottomY
-                    end
-                else
-                    t, b = 0, 0
-                    h = 0
-                end
-            end
-            if hasLB and hasCB then
-                l, t, r, b = 0, nil, splitRightX, 0
-                w, h = 0, splitBottomY
-            end
+        else
+            t, b = 0, 0
+            h = 0
+        end
+    end
 
-            if hasLT and hasLB and not hasCT then
-                l, t, r, b = 0, 0, nil, 0
-                w, h = splitLeftX, 0
-            end
+    -- 底部资源栏
+    if hasLB and hasCB then
+        l, t, r, b = 0, nil, self._rightAreaSize + Constant.DRAG_AREA_SIZE, 0
+        w, h = 0, self._bottomAreaSize
+    end
 
-            if hasCB and hasCT and hasRB and not hasLT then
-                l, t, r, b = splitLeftX, 0, 0, 0
-                w, h = 0, 0
-            end
+    -- 左侧层级栏
+    if hasLT and hasLB and not hasCT then
+        l, t, r, b = 0, 0, nil, 0
+        w, h = self._leftAreaSize, 0
+    end
 
-            if hasCT and not hasLT and not hasRT and not hasCB then
-                l, t, r, b = splitLeftX, 0, splitRightX, splitBottomY
-                w, h = 0, 0
-            end
+    -- 通用右侧
+    if hasCB and hasCT and hasRB and not hasLT then
+        l, t, r, b = self._leftAreaSize, 0, 0, 0
+        w, h = 0, 0
+    end
 
-            if t ~= nil then
-                t = t + areaTop
-            end
+    -- 主窗口
+    if hasCT and not hasLT and not hasRT and not hasCB then
+        l, t, r, b = self._leftAreaSize + Constant.DRAG_AREA_SIZE, 0, self._rightAreaSize + Constant.DRAG_AREA_SIZE, self._bottomAreaSize + Constant.DRAG_AREA_SIZE
+        w, h = 0, 0
+    end
 
-            local container = Container.new(self, self._root, data.Container, { 0, areaTop, 32, 32 })
-            --UIUtil.setMarginsTB(container:getRoot(), areaTop, 300)
+    if t ~= nil then
+        t = t + self._areaTop
+    end
+
+    return numStr, l, t, r, b, w, h
+end
+
+function Container:_onDragRightArea(move, isBegin)
+    if isBegin then
+        self._rightAreaSizeDragOrigin = self._rightAreaSize
+    end
+    self._rightAreaSize = self._rightAreaSizeDragOrigin - move
+    self:_updateLayout()
+end
+
+function Container:_onDragLeftArea(move, isBegin)
+    if isBegin then
+        self._leftAreaSizeDragOrigin = self._leftAreaSize
+    end
+    self._leftAreaSize = self._leftAreaSizeDragOrigin + move
+    self:_updateLayout()
+end
+
+function Container:_onDragBottomArea(move, isBegin)
+    if isBegin then
+        self._bottomAreaSizeDragOrigin = self._bottomAreaSize
+    end
+    self._bottomAreaSize = self._bottomAreaSizeDragOrigin - move
+    self:_updateLayout()
+end
+
+function Container:_updateLayout()
+    local data = self._data
+    local containers = data.Containers
+    if containers then
+        for _, subData in ipairs(containers) do
+            local place = subData.Place
+
+            local numStr, l, t, r, b, w, h = self:_getPlaceKeyAndLayout(place)
+            local key = "Container_" .. numStr
+            local dragKey = "Drag_" .. numStr
+
+            local container = self:getChildFromMap(key)
             UIUtil.setMargins(container:getRoot(), l, t, r, b, w == 0, h == 0)
 
             if w > 0 then
@@ -182,27 +256,24 @@ function Container:_initContent(location)
             if h > 0 then
                 container:getRoot().height = h
             end
-            self:addChildToMap(key, container)
-        end
 
-        --local LT = containers.LT
-        --local LB = containers.LB
-        --local R = containers.R
-        --local CB = containers.CB
-        --local CT = containers.CT
-        --
-        --local SIDE_WIDTH = 200
-        --if LT then
-        --    local container = Container.new(self, self._root, LT, { 0, areaTop, SIDE_WIDTH, 32 })
-        --    UIUtil.setMarginsTB(container:getRoot(), areaTop, 300)
-        --    self:addChildToMap("LT", container)
-        --end
-        --if R then
-        --    local container = Container.new(self, self._root, R, { 0, areaTop, SIDE_WIDTH, 32 })
-        --    UIUtil.setMargins(container:getRoot(), nil, areaTop, 0, 0, false, true)
-        --    self:addChildToMap("R", container)
-        --end
+            if self:getChildFromMap(dragKey) ~= nil then
+                local drag = self:getChildFromMap(dragKey)
+
+                if numStr == "36" then
+                    UIUtil.setMargins(drag:getRoot(), nil, 0, self._rightAreaSize, 0,
+                            false, true)
+                elseif numStr == "1" then
+                    UIUtil.setMargins(drag:getRoot(), self._leftAreaSize, 0, nil, self._bottomAreaSize + Constant.DRAG_AREA_SIZE,
+                            false, true)
+                elseif numStr == "45" then
+                    UIUtil.setMargins(drag:getRoot(), 0, nil, self._rightAreaSize + Constant.DRAG_AREA_SIZE, self._bottomAreaSize,
+                            true, false)
+                end
+            end
+        end
     end
+    self._root:applyMargin(true)
 end
 
 return Container

@@ -19,7 +19,19 @@ function MenuBar:_initContent(location)
             { x, y, 0, Constant.DEFAULT_BAR_HEIGHT }, {
                 layout = "FULL_W",
                 bgColor = "B",
+                --borderColor = "A",
             }, true)
+
+    local tt = UIUtil.newPanel(self._root, "pp", {0,0,32,32})
+    local UISpritePool = require("core.UISpritePool")
+    local textureLocation = UISpritePool.getInstance():get("icon_go").textureLocation
+    local textureLocation2 = UISpritePool.getInstance():get("white").textureLocation
+    local sourceRect = TextureManager.getSourceRect(textureLocation)
+    local offset = Vector2.new(180, 16)
+    tt:getPostDrawLayer(0):addListener(function()
+        --Sprite.draw(textureLocation2, offset, sourceRect, Color.Green, 0)
+        --Sprite.draw(textureLocation, offset, sourceRect, Color.Blue, 0)
+    end)
 
     if self._data.Children then
         local elementX, elementY = 0, 0

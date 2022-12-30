@@ -1,23 +1,25 @@
----@class UIText:UINode
----@field horizontalAlignment TextAlignment_Value
----@field verticalAlignment TextAlignment_Value
----@field verticalOverflow TextHorizontalOverflow_Value
----@field horizontalOverflow TextVerticalOverflow_Value
----@field text string
----@field fontName string
----@field fontSize number
----@field color Color
----@field autoAdaptSize boolean
----@field displayTextSize Size
+---@API
+
+---@class UIText:UINode 描述一个UI文本。
+---@field horizontalAlignment TextAlignment_Value 文本的横向对其方式。
+---@field verticalAlignment TextAlignment_Value 文本的纵向对其方式。
+---@field verticalOverflow TextHorizontalOverflow_Value 文本的纵向溢出方式。
+---@field horizontalOverflow TextVerticalOverflow_Value 文本的横向溢出方式。
+---@field text string 文本内容。
+---@field fontName string 所使用的字体。
+---@field fontSize number 字体大小。
+---@field color Color 文本颜色。
+---@field autoAdaptSize boolean 是否自动根据文本内容适配尺寸。
+---@field displayTextSize Size 返回文本显示区域大小。
 ---@field preferredSize Size
 ---@field preferredWidth number
 ---@field preferredHeight number
----@field isRichText boolean
----@field outlineSize number
----@field outlineColor Color
+---@field isRichText boolean 文本是否表示富文本。
+---@field outlineSize number 文本的描边尺寸。
+---@field outlineColor Color 文本的描边颜色。
+---@field isBatchMode boolean 是否对所有文本进行合批渲染。
 local UIText = {}
 
----new
 ---@overload fun(name:string):UIText
 ---@param name string
 ---@param x number
@@ -34,13 +36,13 @@ end
 function UIText.clone(value)
 end
 
----case
+---
 ---@param uiNode UINode
 ---@return UIText
 function UIText.cast(uiNode)
 end
 
----
+---添加一个文本变化监听器，在文本内容变化时触发。
 ---@param listener table|function
 ---@return ListenerID
 function UIText:addTextChangedListener(listener)
