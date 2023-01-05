@@ -8,28 +8,25 @@ local EventDef = require("config.EventDef")
 local RIGHT_RESERVE_SIZE = 16
 local HK_RESERVE_SIZE = 32
 
---[[
-PopupMenuElement：{
-    str Text  描述文字
-    [str] HotKeys  快捷方式
-    [PopupMenu] Children  下一项菜单栏
-}
-
-PopupMenu -> [PopupMenuElement]
---]]
-
 function PopupMenuElement:__init(parent, parentRoot, data, location, index)
     PopupMenuElement.super.__init(self, parent, parentRoot, data)
     self._index = index
     self:_initContent(location)
 end
 
+---@return TCE.PopupMenuElementData
+function PopupMenuElement:getData()
+    return self._data
+end
+
 function PopupMenuElement:_initContent(location)
+    local data = self:getData()
     self._root = UIUtil.newPanel(self._parentRoot,
             string.format("e_%d", self._index),
             { location[1], location[2], Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
 
-    if self._data.Text ~= nil then
+    local text = data:getText()
+    if text ~= "" then
         local selectBg = UIUtil.newPanel(self._root, "sd", nil, {
             margins = { 3, 3, 3, 3, true, true },
             bgColor = "SD",
@@ -37,15 +34,16 @@ function PopupMenuElement:_initContent(location)
         selectBg.visible = false
 
         local rx = 16
-        local text = UIUtil.newText(self._root, "cap", { rx, 0 }, self._data.Text, {
+        local text = UIUtil.newText(self._root, "cap", { rx, 0 }, text, {
             margins = { nil, 0, nil, 0, false, false },
         })
         rx = rx + text.width
 
-        if self._data.HotKeys ~= nil then
+        local hotkeys = data:getHotkeys()
+        if hotkeys ~= "" then
             rx = rx + HK_RESERVE_SIZE
             local hkContent = ""
-            for i, hk in ipairs(self._data.HotKeys) do
+            for i, hk in ipairs(hotkeys) do
                 if i == 1 then
                     hkContent = hk
                 else
@@ -88,14 +86,14 @@ function PopupMenuElement:setSelect(selected)
 end
 
 function PopupMenuElement:tryShowSubPopupMenu()
-    local data = self._data
+    local data = self:getData()
     local parent = self._parent
-    if data.Children and #data.Children > 0 then
+    local popupMenu = data:getPopupMenu()
+    if popupMenu ~= nil then
         local posInWindowX, posInWindowY = self:getPositionInWindow()
 
-        local PopupMenu = require("PopupMenu")
         local subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
-                data.Children,
+                popupMenu,
                 { posInWindowX + self._root.width, posInWindowY },
                 parent:getLevel() + 1)
         return subPopupMenu
@@ -133,7 +131,14 @@ function PopupMenu:_destroySubPopupMenu()
     end
 end
 
+---@return TCE.PopupMenuData
+function PopupMenu:getData()
+    return self._data
+end
+
 function PopupMenu:_initContent(location)
+    local data = self:getData()
+    local elements = data:getElements()
     self._root = UIUtil.newPanel(self._parentRoot,
             "popup", { location[1], location[2] }, {
                 bgColor = "A",
@@ -145,7 +150,7 @@ function PopupMenu:_initContent(location)
     if self._fixWidth then
         maxWidth = self._fixWidth
     end
-    for idx, data in ipairs(self._data) do
+    for idx, data in ipairs(elements) do
         local element = PopupMenuElement.new(self, self._root, data, { 0, offsetY }, idx)
         offsetY = offsetY + element:getRoot().height
         if not self._fixWidth then

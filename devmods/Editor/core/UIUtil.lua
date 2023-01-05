@@ -4,7 +4,6 @@ local ThemeUtil = require("core.ThemeUtil")
 local UISpritePool = require("core.UISpritePool")
 local Constant = require("config.Constant")
 
----newText
 ---@param parent UINode
 ---@param name string
 ---@param location table
@@ -13,16 +12,42 @@ local Constant = require("config.Constant")
 ---@return UIPanel
 function UIUtil.newText(parent, name, location, content, cfg)
     local node = UIText.new(name)
+    parent:addChild(node)
+    UIUtil.setText(node, location, content, cfg)
+    return node
+end
+
+---@param parent UINode
+---@param name string
+---@param location table
+---@param content string
+---@param cfg table
+---@return UIPanel
+function UIUtil.ensureText(parent, name, location, content, cfg)
+    local node = parent:getChild(name)
+    if not node:valid() then
+        return UIUtil.newText(parent, name, location, content, cfg)
+    else
+        UIUtil.setText(node, location, content, cfg)
+    end
+    return node
+end
+
+---@param nodeParam UINode
+---@param location table
+---@param content string
+---@param cfg table
+---@return UIPanel
+function UIUtil.setText(nodeParam, location, content, cfg)
+    local node = UIText.cast(nodeParam)
     UIUtil.setLocation(node, location)
     node.text = content
     node.color = ThemeUtil.getColor("FONT_COLOR")
     node.fontSize = Constant.DEFAULT_FONT_SIZE
     node.horizontalOverflow = TextHorizontalOverflow.Overflow
     node.isBatchMode = false
-    parent:addChild(node)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setTextByCfg(node, cfg)
-    return node
 end
 
 ---newInputField
@@ -56,8 +81,20 @@ end
 ---@return UIPanel
 function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
     local node = UIPanel.new(name)
-    UIUtil.setLocation(node, location)
     parent:addChild(node)
+    UIUtil.setPanel(node, location, cfg, cacheRT, touchable)
+    return node
+end
+
+---@param nodeParam UINode
+---@param location table
+---@param cfg table
+---@param cacheRT boolean
+---@param touchable boolean
+---@return UIPanel
+function UIUtil.setPanel(nodeParam, location, cfg, cacheRT, touchable)
+    local node = UIPanel.cast(nodeParam)
+    UIUtil.setLocation(node, location)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setImageByCfg(node, cfg)
     if cacheRT ~= nil then
@@ -67,6 +104,22 @@ function UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
         node.touchable = touchable
     end
     node.textBatchRendering = false
+end
+
+---@param parent UINode
+---@param name string
+---@param location table
+---@param cfg table
+---@param cacheRT boolean
+---@param touchable boolean
+---@return UIPanel
+function UIUtil.ensurePanel(parent, name, location, cfg, cacheRT, touchable)
+    local node = parent:getChild(name)
+    if not node:valid() then
+        return UIUtil.newPanel(parent, name, location, cfg, cacheRT, touchable)
+    else
+        UIUtil.setPanel(node, location, cfg, cacheRT, touchable)
+    end
     return node
 end
 

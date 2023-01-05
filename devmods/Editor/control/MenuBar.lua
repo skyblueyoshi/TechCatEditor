@@ -12,7 +12,15 @@ function MenuBar:__init(parent, parentRoot, data, location)
     self:_initContent(location)
 end
 
+---@return TCE.MenuBarData
+function MenuBar:getData()
+    return self._data
+end
+
 function MenuBar:_initContent(location)
+    local data = self:getData()
+    local elements = data:getElements()
+
     local x, y = location[1], location[2]
     local name = "menu_bar"
     self._root = UIUtil.newPanel(self._parentRoot, name,
@@ -22,27 +30,23 @@ function MenuBar:_initContent(location)
                 --borderColor = "A",
             }, true)
 
-    local tt = UIUtil.newPanel(self._root, "pp", {0,0,32,32})
-    local UISpritePool = require("core.UISpritePool")
-    local textureLocation = UISpritePool.getInstance():get("icon_go").textureLocation
-    local textureLocation2 = UISpritePool.getInstance():get("white").textureLocation
-    local sourceRect = TextureManager.getSourceRect(textureLocation)
-    local offset = Vector2.new(180, 16)
-    tt:getPostDrawLayer(0):addListener(function()
-        --Sprite.draw(textureLocation2, offset, sourceRect, Color.Green, 0)
-        --Sprite.draw(textureLocation, offset, sourceRect, Color.Blue, 0)
-    end)
-
-    if self._data.Children then
-        local elementX, elementY = 0, 0
-        for idx, data in ipairs(self._data.Children) do
-            local elementLocation = { elementX, elementY, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT }
-            local tab = Button.new(self, self._root, data, elementLocation, { tag = idx, style = "Tab" })
-            elementX = elementX + tab:getRoot().width
+    if #elements > 0 then
+        for idx, elementData in ipairs(elements) do
+            local elementLocation = { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT }
+            local tab = Button.new(self, self._root, elementData, elementLocation, { tag = idx, style = "Tab" })
             self:addChild(tab)
         end
     end
+    self:_adjustChildrenLayout()
     self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
+end
+
+function MenuBar:_adjustChildrenLayout()
+    local elementX, elementY = 0, 0
+    for idx, tab in ipairs(self:getChildren()) do
+        tab:getRoot():setPosition(elementX, elementY)
+        elementX = elementX + tab:getRoot().width
+    end
 end
 
 function MenuBar:clearSelected()
@@ -70,6 +74,11 @@ end
 function MenuBar:_onPopupOutsideEvent(_)
     self.showPopupWhenPointed = false
     self:clearSelected()
+end
+
+function MenuBar:onChildLayoutChanged(key)
+    self:_onPopupOutsideEvent()
+    self:_adjustChildrenLayout()
 end
 
 return MenuBar

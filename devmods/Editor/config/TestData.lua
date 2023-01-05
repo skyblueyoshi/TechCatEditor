@@ -1,3 +1,5 @@
+local UIData = require("control.data.UIData")
+
 local popupMenuA = {
     {
         Text = "Test...",
@@ -547,7 +549,7 @@ local ContainerR = {
     },
 }
 
-local window = {
+local windowOld = {
     MenuBar = menuBar,
     Containers = {
         {
@@ -569,4 +571,32 @@ local window = {
     }
 }
 
-return window
+local PopupMenu = {
+    elements = {
+        {
+            text = "Element 0",
+        },
+        {
+            text = "Element 1",
+        },
+    },
+}
+
+local MenuBarData = {
+    elements = {
+        {
+            text = "File",
+            popupMenu = PopupMenu,
+        },
+        {
+            text = "Edit",
+            popupMenu = PopupMenu,
+        },
+    }
+}
+
+local EditorWindowData = {
+    MenuBar = UIData.create("MenuBar", MenuBarData),
+}
+
+return EditorWindowData

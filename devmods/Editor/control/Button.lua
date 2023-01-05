@@ -6,14 +6,6 @@ local EventDef = require("config.EventDef")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
 
---[[
-data格式：
-{
-    str Text  按钮描述的文字
-    PopupMenu PopupMenu  弹出菜单栏数据
-}
---]]
-
 function Button:__init(parent, parentRoot, data, location, params)
     Button.super.__init(self, parent, parentRoot, data, location)
     self._subPopupMenu = nil
@@ -42,32 +34,39 @@ function Button:_destroySubPopupMenu()
     end
 end
 
+---@return TCE.ButtonData
+function Button:getData()
+    return self._data
+end
+
 function Button:_initContent(location)
     Button.super._initContent(self, location)
+    self:_adjustLayout()
+    self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
+end
 
-    local data = self._data
+function Button:_adjustLayout()
+    local data = self:getData()
+    local icon = data:getIcon()
+    local text = data:getText()
+
     local curX = Constant.BTN_SIDE_OFFSET
-    if data.Icon then
-        local img = UIUtil.newPanel(self._root, "icon", { curX, 0, 16, 16 }, {
+    if icon ~= "" then
+        local img = UIUtil.ensurePanel(self._root, "icon", { curX, 0, 16, 16 }, {
             layout = "CENTER_H",
         })
-        img.sprite = UISpritePool.getInstance():get(data.Icon)
+        img.sprite = UISpritePool.getInstance():get(icon)
         img.sprite.color = ThemeUtil.getColor("ICON_COLOR")
         curX = curX + img.width + Constant.BTN_SIDE_OFFSET
     end
-    if data.Text then
-        local text = UIUtil.newText(self._root, "cap", { curX, 0 }, data.Text, {
+    if text ~= "" then
+        local lbText = UIUtil.ensureText(self._root, "cap", { curX, 0 }, text, {
             layout = "CENTER_H",
         })
-        curX = curX + text.width
-
+        curX = curX + lbText.width
     end
     curX = curX + Constant.BTN_SIDE_OFFSET
     self._root.width = math.max(self._root.width, curX)
-
-    if self._data.PopupMenu then
-        self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
-    end
 
     self._root:applyMargin(true)
 end
@@ -101,11 +100,13 @@ end
 
 function Button:tryShowPopupMenu()
     self:hidePopupMenu()
-    if self._data.PopupMenu then
+    local data = self:getData()
+    local popupMenuData = data:getPopupMenu()
+    if popupMenuData ~= nil then
         local PopupMenu = require("PopupMenu")
         local wx, wy = self:getPositionInWindow()
         self._subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
-                self._data.PopupMenu,
+                popupMenuData,
                 { wx, wy + self._root.height })
     end
     return self._subPopupMenu
@@ -117,6 +118,14 @@ end
 
 function Button:_onPopupOutsideEvent(_)
     self:hidePopupMenu()
+end
+
+function Button:onDataChanged(names)
+    if names["popupMenu"] then
+        self:hidePopupMenu()
+    end
+    self:_adjustLayout()
+    self:requestParentChangeLayout(nil)
 end
 
 return Button

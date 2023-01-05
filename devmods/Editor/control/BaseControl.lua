@@ -15,6 +15,11 @@ function BaseControl:__init(parent, parentRoot, data)
     self.isWindow = false
     self._destroyed = false
     self._eventListenerIDs = {}
+
+    self._dataListener = nil
+    if self._data.addListener ~= nil then
+        self._dataListener = self._data:addListener(self)
+    end
 end
 
 function BaseControl:isDestroyed()
@@ -29,6 +34,11 @@ function BaseControl:destroy()
 end
 
 function BaseControl:onDestroy()
+    if self._dataListener ~= nil then
+        self._data:removeListener(self._dataListener)
+        self._dataListener = nil
+    end
+
     local eventManager = EventManager.getInstance()
     for _, id in ipairs(self._eventListenerIDs) do
         eventManager:removeListener(id)
@@ -52,6 +62,14 @@ function BaseControl:onDestroy()
     self._config = nil
     self._data = nil
     self._destroyed = true
+end
+
+function BaseControl:getChildren()
+    return self._children
+end
+
+function BaseControl:getChildrenMap()
+    return self._childrenMap
 end
 
 function BaseControl:addChild(child)
@@ -104,6 +122,12 @@ function BaseControl:getPositionInWindow()
     end
     local topX, topY = self._parent:getPositionInWindow()
     return topX + self._root.positionX, topY + self._root.positionY
+end
+
+function BaseControl:requestParentChangeLayout(key)
+    if self._parent.onChildLayoutChanged ~= nil then
+        self._parent:onChildLayoutChanged(key)
+    end
 end
 
 return BaseControl
