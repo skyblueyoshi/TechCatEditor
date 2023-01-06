@@ -9,6 +9,9 @@ local DataMembers = {
 
 function PopupMenuElementData:__init(cfg)
     self:initData(DataMembers, cfg)
+    Input.keyboard:getHotKeys(Keys.N):addListener(function()
+        self:setText(self:getText() .. "v")
+    end)
 end
 
 function PopupMenuElementData:setText(value)

@@ -161,6 +161,37 @@ function BaseData:checkChangedMemberNames(changedMemberNames)
     return false
 end
 
+function BaseData:_listClear(memberName)
+    local arr = self:_get(memberName)
+    if #arr == 0 then
+        return false
+    end
+    self:_set(memberName, {})
+    return true
+end
+
+function BaseData:_listAppend(memberName, element)
+    self:_listInsert(memberName, -1, element)
+end
+
+function BaseData:_listInsert(memberName, index, element)
+    local arr = self:_get(memberName)
+    if index == -1 then
+        table.insert(arr, element)
+    else
+        table.insert(arr, index, element)
+    end
+    self:_onDataChanged({ memberName })
+    return true
+end
+
+function BaseData:_listRemove(memberName, index)
+    local arr = self:_get(memberName)
+    table.remove(arr, index)
+    self:_onDataChanged({ memberName })
+    return true
+end
+
 function BaseData:_set(memberName, cfgObj, runOnChangeEvent)
     if runOnChangeEvent == nil then
         runOnChangeEvent = true

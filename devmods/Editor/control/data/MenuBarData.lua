@@ -18,4 +18,13 @@ function MenuBarData:getElements()
     return self:_get("elements")
 end
 
+---@param element TCE.ButtonData
+function MenuBarData:addElement(element)
+    self:_listAppend("elements", element)
+end
+
+function MenuBarData:clearElements()
+    self:_listClear("elements")
+end
+
 return MenuBarData

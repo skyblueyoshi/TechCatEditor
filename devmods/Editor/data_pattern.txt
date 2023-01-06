@@ -1,0 +1,4 @@
+class ButtonData
+    string text = ""
+    string icon = ""
+    PopupMenu popupMenu = nil

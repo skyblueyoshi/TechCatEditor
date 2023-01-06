@@ -20,48 +20,54 @@ function PopupMenuElement:getData()
 end
 
 function PopupMenuElement:_initContent(location)
-    local data = self:getData()
     self._root = UIUtil.newPanel(self._parentRoot,
             string.format("e_%d", self._index),
             { location[1], location[2], Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
+    self:_adjustLayout(true)
+    self._root:addMousePointedEnterListener({ self._onPointedIn, self })
+    self._root:addTouchDownListener({ self._onClicked, self })
+end
 
+function PopupMenuElement:adjustLayout()
+    self:_adjustLayout(false)
+end
+
+function PopupMenuElement:_adjustLayout(isInitializing)
+    local data = self:getData()
     local text = data:getText()
-    if text ~= "" then
-        local selectBg = UIUtil.newPanel(self._root, "sd", nil, {
-            margins = { 3, 3, 3, 3, true, true },
-            bgColor = "SD",
-        }, false, false)
+
+    local selectBg = UIUtil.ensurePanel(self._root, "sd", nil, {
+        margins = { 3, 3, 3, 3, true, true },
+        bgColor = "SD",
+    }, false, false)
+    if isInitializing then
         selectBg.visible = false
-
-        local rx = 16
-        local text = UIUtil.newText(self._root, "cap", { rx, 0 }, text, {
-            margins = { nil, 0, nil, 0, false, false },
-        })
-        rx = rx + text.width
-
-        local hotkeys = data:getHotkeys()
-        if hotkeys ~= "" then
-            rx = rx + HK_RESERVE_SIZE
-            local hkContent = ""
-            for i, hk in ipairs(hotkeys) do
-                if i == 1 then
-                    hkContent = hk
-                else
-                    hkContent = hkContent .. "+" .. hk
-                end
-            end
-            local hkText = UIUtil.newText(self._root, "hk", { rx, 0 }, hkContent, {
-                margins = { nil, 0, nil, 0, false, false },
-            })
-            rx = rx + hkText.width
-        end
-
-        self._root.width = rx + RIGHT_RESERVE_SIZE
-        self._root:addMousePointedEnterListener({ self._onPointedIn, self })
-        self._root:addTouchDownListener({ self._onClicked, self })
-
     end
 
+    local rx = 16
+    local lbText = UIUtil.ensureText(self._root, "cap", { rx, 0 }, text, {
+        margins = { nil, 0, nil, 0, false, false },
+    })
+    rx = rx + lbText.width
+
+    local hotkeys = data:getHotkeys()
+    if hotkeys ~= "" then
+        rx = rx + HK_RESERVE_SIZE
+        local hkContent = ""
+        for i, hk in ipairs(hotkeys) do
+            if i == 1 then
+                hkContent = hk
+            else
+                hkContent = hkContent .. "+" .. hk
+            end
+        end
+        local hkText = UIUtil.ensureText(self._root, "hk", { rx, 0 }, hkContent, {
+            margins = { nil, 0, nil, 0, false, false },
+        })
+        rx = rx + hkText.width
+    end
+
+    self._root.width = rx + RIGHT_RESERVE_SIZE
 end
 
 function PopupMenuElement:adjustWidth(newWidth)
@@ -99,6 +105,10 @@ function PopupMenuElement:tryShowSubPopupMenu()
         return subPopupMenu
     end
     return nil
+end
+
+function PopupMenuElement:onDataChanged(names)
+    self._parent:onChildElementDataChanged(names)
 end
 
 function PopupMenu:__init(parent, parentRoot, data, location, level, params)
@@ -146,17 +156,28 @@ function PopupMenu:_initContent(location)
             }, true)
 
     local offsetY = 0
+    for idx, elementData in ipairs(elements) do
+        local element = PopupMenuElement.new(self, self._root, elementData, { 0, offsetY }, idx)
+        offsetY = offsetY + element:getRoot().height
+        self:addChild(element)
+    end
+    self:_adjustLayout()
+
+    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
+end
+
+function PopupMenu:_adjustLayout()
+    local offsetY = 0
     local maxWidth = 0
     if self._fixWidth then
         maxWidth = self._fixWidth
     end
-    for idx, data in ipairs(elements) do
-        local element = PopupMenuElement.new(self, self._root, data, { 0, offsetY }, idx)
-        offsetY = offsetY + element:getRoot().height
+    for _, child in ipairs(self._children) do
+        child:adjustLayout()
+        offsetY = offsetY + child:getRoot().height
         if not self._fixWidth then
-            maxWidth = math.max(maxWidth, element:getRoot().width)
+            maxWidth = math.max(maxWidth, child:getRoot().width)
         end
-        self:addChild(element)
     end
     self._root.height = offsetY
     self._root.width = maxWidth
@@ -164,9 +185,7 @@ function PopupMenu:_initContent(location)
     for _, child in ipairs(self._children) do
         child:adjustWidth(maxWidth)
     end
-
     self._root:applyMargin(true)
-    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
 end
 
 function PopupMenu:_onMouseLeave(_)
@@ -212,6 +231,15 @@ function PopupMenu:onElementClicked(index)
         self._clickCallback[1](self._clickCallback[2], index)
     end
     self:triggerEvent(EventDef.ALL_POPUP_CLOSE)
+end
+
+function PopupMenu:onChildElementDataChanged(names)
+    self:_destroySubPopupMenu()
+    self:_adjustLayout()
+end
+
+function PopupMenu:onDataChanged(names)
+
 end
 
 return PopupMenu
