@@ -3,17 +3,18 @@ local Window = class("Window", require("Container"))
 local UIUtil = require("core.UIUtil")
 local EventDef = require("config.EventDef")
 
-function Window:__init(parent, parentRoot, data, location)
-    Window.super.__init(self, parent, parentRoot, data, location)
+function Window:__init(name, parent, parentRoot, data, location)
+    Window.super.__init(self, name, parent, parentRoot, data, location)
     self.isWindow = true
-
-    self:_initWindowContent(location)
 end
 
-function Window:_initWindowContent(location)
-    local popupArea = UIUtil.newPanel(self._root, "popup_area", location, { layout = "FULL" }, false)
+function Window:adjustLayout(isInitializing, location)
+    Window.super.adjustLayout(self, isInitializing, location)
+    local popupArea = UIUtil.ensurePanel(self._root, "popup_area", location, { layout = "FULL" }, false)
     popupArea.touchBlockable = false
-    popupArea:addTouchDownListener({ self._onPopupOutsideClicked, self })
+    if isInitializing then
+        popupArea:addTouchDownListener({ self._onPopupOutsideClicked, self })
+    end
 end
 
 function Window:_onPopupOutsideClicked(_, _)

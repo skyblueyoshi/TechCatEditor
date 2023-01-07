@@ -6,7 +6,7 @@ local DataMembers = {
 }
 
 function TreeData:__init(cfg)
-    self:initData(DataMembers, cfg)
+    self:initData(DataMembers, cfg, false)
 end
 
 ---@param value table

@@ -2,7 +2,8 @@
 local BaseControl = class("BaseControl")
 local EventManager = require("core.EventManager")
 
-function BaseControl:__init(parent, parentRoot, data)
+function BaseControl:__init(name, parent, parentRoot, data)
+    self._name = name ---@type string
     self._parent = parent ---@type TCE.BaseControl
     self._parentRoot = parentRoot ---@type UINode
     self._root = nil ---@type UINode

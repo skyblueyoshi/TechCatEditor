@@ -9,8 +9,8 @@ local EventDef = require("config.EventDef")
 local RIGHT_RESERVE_SIZE = 16
 local HK_RESERVE_SIZE = 32
 
-function PopupMenuElement:__init(parent, parentRoot, data, location, index)
-    PopupMenuElement.super.__init(self, parent, parentRoot, data)
+function PopupMenuElement:__init(name, parent, parentRoot, data, location, index)
+    PopupMenuElement.super.__init(self, name, parent, parentRoot, data)
     self._index = index
     self:_initContent(location)
 end
@@ -21,19 +21,14 @@ function PopupMenuElement:getData()
 end
 
 function PopupMenuElement:_initContent(location)
-    self._root = UIUtil.newPanel(self._parentRoot,
-            string.format("e_%d", self._index),
-            { location[1], location[2], Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
-    self:_adjustLayout(true)
+    self:adjustLayout(true, { location[1], location[2], Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
     self._root:addMousePointedEnterListener({ self._onPointedIn, self })
     self._root:addTouchDownListener({ self._onClicked, self })
 end
 
-function PopupMenuElement:adjustLayout()
-    self:_adjustLayout(false)
-end
+function PopupMenuElement:adjustLayout(isInitializing, location)
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, location)
 
-function PopupMenuElement:_adjustLayout(isInitializing)
     local data = self:getData()
     local text = data:getText()
 
@@ -99,7 +94,7 @@ function PopupMenuElement:tryShowSubPopupMenu()
     if popupMenu ~= nil then
         local posInWindowX, posInWindowY = self:getPositionInWindow()
 
-        local subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
+        local subPopupMenu = PopupMenu.new("pop", self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
                 popupMenu,
                 { posInWindowX + self._root.width, posInWindowY },
                 parent:getLevel() + 1)
@@ -112,8 +107,8 @@ function PopupMenuElement:onDataChanged(names)
     self._parent:onChildElementDataChanged(names)
 end
 
-function PopupMenu:__init(parent, parentRoot, data, location, level, params)
-    PopupMenu.super.__init(self, parent, parentRoot, data)
+function PopupMenu:__init(name, parent, parentRoot, data, location, level, params)
+    PopupMenu.super.__init(self, name, parent, parentRoot, data)
     self._level = level or 0
 
     self._selectedIndex = 0
@@ -148,13 +143,17 @@ function PopupMenu:getData()
 end
 
 function PopupMenu:_initContent(location)
-    self._root = UIUtil.newPanel(self._parentRoot,
-            "popup", { location[1], location[2] }, {
+    self:adjustLayout(true, { location[1], location[2] })
+    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
+end
+
+function PopupMenu:adjustLayout(isInitializing, location)
+    self._root = UIUtil.ensurePanel(self._parentRoot,
+            self._name, location, {
                 bgColor = "A",
                 borderColor = "BD",
             }, true)
     self:_reloadAllChildren()
-    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
 end
 
 function PopupMenu:_reloadAllChildren()
@@ -164,14 +163,14 @@ function PopupMenu:_reloadAllChildren()
     local elements = data:getElements()
     local offsetY = 0
     for idx, elementData in ipairs(elements) do
-        local element = PopupMenuElement.new(self, self._root, elementData, { 0, offsetY }, idx)
+        local element = PopupMenuElement.new("e_" .. tostring(idx), self, self._root, elementData, { 0, offsetY }, idx)
         offsetY = offsetY + element:getRoot().height
         self:addChild(element)
     end
-    self:_adjustLayout()
+    self:_adjustChildrenLayout()
 end
 
-function PopupMenu:_adjustLayout()
+function PopupMenu:_adjustChildrenLayout()
     local offsetY = 0
     local maxWidth = 0
     if self._fixWidth then
@@ -240,12 +239,12 @@ end
 
 function PopupMenu:onChildElementDataChanged(names)
     self:_destroySubPopupMenu()
-    self:_adjustLayout()
+    self:_adjustChildrenLayout()
 end
 
 function PopupMenu:onDataChanged(names)
     if names["elements"] then
-        self:_reloadAllChildren()
+        self:adjustLayout(false)
     end
 end
 

@@ -5,16 +5,8 @@ local Constant = require("config.Constant")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
 
---[[
-TreeNode：{
-    str Text  描述文字
-    bool CanExpand  是否可以展开下一层级
-    [TreeNode] Children  下一层级所有节点
-}
---]]
-
-function TreeView:__init(parent, parentRoot, data, location)
-    TreeView.super.__init(self, parent, parentRoot, data, {})
+function TreeView:__init(name, parent, parentRoot, data, location)
+    TreeView.super.__init(self, name, parent, parentRoot, data, {})
     self._mappingList = {}
     self._selectIndex = 0
     self:_initContent(location)
@@ -25,29 +17,38 @@ function TreeView:onDestroy()
     TreeView.super.onDestroy(self)
 end
 
-function TreeView:_loadMappingDataRecursively(data, level)
-    table.insert(self._mappingList, { data, level })
-    if data.Children then
-        for _, subData in ipairs(data.Children) do
-            self:_loadMappingDataRecursively(subData, level + 1)
-        end
-    end
+---@return TCE.TreeData
+function TreeView:getData()
+    return self._data
 end
 
 function TreeView:_reloadMappingList()
     self._mappingList = {}
-    if #self._data.Children > 0 then
-        for _, subData in ipairs(self._data.Children) do
-            self:_loadMappingDataRecursively(subData, 0)
+    local data = self:getData()
+
+    ---@param _subData TCE.TreeElementData
+    ---@param _level number
+    local function _loadRecursively(_subData, _level)
+        table.insert(self._mappingList, {_subData, _level})
+        print("sssssss", _subData:getText())
+        for _, _nextData in ipairs(_subData:getElements()) do
+            _loadRecursively(_nextData, _level + 1)
         end
+    end
+
+    for _, subData in ipairs(data:getElements()) do
+        _loadRecursively(subData, 0)
     end
 end
 
 function TreeView:_initContent(location)
-    self:_preInitScrollContainer(location)
+    self:adjustLayout(true, { location[1], location[2], 200, 400 })
+end
 
+function TreeView:adjustLayout(isInitializing, location)
+    self:_adjustLayoutBegin(isInitializing, location)
     self:_reloadMappingList()
-    self:_postInitScrollContainer()
+    self:_adjustLayoutEnd(isInitializing)
 end
 
 function TreeView:_onCreatePanelItem()
@@ -81,17 +82,21 @@ end
 function TreeView:_setTableElement(node, index)
     --print("TreeView:_setTableElement", index, node.position, node.size)
     local mapping = self._mappingList[index]
-    local data, level = mapping[1], mapping[2]
+    ---@type TCE.TreeElementData
+    local data = mapping[1]
+    local level = mapping[2]
+    local treeData = self:getData()
+
     local arr = UIPanel.cast(node:getChild("img_arr"))
     local icon = UIPanel.cast(node:getChild("img_icon"))
     local cap = UIText.cast(node:getChild("cap"))
 
     local curX = level * 10
     local isParentNode = false
-    if data.CanExpand then
+    if data:getCanExpand() then
         arr.sprite = UISpritePool.getInstance():get("icon_arr_folded")
         isParentNode = true
-    elseif data.Children and #data.Children > 0 then
+    elseif #data:getElements() > 0 then
         arr.sprite = UISpritePool.getInstance():get("icon_arr_unfolded")
         isParentNode = true
     end
@@ -103,11 +108,12 @@ function TreeView:_setTableElement(node, index)
     curX = curX + 16
 
     local iconName
-    if self._data.IconList and #self._data.IconList >= 2 then
+    local iconList = treeData:getIconList()
+    if #iconList >= 2 then
         if isParentNode then
-            iconName = self._data.IconList[1]
+            iconName = iconList[1]
         else
-            iconName = self._data.IconList[2]
+            iconName = iconList[2]
         end
     end
 
@@ -122,7 +128,7 @@ function TreeView:_setTableElement(node, index)
     end
     curX = curX + 2
 
-    cap.text = data.Text
+    cap.text = data:getText()
     cap.positionX = curX
 
     node:getChild("sd").visible = false

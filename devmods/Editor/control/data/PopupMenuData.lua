@@ -5,7 +5,7 @@ local DataMembers = {
 }
 
 function PopupMenuData:__init(cfg)
-    self:initData(DataMembers, cfg)
+    self:initData(DataMembers, cfg, false)
 end
 
 ---@param value table

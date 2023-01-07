@@ -4,8 +4,8 @@ local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 local ScrollBar = require("ScrollBar")
 
-function ScrollContainer:__init(parent, parentRoot, data, param)
-    ScrollContainer.super.__init(self, parent, parentRoot, data)
+function ScrollContainer:__init(name, parent, parentRoot, data, param)
+    ScrollContainer.super.__init(self, name, parent, parentRoot, data)
     self._containerRoot = nil  ---@type UINode
     self._sv = nil
     self._isSvVertical = true
@@ -26,26 +26,36 @@ function ScrollContainer:__init(parent, parentRoot, data, param)
 end
 
 function ScrollContainer:_preInitScrollContainer(location)
-    local x, y = location[1], location[2]
-    local name = "scroll_base"
-    self._root = UIUtil.newPanel(self._parentRoot, name,
-            { x, y, 200, 400 }, {
+    self:_adjustLayoutBegin(true, { location[1], location[2], 200, 400 })
+end
+
+function ScrollContainer:_postInitScrollContainer()
+    self:_adjustLayoutEnd(true)
+end
+
+function ScrollContainer:_adjustLayoutBegin(isInitializing, location)
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, location, {
                 layout = "FULL",
                 bgColor = self._bgColor,
                 borderColor = "BD",
             }, true)
-    self._sv = UIScrollView.new("panel_list", 0, 0, 200, 333)
+
+    if isInitializing then
+        self._sv = UIScrollView.new("panel_list", 0, 0, 200, 333)
+        self._root:addChild(self._sv)
+    end
     UIUtil.setMargins(self._sv, 1, 1, 1, 1, true, true)
-    self._root:addChild(self._sv)
     self._root:applyMargin(true)
 
-    self:_onCreatePanelItem()
+    self:_onEnsurePanelItem()
 end
 
-function ScrollContainer:_postInitScrollContainer()
+function ScrollContainer:_adjustLayoutEnd(isInitializing)
     self._sv:applyMargin(true)
     self:_onUpdateScrollContainer(true)
-    self._scrollBar = ScrollBar.new(self, self._root, true)
+    if isInitializing then
+        self._scrollBar = ScrollBar.new("scroll_bar_v", self, self._root, true)
+    end
     self._scrollBar:setVisible(self._canScrollVertical)
 end
 
@@ -85,17 +95,16 @@ function ScrollContainer:_onResize(_)
     self:_onUpdateScrollContainer(false)
 end
 
-function ScrollContainer:_makeDefaultPanelItem(width, height)
-    local panelItem = UIUtil.newPanel(self._sv, "panel_item",
+function ScrollContainer:_ensureDefaultPanelItem(width, height)
+    local panelItem = UIUtil.ensurePanel(self._sv, "panel_item",
             { 0, 0, width, height }, {
                 bgColor = self._bgColor,
             }, false)
     return panelItem
 end
 
-function ScrollContainer:_onCreatePanelItem()
-    local panelItem = self:_makeDefaultPanelItem(200, Constant.DEFAULT_ELEMENT_HEIGHT)
-    return panelItem
+function ScrollContainer:_onEnsurePanelItem()
+    return self:_ensureDefaultPanelItem(200, Constant.DEFAULT_ELEMENT_HEIGHT)
 end
 
 function ScrollContainer:_getTableElementCount()

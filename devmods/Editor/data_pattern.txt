@@ -14,7 +14,7 @@ class PopupMenuElementData
 class PopupMenuData
     PopupMenuElementData[] elements = {}
 
-class TreeElementData
+class TreeElementData @needParentHooked
     string text = ""
     boolean canExpand = false
     TreeElementData[] elements = {}
@@ -22,3 +22,8 @@ class TreeElementData
 class TreeData
     table iconList = {}
     TreeElementData[] elements = {}
+
+class ContainerData
+    boolean isSide = false
+    MenuBarData menuBar = nil
+    TreeData tree = nil

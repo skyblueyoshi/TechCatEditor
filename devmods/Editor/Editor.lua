@@ -50,7 +50,9 @@ function Editor:_initCanvas()
     self._canvas:addChild(panel)
 
     local TestData = require("config.TestData")
-    self._wd = require("control.Window").new(self, self:getRoot(), TestData, nil)
+    local UIData = require("control.data.UIData")
+    self._wd = require("control.Window").new("win", self, self:getRoot(),
+            UIData.create("ContainerData", TestData), nil)
 
     --local rt = UIRenderTargetNode.new("rt", 0, 0, 128, 128)
     --self:getRoot():addChild(rt)

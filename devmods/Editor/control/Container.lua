@@ -14,8 +14,8 @@ local LEFT_AREA_SIZE = 250
 local RIGHT_AREA_SIZE = 250
 local BOTTOM_AREA_SIZE = 300
 
-function Container:__init(parent, parentRoot, data, location)
-    Container.super.__init(self, parent, parentRoot, data)
+function Container:__init(name, parent, parentRoot, data, location)
+    Container.super.__init(self, name, parent, parentRoot, data)
     self.isContainer = true
     self._leftAreaSize = LEFT_AREA_SIZE
     self._rightAreaSize = RIGHT_AREA_SIZE
@@ -29,88 +29,110 @@ function Container:__init(parent, parentRoot, data, location)
     self:_initContent(location)
 end
 
+---@return TCE.ContainerData
+function Container:getData()
+    return self._data
+end
+
 function Container:_initContent(location)
-    local data = self._data
-    local name = "container"
+    self:adjustLayout(true, location)
+end
+
+function Container:adjustLayout(isInitializing, location)
+    local data = self:getData()
     local cfg = {
         bgColor = "C",
     }
-    if data.IsSide then
+    if data:getIsSide() then
         cfg.bgColor = "B"
     end
     if location == nil or #location == 0 then
         cfg.layout = "FULL"
     end
-    self._root = UIUtil.newPanel(self._parentRoot, name, location, cfg, true)
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, location, cfg, true)
     self._root:applyMargin(true)
 
-    if data.MenuBar then
-        local ui = require("MenuBar").new(self, self._root,
-                data.MenuBar, { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT })
-        self:addChildToMap(KEY_MENU_BAR, ui)
+    if data:getMenuBar() ~= nil then
+        local loc = { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT }
+        ---@type TCE.MenuBar
+        local ui = self:getChildFromMap(KEY_MENU_BAR)
+        if ui == nil then
+            ui = require("MenuBar").new("menu_bar", self, self._root, data:getMenuBar(), loc)
+            self:addChildToMap(KEY_MENU_BAR, ui)
+        else
+            ui:adjustLayout(false, nil)
+        end
         self._areaTop = self._areaTop + ui:getRoot().height
+    else
+        self:removeChildFromMap(KEY_MENU_BAR)
     end
 
-    if data.TreeView then
-        local ui = require("TreeView").new(self, self._root,
-                data.TreeView, { 0, 0, 32, 32 }
-        )
-        self:addChildToMap(KEY_TREE_VIEW, ui)
-    end
-
-    if data.PropertyList then
-        local ui = require("PropertyList").new(self, self._root,
-                data.PropertyList, { 0, 0, 32, 32 }
-        )
-        self:addChildToMap(KEY_PROPERTY_LIST, ui)
-    end
-
-    if data.GridView then
-        local ui = require("GridView").new(self, self._root,
-                data.GridView, { 0, 0, 32, 32 }
-        )
-        self:addChildToMap(KEY_GRID_VIEW, ui)
-    end
-
-    if data.TabView then
-        local ui = require("TabView").new(self, self._root,
-                data.TabView, { 0, 0, 32, 32 }
-        )
-        self:addChildToMap(KEY_TAB_VIEW, ui)
-    end
-
-    if data.RenderTargetView then
-        local ui = require("RenderTargetView").new(self, self._root,
-                data.RenderTargetView, { 0, 0, 32, 32 }
-        )
-        self:addChildToMap(KEY_RENDER_TARGET_VIEW, ui)
-    end
-
-    local containers = data.Containers
-    if containers then
-        for _, subData in ipairs(containers) do
-            local place = subData.Place
-
-            local numStr, l, t, r, b, w, h = self:_getPlaceKeyAndLayout(place)
-            local key = "Container_" .. numStr
-            local dragKey = "Drag_" .. numStr
-
-            local container = Container.new(self, self._root, subData.Container, { 0, self._areaTop, 32, 32 })
-
-            self:addChildToMap(key, container)
-
-            local function _makeDrag(targetNumStr, isVertical, func)
-                if numStr == targetNumStr then
-                    local drag = require("DraggableArea").new(self, self._root, isVertical, { func, self })
-                    self:addChildToMap(dragKey, drag)
-                end
-            end
-
-            _makeDrag("36", false, self._onDragRightArea)
-            _makeDrag("1", false, self._onDragLeftArea)
-            _makeDrag("45", true, self._onDragBottomArea)
+    if data:getTree() ~= nil then
+        local loc = { 0, 0, 32, 32 }
+        ---@type TCE.TreeView
+        local ui = self:getChildFromMap(KEY_TREE_VIEW)
+        if ui == nil then
+            ui = require("TreeView").new("tree_view", self, self._root, data:getTree(), loc)
+            self:addChildToMap(KEY_MENU_BAR, ui)
+        else
+            ui:adjustLayout(false, nil)
         end
     end
+    --
+    --if data.PropertyList then
+    --    local ui = require("PropertyList").new(self, self._root,
+    --            data.PropertyList, { 0, 0, 32, 32 }
+    --    )
+    --    self:addChildToMap(KEY_PROPERTY_LIST, ui)
+    --end
+    --
+    --if data.GridView then
+    --    local ui = require("GridView").new(self, self._root,
+    --            data.GridView, { 0, 0, 32, 32 }
+    --    )
+    --    self:addChildToMap(KEY_GRID_VIEW, ui)
+    --end
+    --
+    --if data.TabView then
+    --    local ui = require("TabView").new(self, self._root,
+    --            data.TabView, { 0, 0, 32, 32 }
+    --    )
+    --    self:addChildToMap(KEY_TAB_VIEW, ui)
+    --end
+    --
+    --if data.RenderTargetView then
+    --    local ui = require("RenderTargetView").new(self, self._root,
+    --            data.RenderTargetView, { 0, 0, 32, 32 }
+    --    )
+    --    self:addChildToMap(KEY_RENDER_TARGET_VIEW, ui)
+    --end
+    --
+    --local containers = data.Containers
+    --if containers then
+    --    for _, subData in ipairs(containers) do
+    --        local place = subData.Place
+    --
+    --        local numStr, l, t, r, b, w, h = self:_getPlaceKeyAndLayout(place)
+    --        local key = "Container_" .. numStr
+    --        local dragKey = "Drag_" .. numStr
+    --
+    --        local container = Container.new(self, self._root, subData.Container, { 0, self._areaTop, 32, 32 })
+    --
+    --        self:addChildToMap(key, container)
+    --
+    --        local function _makeDrag(targetNumStr, isVertical, func)
+    --            if numStr == targetNumStr then
+    --                local drag = require("DraggableArea").new(self, self._root, isVertical, { func, self })
+    --                self:addChildToMap(dragKey, drag)
+    --            end
+    --        end
+    --
+    --        _makeDrag("36", false, self._onDragRightArea)
+    --        _makeDrag("1", false, self._onDragLeftArea)
+    --        _makeDrag("45", true, self._onDragBottomArea)
+    --    end
+    --end
+
     self:_updateLayout()
 end
 

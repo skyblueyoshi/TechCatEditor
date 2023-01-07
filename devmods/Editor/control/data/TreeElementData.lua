@@ -7,7 +7,7 @@ local DataMembers = {
 }
 
 function TreeElementData:__init(cfg)
-    self:initData(DataMembers, cfg)
+    self:initData(DataMembers, cfg, true)
 end
 
 ---@param value string

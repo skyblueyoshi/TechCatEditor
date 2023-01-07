@@ -62,8 +62,12 @@ local function isBaseTypeEqualTo(obj1, obj2)
     return obj1 == obj2
 end
 
-local function createElementByCfg(uiName, cfgObj)
-    return require("UIData").create(uiName, cfgObj)
+local function createElementByCfg(uiName, cfgObj, parent, parentMemberName)
+    local element = require("UIData").create(uiName, cfgObj)
+    if parent ~= nil then
+        element:_setParent(parent, parentMemberName)
+    end
+    return element
 end
 
 local function isInfoListOrDict(info)
@@ -80,10 +84,18 @@ local function getInfoUIName(info)
     return info[2]
 end
 
-function BaseData:initData(DataMembers, cfg)
-    self._onDataChangedListeners = {}
-    self._listenerIndex = 0
+function BaseData:initData(DataMembers, cfg, needParentHooked)
+    -- 父数据
+    self._parent = nil
+    self._parentMemberName = nil
+
+    -- 数据格式记录
     self._memberInfo = DataMembers
+
+    -- 数据监听
+    self._onDataChangedListeners = {}
+    self._maxListenerID = 0
+    self._needParentHooked = needParentHooked
 
     for name, info in pairs(self._memberInfo) do
         self[name] = info[1]
@@ -91,16 +103,40 @@ function BaseData:initData(DataMembers, cfg)
     self:load(cfg)
 end
 
-function BaseData:addListener(listener)
-    self._listenerIndex = self._listenerIndex + 1
-    self._onDataChangedListeners[self._listenerIndex] = listener
-    return self._listenerIndex
+---设置当前数据的父亲数据。
+---@param parent TCE.BaseData
+---@param parentMemberName string
+function BaseData:_setParent(parent, parentMemberName)
+    self._parent = parent
+    self._parentMemberName = parentMemberName
 end
 
+function BaseData:_removeParent()
+    self._parent = nil
+    self._parentMemberName = nil
+end
+
+function BaseData:isNeedParentHooked()
+    return self._needParentHooked
+end
+
+---加入一个数据变化监听。
+---@param listener any
+---@return number
+function BaseData:addListener(listener)
+    self._maxListenerID = self._maxListenerID + 1
+    self._onDataChangedListeners[self._maxListenerID] = listener
+    return self._maxListenerID
+end
+
+---移除一个数据变化监听。
+---@param listenerIndex number
 function BaseData:removeListener(listenerIndex)
     self._onDataChangedListeners[listenerIndex] = nil
 end
 
+---将所有数据设置为默认数据。
+---@return boolean 数据是否变化。
 function BaseData:clear()
     local changedMemberNames = {}
     for name, info in pairs(self._memberInfo) do
@@ -109,9 +145,11 @@ function BaseData:clear()
             table.insert(changedMemberNames, name)
         end
     end
-    return self:checkChangedMemberNames(changedMemberNames)
+    return self:_checkChangedMemberNames(changedMemberNames)
 end
 
+---将所有数据保存到纯数据表。
+---@return table
 function BaseData:save()
     local result = {}
     for memberName, info in pairs(self._memberInfo) do
@@ -141,6 +179,9 @@ function BaseData:save()
     return result
 end
 
+---从表中载入数据。
+---@param cfg table
+---@return boolean 数据是否变化。
 function BaseData:load(cfg)
     local changedMemberNames = {}
     for memberName, _ in pairs(self._memberInfo) do
@@ -150,10 +191,17 @@ function BaseData:load(cfg)
             table.insert(changedMemberNames, memberName)
         end
     end
-    return self:checkChangedMemberNames(changedMemberNames)
+    return self:_checkChangedMemberNames(changedMemberNames)
 end
 
-function BaseData:checkChangedMemberNames(changedMemberNames)
+---获取指定成员数据。
+---@param memberName string
+---@return any
+function BaseData:get(memberName)
+    return self:_get(memberName)
+end
+
+function BaseData:_checkChangedMemberNames(changedMemberNames)
     if #changedMemberNames > 0 then
         local nameDict = {}
         for _, name in ipairs(changedMemberNames) do
@@ -185,6 +233,7 @@ function BaseData:_listInsert(memberName, index, element)
     else
         table.insert(arr, index, element)
     end
+    element:_setParent(self, memberName)
     self:_onDataChanged({ [memberName] = true })
     return true
 end
@@ -214,13 +263,13 @@ function BaseData:_set(memberName, cfgObj, runOnChangeEvent)
                     if isList then
                         local tempList = {}
                         for i, cfgObjElement in ipairs(cfgObj) do
-                            tempList[i] = createElementByCfg(uiName, cfgObjElement)
+                            tempList[i] = createElementByCfg(uiName, cfgObjElement, self, memberName)
                         end
                         self[memberName] = tempList
                     else
                         local tempDict = {}
                         for inKey, cfgObjElement in pairs(cfgObj) do
-                            tempDict[inKey] = createElementByCfg(uiName, cfgObjElement)
+                            tempDict[inKey] = createElementByCfg(uiName, cfgObjElement, self, memberName)
                         end
                         self[memberName] = tempDict
                     end
@@ -249,6 +298,10 @@ function BaseData:_set(memberName, cfgObj, runOnChangeEvent)
         end
     else
         if uiName ~= nil then
+            local isList, isDict = isInfoListOrDict(info)
+            if isList or isDict then
+                return self:_set(memberName, {}, runOnChangeEvent)
+            end
             if self[memberName] ~= nil then
                 changed = true
                 self[memberName] = nil
@@ -262,15 +315,21 @@ function BaseData:_set(memberName, cfgObj, runOnChangeEvent)
     return changed
 end
 
-function BaseData:get(memberName)
-    return self:_get(memberName)
-end
-
 function BaseData:_get(memberName)
     return self[memberName]
 end
 
 function BaseData:_onDataChanged(changedNames)
+    if self._needParentHooked then
+        if self._parent ~= nil then
+            names = nil
+            if not self._parent:isNeedParentHooked() then
+                names = { [self._parentMemberName] = true }
+            end
+            self._parent:_onDataChanged(names)
+        end
+        return
+    end
     for _, listener in pairs(self._onDataChangedListeners) do
         if listener.onDataChanged then
             listener:onDataChanged(changedNames)

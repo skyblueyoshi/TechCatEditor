@@ -592,11 +592,40 @@ local MenuBarData = {
             text = "Edit",
             popupMenu = PopupMenu,
         },
+        {
+            text = "Edit22",
+            popupMenu = PopupMenu,
+        },
+    }
+}
+
+local TreeData = {
+    iconList = {
+        "icon_go",
+        "icon_go",
+    },
+    elements = {
+        {
+            text = "GameObject",
+            elements = {
+                {
+                    text = "Cup",
+                },
+                {
+                    text = "Cup2",
+                    canExpand = true,
+                },
+                {
+                    text = "Cup3",
+                },
+            }
+        },
     }
 }
 
 local EditorWindowData = {
-    MenuBar = UIData.create("MenuBarData", MenuBarData),
+    menuBar = MenuBarData,
+    tree = TreeData,
 }
 
 return EditorWindowData

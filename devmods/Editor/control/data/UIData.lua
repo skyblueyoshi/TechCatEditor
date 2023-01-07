@@ -7,6 +7,7 @@ local DataDict = {
     MenuBarData = require("MenuBarData"),
     TreeElementData = require("TreeElementData"),
     TreeData = require("TreeData"),
+    ContainerData = require("ContainerData"),
 }
 
 function UIData.create(uiName, cfg)

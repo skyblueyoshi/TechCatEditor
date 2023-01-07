@@ -6,8 +6,8 @@ local Constant = require("config.Constant")
 ---__init
 ---@param parent TCE.BaseControl
 ---@param parentRoot UINode
-function ScrollBar:__init(parent, parentRoot, isVertical)
-    ScrollBar.super.__init(self, parent, parentRoot, {})
+function ScrollBar:__init(name, parent, parentRoot, isVertical)
+    ScrollBar.super.__init(self, name, parent, parentRoot, {})
     self._isVertical = isVertical
     self._panelList = UIScrollView.cast(self._parentRoot:getChild("panel_list"))
     self._slider = nil  ---@type UINode
@@ -24,28 +24,7 @@ function ScrollBar:onDestroy()
 end
 
 function ScrollBar:_initContent()
-    local name = self._isVertical and "bar_v" or "bar_h"
-    local margins
-    if self._isVertical then
-        margins = { nil, 1, 1, 1, false, true }
-    else
-        margins = { 1, nil, 1, 1, true, false }
-    end
-
-    self._root = UIUtil.newPanel(self._parentRoot, name, { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH }, {
-        margins = margins,
-        bgColor = "A2",
-    })
-    UIUtil.newPanel(self._root, "mask", { 0, 0, 12, 12 }, {
-        bgColor = "A",
-        margins = { 6, 12, 6, 12, true, true },
-    })
-    self._slider = UIUtil.newPanel(self._root, "slider", { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH })
-    UIUtil.newPanel(self._slider, "sd", { 0, 0, 12, 12 }, {
-        bgColor = "SD",
-        margins = { 4, 4, 4, 4, true, true },
-    }, false, false)
-    self._root:applyMargin(true)
+    self:adjustLayout(true, nil)
 
     local listener = { self._onScrollDataChanged, self }
     self._panelList:addScrollingListener(listener)
@@ -56,6 +35,38 @@ function ScrollBar:_initContent()
     self._slider:addTouchMoveListener({ self._onTouchMove, self })
 
     self:_onScrollDataChanged()
+end
+
+function ScrollBar:adjustLayout(isInitializing, location)
+    local margins
+    if self._isVertical then
+        margins = { nil, 1, 1, 1, false, true }
+    else
+        margins = { 1, nil, 1, 1, true, false }
+    end
+
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH }, {
+        margins = margins,
+        bgColor = "A2",
+    })
+    UIUtil.ensurePanel(self._root, "mask", { 0, 0, 12, 12 }, {
+        bgColor = "A",
+        margins = { 6, 12, 6, 12, true, true },
+    })
+    local sliderLocation
+    if isInitializing then
+        sliderLocation = { 0, 0, Constant.SCROLL_BAR_WIDTH, Constant.SCROLL_BAR_WIDTH }
+    end
+    self._slider = UIUtil.ensurePanel(self._root, "slider", sliderLocation)
+    UIUtil.ensurePanel(self._slider, "sd", { 0, 0, 12, 12 }, {
+        bgColor = "SD",
+        margins = { 4, 4, 4, 4, true, true },
+    }, false, false)
+    self._root:applyMargin(true)
+
+    if not isInitializing then
+        self:_onScrollDataChanged()
+    end
 end
 
 function ScrollBar:_onScrollDataChanged()

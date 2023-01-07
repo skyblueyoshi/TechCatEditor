@@ -3,8 +3,8 @@ local ActivePanel = class("ActivePanel", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 
-function ActivePanel:__init(parent, parentRoot, data, location)
-    ActivePanel.super.__init(self, parent, parentRoot, data)
+function ActivePanel:__init(name, parent, parentRoot, data, location)
+    ActivePanel.super.__init(self, name, parent, parentRoot, data)
     self._pointed = false
     self._selected = false
     self._selectedColor = "SD"
@@ -12,18 +12,23 @@ function ActivePanel:__init(parent, parentRoot, data, location)
 end
 
 function ActivePanel:_initContent(location)
-    local name = string.format("btn")
-    self._root = UIUtil.newPanel(self._parentRoot,
-            name, location, nil, true, true)
-    UIUtil.newPanel(self._root, "sd", nil, {
-        layout = "FULL",
-        bgColor = "BD",
-    }, false, false)
-    self._root:getChild("sd").visible = false
-
+    self:adjustLayout(true, location)
     self._root:addMousePointedEnterListener({ self._onMouseEnter, self })
     self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
     self._root:addTouchDownListener({ self._onMouseDown, self })
+end
+
+function ActivePanel:adjustLayout(isInitializing, location)
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, location, nil, true, true)
+    UIUtil.ensurePanel(self._root, "sd", nil, {
+        layout = "FULL",
+        bgColor = "BD",
+    }, false, false)
+
+    if isInitializing then
+        self._root:getChild("sd").visible = false
+    end
+
     self._root:applyMargin(true)
 end
 

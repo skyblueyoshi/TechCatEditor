@@ -34,12 +34,24 @@ def process_lines(lines: List[str]):
     return symbol_lists
 
 
+def has_symbol(symbol_list, symbol):
+    for s in symbol_list:
+        if s == symbol:
+            return True
+    return False
+
+
+def to_lua_boolean_str(b_value):
+    return "true" if b_value else "false"
+
+
 def gen_page(symbol_lists: List[List[str]], index: int):
     members = []
     if index >= len(symbol_lists):
         return index
     if symbol_lists[index][0] == "class":
         class_name = symbol_lists[index][1]
+        need_parent_hooked = has_symbol(symbol_lists[index], "@needParentHooked")
     else:
         return index
     index += 1
@@ -49,10 +61,10 @@ def gen_page(symbol_lists: List[List[str]], index: int):
         type_name = symbol_list[0]
         if type_name.endswith("[]"):
             type_style = TypeStyle.list
-            type_name = type_name.removesuffix("[]")
+            type_name = type_name[:-2]
         elif type_name.endswith("{}"):
             type_style = TypeStyle.dict
-            type_name = type_name.removesuffix("{}")
+            type_name = type_name[:-2]
         member = (symbol_list[1], cap_str(symbol_list[1]), type_name, symbol_list[3], type_style)
         members.append(member)
 
@@ -83,10 +95,10 @@ local {0} = class("{0}", require("BaseData"))\n'''.format(class_name)
 
     res += '''
 function {0}:__init(cfg)
-    self:initData(DataMembers, cfg)
+    self:initData(DataMembers, cfg, {1})
 end
 
-'''.format(class_name)
+'''.format(class_name, to_lua_boolean_str(need_parent_hooked))
 
     for member in members:
         var_name = member[0]

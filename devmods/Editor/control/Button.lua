@@ -6,9 +6,9 @@ local EventDef = require("config.EventDef")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
 
-function Button:__init(parent, parentRoot, data, location, params)
-    Button.super.__init(self, parent, parentRoot, data, location)
-    self._subPopupMenu = nil
+function Button:__init(name, parent, parentRoot, data, location, params)
+    Button.super.__init(self, name, parent, parentRoot, data, location)
+    self._popupMenu = nil
     self._style = params.style or "None"
     self._tag = params.tag or 0
 
@@ -23,14 +23,14 @@ function Button:__init(parent, parentRoot, data, location, params)
 end
 
 function Button:onDestroy()
-    self:_destroySubPopupMenu()
+    self:_destroyPopupMenu()
     Button.super.onDestroy(self)
 end
 
-function Button:_destroySubPopupMenu()
-    if self._subPopupMenu ~= nil then
-        self._subPopupMenu:destroy()
-        self._subPopupMenu = nil
+function Button:_destroyPopupMenu()
+    if self._popupMenu ~= nil then
+        self._popupMenu:destroy()
+        self._popupMenu = nil
     end
 end
 
@@ -41,11 +41,12 @@ end
 
 function Button:_initContent(location)
     Button.super._initContent(self, location)
-    self:_adjustLayout()
     self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
 end
 
-function Button:_adjustLayout()
+function Button:adjustLayout(isInitializing, location)
+    Button.super.adjustLayout(self, isInitializing, location)
+
     local data = self:getData()
     local icon = data:getIcon()
     local text = data:getText()
@@ -105,15 +106,15 @@ function Button:tryShowPopupMenu()
     if popupMenuData ~= nil then
         local PopupMenu = require("PopupMenu")
         local wx, wy = self:getPositionInWindow()
-        self._subPopupMenu = PopupMenu.new(self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
+        self._popupMenu = PopupMenu.new("pop", self:getWindow(), self:getWindow():getRoot():getChild("popup_area"),
                 popupMenuData,
                 { wx, wy + self._root.height })
     end
-    return self._subPopupMenu
+    return self._popupMenu
 end
 
 function Button:hidePopupMenu()
-    self:_destroySubPopupMenu()
+    self:_destroyPopupMenu()
 end
 
 function Button:_onPopupOutsideEvent(_)
@@ -124,7 +125,7 @@ function Button:onDataChanged(names)
     if names["popupMenu"] then
         self:hidePopupMenu()
     end
-    self:_adjustLayout()
+    self:adjustLayout(false)
     self:requestParentChangeLayout(nil)
 end
 

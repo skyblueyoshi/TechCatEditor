@@ -7,7 +7,7 @@ local DataMembers = {
 }
 
 function ButtonData:__init(cfg)
-    self:initData(DataMembers, cfg)
+    self:initData(DataMembers, cfg, false)
 end
 
 ---@param value string
