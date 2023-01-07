@@ -1,4 +1,24 @@
 class ButtonData
     string text = ""
     string icon = ""
-    PopupMenu popupMenu = nil
+    PopupMenuData popupMenu = nil
+
+class MenuBarData
+    ButtonData[] elements = {}
+
+class PopupMenuElementData
+    string text = ""
+    string hotKeys = ""
+    PopupMenuData popupMenu = nil
+
+class PopupMenuData
+    PopupMenuElementData[] elements = {}
+
+class TreeElementData
+    string text = ""
+    boolean canExpand = false
+    TreeElementData[] elements = {}
+
+class TreeData
+    table iconList = {}
+    TreeElementData[] elements = {}

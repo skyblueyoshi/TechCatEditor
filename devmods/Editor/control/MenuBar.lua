@@ -18,9 +18,6 @@ function MenuBar:getData()
 end
 
 function MenuBar:_initContent(location)
-    local data = self:getData()
-    local elements = data:getElements()
-
     local x, y = location[1], location[2]
     local name = "menu_bar"
     self._root = UIUtil.newPanel(self._parentRoot, name,
@@ -30,6 +27,15 @@ function MenuBar:_initContent(location)
                 --borderColor = "A",
             }, true)
 
+    self:_reloadAllChildren()
+    self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
+end
+
+function MenuBar:_reloadAllChildren()
+    self:removeAllChildren()
+
+    local data = self:getData()
+    local elements = data:getElements()
     if #elements > 0 then
         for idx, elementData in ipairs(elements) do
             local elementLocation = { 0, 0, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT }
@@ -38,12 +44,11 @@ function MenuBar:_initContent(location)
         end
     end
     self:_adjustChildrenLayout()
-    self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
 end
 
 function MenuBar:_adjustChildrenLayout()
     local elementX, elementY = 0, 0
-    for idx, tab in ipairs(self:getChildren()) do
+    for _, tab in ipairs(self:getChildren()) do
         tab:getRoot():setPosition(elementX, elementY)
         elementX = elementX + tab:getRoot().width
     end
@@ -79,6 +84,12 @@ end
 function MenuBar:onChildLayoutChanged(key)
     self:_onPopupOutsideEvent()
     self:_adjustChildrenLayout()
+end
+
+function MenuBar:onDataChanged(names)
+    if names["elements"] then
+        self:_reloadAllChildren()
+    end
 end
 
 return MenuBar

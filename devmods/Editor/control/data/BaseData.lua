@@ -155,7 +155,11 @@ end
 
 function BaseData:checkChangedMemberNames(changedMemberNames)
     if #changedMemberNames > 0 then
-        self:_onDataChanged(changedMemberNames)
+        local nameDict = {}
+        for _, name in ipairs(changedMemberNames) do
+            nameDict[name] = true
+        end
+        self:_onDataChanged(nameDict)
         return true
     end
     return false
@@ -181,14 +185,14 @@ function BaseData:_listInsert(memberName, index, element)
     else
         table.insert(arr, index, element)
     end
-    self:_onDataChanged({ memberName })
+    self:_onDataChanged({ [memberName] = true })
     return true
 end
 
 function BaseData:_listRemove(memberName, index)
     local arr = self:_get(memberName)
     table.remove(arr, index)
-    self:_onDataChanged({ memberName })
+    self:_onDataChanged({ [memberName] = true })
     return true
 end
 
@@ -253,7 +257,7 @@ function BaseData:_set(memberName, cfgObj, runOnChangeEvent)
     end
 
     if changed and runOnChangeEvent then
-        self:_onDataChanged({ memberName })
+        self:_onDataChanged({ [memberName] = true })
     end
     return changed
 end

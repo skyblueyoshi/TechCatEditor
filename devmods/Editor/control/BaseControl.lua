@@ -45,14 +45,8 @@ function BaseControl:onDestroy()
     end
     self._eventListenerIDs = {}
 
-    for _, child in ipairs(self._children) do
-        child:destroy()
-    end
-    self._children = {}
-    for k, child in pairs(self._childrenMap) do
-        child:destroy()
-    end
-    self._childrenMap = {}
+    self:removeAllChildren()
+    self:removeAllChildrenMap()
 
     self._parentRoot:removeChild(self._root)
     self._parentRoot = nil
@@ -62,6 +56,20 @@ function BaseControl:onDestroy()
     self._config = nil
     self._data = nil
     self._destroyed = true
+end
+
+function BaseControl:removeAllChildren()
+    for _, child in ipairs(self._children) do
+        child:destroy()
+    end
+    self._children = {}
+end
+
+function BaseControl:removeAllChildrenMap()
+    for k, child in pairs(self._childrenMap) do
+        child:destroy()
+    end
+    self._childrenMap = {}
 end
 
 function BaseControl:getChildren()
@@ -128,6 +136,9 @@ function BaseControl:requestParentChangeLayout(key)
     if self._parent.onChildLayoutChanged ~= nil then
         self._parent:onChildLayoutChanged(key)
     end
+end
+
+function BaseControl:onDataChanged(names)
 end
 
 return BaseControl

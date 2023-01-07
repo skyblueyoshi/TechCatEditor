@@ -1,5 +1,6 @@
 ---@class TCE.PopupMenuElement:TCE.BaseControl
 local PopupMenuElement = class("PopupMenuElement", require("BaseControl"))
+---@class TCE.PopupMenu:TCE.BaseControl
 local PopupMenu = class("PopupMenu", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
@@ -50,7 +51,7 @@ function PopupMenuElement:_adjustLayout(isInitializing)
     })
     rx = rx + lbText.width
 
-    local hotkeys = data:getHotkeys()
+    local hotkeys = data:getHotKeys()
     if hotkeys ~= "" then
         rx = rx + HK_RESERVE_SIZE
         local hkContent = ""
@@ -147,14 +148,20 @@ function PopupMenu:getData()
 end
 
 function PopupMenu:_initContent(location)
-    local data = self:getData()
-    local elements = data:getElements()
     self._root = UIUtil.newPanel(self._parentRoot,
             "popup", { location[1], location[2] }, {
                 bgColor = "A",
                 borderColor = "BD",
             }, true)
+    self:_reloadAllChildren()
+    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
+end
 
+function PopupMenu:_reloadAllChildren()
+    self:removeAllChildren()
+
+    local data = self:getData()
+    local elements = data:getElements()
     local offsetY = 0
     for idx, elementData in ipairs(elements) do
         local element = PopupMenuElement.new(self, self._root, elementData, { 0, offsetY }, idx)
@@ -162,8 +169,6 @@ function PopupMenu:_initContent(location)
         self:addChild(element)
     end
     self:_adjustLayout()
-
-    self._root:addMousePointedLeaveListener({ self._onMouseLeave, self })
 end
 
 function PopupMenu:_adjustLayout()
@@ -239,7 +244,9 @@ function PopupMenu:onChildElementDataChanged(names)
 end
 
 function PopupMenu:onDataChanged(names)
-
+    if names["elements"] then
+        self:_reloadAllChildren()
+    end
 end
 
 return PopupMenu

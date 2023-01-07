@@ -1,14 +1,14 @@
 ---@class TCE.MenuBarData:TCE.BaseData
 local MenuBarData = class("MenuBarData", require("BaseData"))
-
 local DataMembers = {
-    elements = { {}, "Button", "list" },
+    elements = { {}, "ButtonData", "list" },
 }
 
 function MenuBarData:__init(cfg)
     self:initData(DataMembers, cfg)
 end
 
+---@param value table
 function MenuBarData:setElements(value)
     self:_set("elements", value)
 end
@@ -19,7 +19,7 @@ function MenuBarData:getElements()
 end
 
 ---@param element TCE.ButtonData
-function MenuBarData:addElement(element)
+function MenuBarData:addToElements(element)
     self:_listAppend("elements", element)
 end
 

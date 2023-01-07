@@ -1,10 +1,12 @@
 local UIData = class("UIData")
 
 local DataDict = {
-    Button = require("ButtonData"),
-    PopupMenuElement = require("PopupMenuElementData"),
-    PopupMenu = require("PopupMenuData"),
-    MenuBar = require("MenuBarData"),
+    ButtonData = require("ButtonData"),
+    PopupMenuElementData = require("PopupMenuElementData"),
+    PopupMenuData = require("PopupMenuData"),
+    MenuBarData = require("MenuBarData"),
+    TreeElementData = require("TreeElementData"),
+    TreeData = require("TreeData"),
 }
 
 function UIData.create(uiName, cfg)

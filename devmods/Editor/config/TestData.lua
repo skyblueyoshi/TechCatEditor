@@ -596,7 +596,7 @@ local MenuBarData = {
 }
 
 local EditorWindowData = {
-    MenuBar = UIData.create("MenuBar", MenuBarData),
+    MenuBar = UIData.create("MenuBarData", MenuBarData),
 }
 
 return EditorWindowData
