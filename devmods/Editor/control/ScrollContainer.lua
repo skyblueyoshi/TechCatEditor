@@ -23,6 +23,8 @@ function ScrollContainer:__init(name, parent, parentRoot, data, param)
     if param.isGrid ~= nil then
         self._isGrid = param.isGrid
     end
+
+    self._selectIndex = 0
 end
 
 function ScrollContainer:_preInitScrollContainer(location)
@@ -52,14 +54,14 @@ end
 
 function ScrollContainer:_adjustLayoutEnd(isInitializing)
     self._sv:applyMargin(true)
-    self:_onUpdateScrollContainer(true)
+    self:_onUpdateScrollContainer(isInitializing)
     if isInitializing then
         self._scrollBar = ScrollBar.new("scroll_bar_v", self, self._root, true)
     end
     self._scrollBar:setVisible(self._canScrollVertical)
 end
 
-function ScrollContainer:_onUpdateScrollContainer(isInit)
+function ScrollContainer:_onUpdateScrollContainer(isInitializing)
     self._sv:applyMargin(true)
 
     local cfg = {
@@ -75,9 +77,9 @@ function ScrollContainer:_onUpdateScrollContainer(isInit)
         self._sv:setRightMargin(0, true)
     end
     self._sv:applyMargin()
-    print(innerSize, self._sv.size, self._canScrollVertical, isInit)
+    --print(innerSize, self._sv.size, self._canScrollVertical, isInitializing)
 
-    if isInit then
+    if isInitializing then
         UIUtil.createTableView(self._sv, self, self._isSvVertical, cfg)
         self._sv:addResizeListener({ self._onResize, self })
     else
@@ -111,10 +113,40 @@ function ScrollContainer:_getTableElementCount()
     return 0
 end
 
----_setTableElement
 ---@param node UINode
 ---@param index number
 function ScrollContainer:_setTableElement(node, index)
+    local element = self:_onCreateElement(node, index)
+    self:addChildToMap("e_" .. tostring(index), element)
+end
+
+---@param node UINode
+---@param index number
+---@return TCE.BaseControl
+function ScrollContainer:_onCreateElement(node, index)
+    return nil
+end
+
+---@param node UINode
+---@param index number
+function ScrollContainer:_recycleTableElement(node, index)
+    self:removeChildFromMap("e_" .. tostring(index))
+end
+
+---@return number
+function ScrollContainer:getSelectedIndex()
+    return self._selectIndex
+end
+
+function ScrollContainer:setSelected(index)
+    if self._selectIndex == index then
+        return
+    end
+    self._selectIndex = index
+    local nodes = UIUtil.getAllValidElements(self._sv)
+    for _, node in ipairs(nodes) do
+        UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
+    end
 end
 
 return ScrollContainer

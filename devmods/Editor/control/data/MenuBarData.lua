@@ -23,6 +23,11 @@ function MenuBarData:addToElements(element)
     self:_listAppend("elements", element)
 end
 
+---@param value table
+function MenuBarData:addCfgToElements(value)
+    self:_listAppendCfg("elements", value)
+end
+
 function MenuBarData:clearElements()
     self:_listClear("elements")
 end

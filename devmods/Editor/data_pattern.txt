@@ -14,7 +14,7 @@ class PopupMenuElementData
 class PopupMenuData
     PopupMenuElementData[] elements = {}
 
-class TreeElementData @needParentHooked
+class TreeElementData
     string text = ""
     boolean canExpand = false
     TreeElementData[] elements = {}
@@ -23,7 +23,44 @@ class TreeData
     table iconList = {}
     TreeElementData[] elements = {}
 
+class ContainerLayoutData @needParentHooked
+    table place = {}
+    ContainerData container = nil
+
 class ContainerData
     boolean isSide = false
     MenuBarData menuBar = nil
     TreeData tree = nil
+    TabData tab = nil
+    GridData grid = nil
+    ContainerLayoutData[] layouts = {}
+
+class TabElementData
+    ButtonData tabButton = nil
+    ContainerData container = nil
+
+class TabData
+    TabElementData[] elements = {}
+
+class GridElementData
+    string text = ""
+
+class GridData
+    GridElementData[] elements = {}
+
+class PropertyListConfigElementData @needParentHooked
+    string propertyType = ""
+    table params = {}
+
+class PropertyListConfigData @needParentHooked
+    PropertyListConfigElementData[] elements = {}
+
+class PropertyListElementData
+    string text = ""
+    number configIndex = 0
+    any value = nil
+    table params = {}
+
+class PropertyListData
+    PropertyListConfigData config = nil
+    PropertyListElementData[] elements = {}

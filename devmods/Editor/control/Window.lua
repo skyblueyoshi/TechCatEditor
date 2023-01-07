@@ -6,6 +6,8 @@ local EventDef = require("config.EventDef")
 function Window:__init(name, parent, parentRoot, data, location)
     Window.super.__init(self, name, parent, parentRoot, data, location)
     self.isWindow = true
+
+    File.saveString(Path.join(App.persistentDataPath, "test.json"), JsonUtil.toJson(data:save(true)))
 end
 
 function Window:adjustLayout(isInitializing, location)

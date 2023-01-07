@@ -1,68 +1,117 @@
 ---@class TCE.GridView:TCE.ScrollContainer
 local GridView = class("GridView", require("ScrollContainer"))
+---@class TCE.GridViewElement:TCE.ScrollContainer
+local GridViewElement = class("GridViewElement", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
-local Constant = require("config.Constant")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
 
---[[
-GridNode：{
-    str Text  描述文字
-}
---]]
+function GridViewElement:__init(root, parent, data, index)
+    GridViewElement.super.__init(self, "", parent, nil, data)
+    self._root = root
+    self._index = index
+    self:_initContent()
+end
 
-function GridView:__init(parent, parentRoot, data, location)
-    GridView.super.__init(self, parent, parentRoot, data, {
+---@return TCE.GridElementData
+function GridViewElement:getData()
+    return self._data
+end
+
+function GridViewElement:_initContent()
+    self:adjustLayout(true)
+    self._root:addMousePointedEnterListener({ self._onElementMouseEnter, self })
+    self._root:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
+    self._root:addTouchDownListener({ self._onElementClicked, self })
+
+    --if self._index == 1 then
+    --    UIRenderTargetNode.cast(self._root:getChild("rt")):addRenderTargetListener({ self._testRT, self })
+    --end
+end
+
+function GridViewElement:adjustLayout(isInitializing, _)
+    local data = self:getData()
+    local cap = UIText.cast(self._root:getChild("cap"))
+    cap.text = data:getText()
+
+    if isInitializing then
+        self._root:getChild("sd").visible = false
+    end
+
+    self._root:applyMargin(true)
+
+    UIUtil.setPanelDisplay(self._root, self._index == self._parent:getSelectedIndex(), false)
+
+    self._root:getChild("img"):getPostDrawLayer(0):removeSpriteAnimation()
+    --if data.OnCreated ~= nil then
+    --    data.OnCreated[1](node, index, table.unpack(data.OnCreated[2]))
+    --end
+end
+
+function GridViewElement:_onElementMouseEnter(_, _)
+    self:_updateSelectedState(true)
+end
+
+function GridViewElement:_onElementMouseLeave(_, _)
+    self:_updateSelectedState(false)
+end
+
+function GridViewElement:_updateSelectedState(pointed)
+    UIUtil.setPanelDisplay(self._root, self._index == self._parent:getSelectedIndex(),
+            pointed, nil, "A")
+end
+
+function GridViewElement:_onElementClicked(_, _)
+    self._parent:setSelected(self._index)
+end
+
+function GridView:__init(name, parent, parentRoot, data, location)
+    GridView.super.__init(self, name, parent, parentRoot, data, {
         isItemFillWidth = false,
         isGrid = true,
     })
-    self._mappingList = {}
-    self._selectIndex = 0
     self:_initContent(location)
 end
 
 function GridView:onDestroy()
-    self._mappingList = {}
     GridView.super.onDestroy(self)
 end
 
-function GridView:_reloadMappingList()
-    self._mappingList = {}
-    if #self._data.Children > 0 then
-        for _, subData in ipairs(self._data.Children) do
-            table.insert(self._mappingList, subData)
-        end
-    end
+---@return TCE.GridData
+function GridView:getData()
+    return self._data
 end
 
 function GridView:_initContent(location)
-    self:_preInitScrollContainer(location)
-
-    self:_reloadMappingList()
-    self:_postInitScrollContainer()
+    self:adjustLayout(true, location)
 end
 
-function GridView:_onCreatePanelItem()
-    local panelItem = self:_makeDefaultPanelItem(96, 120)
-    UIUtil.newPanel(panelItem, "sd", nil, {
+function GridView:adjustLayout(isInitializing, location)
+    self:_adjustLayoutBegin(isInitializing, location)
+    self:_adjustLayoutEnd(isInitializing)
+end
+
+function GridView:_onEnsurePanelItem()
+    local panelItem = self:_ensureDefaultPanelItem(96, 120)
+    UIUtil.ensurePanel(panelItem, "sd", nil, {
         layout = "FULL",
         bgColor = "BD",
     }, false, false)
     panelItem:getChild("sd").visible = false
 
-    local img = UIUtil.newPanel(panelItem, "img", { 0, 8, 64, 64 }, {
+    local img = UIUtil.ensurePanel(panelItem, "img", { 0, 8, 64, 64 }, {
         layout = "CENTER_W",
     }, false, false)
     img.sprite = UISpritePool.getInstance():get("icon_folder")
     img.sprite.color = ThemeUtil.getColor("ICON_COLOR")
 
-    local text = UIUtil.newText(panelItem, "cap", { 0, 80, 32, 32 }, "1", {
+    UIUtil.ensureText(panelItem, "cap", { 0, 80, 32, 32 }, "1", {
         layout = "CENTER_W",
     })
 
-    local rt = UIRenderTargetNode.new("rt", 0, 0, 32, 32)
-    rt.visible = true
-    panelItem:addChild(rt)
+    --local rt = UIRenderTargetNode.new("rt", 0, 0, 32, 32)
+    --rt.visible = true
+    --panelItem:addChild(rt)
 
     return panelItem
 end
@@ -75,62 +124,41 @@ function GridView:_testRT(n, w, h)
 end
 
 function GridView:_getTableElementCount()
-    return #self._mappingList
+    return #self:getData():getElements()
+end
+
+function GridView:_onCreateElement(node, index)
+    local data = self:getData():getElements()[index]
+    return GridViewElement.new(node, self, data, index)
 end
 
 ---_setTableElement
 ---@param node UINode
 ---@param index number
-function GridView:_setTableElement(node, index)
-    --print("GridView:_setTableElement", index, node.position, node.size)
-    local data = self._mappingList[index]
-    local cap = UIText.cast(node:getChild("cap"))
-    cap.text = data.Text
-
-    node:getChild("sd").visible = false
-
-    node:applyMargin(true)
-    node:addMousePointedEnterListener({ self._onElementMouseEnter, self })
-    node:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
-    node:addTouchDownListener({ self._onElementClicked, self })
-
-    if index == 1 then
-        UIRenderTargetNode.cast(node:getChild("rt")):addRenderTargetListener({ self._testRT, self })
-    end
-
-    --local treeNode = TreeNode.new(self, node, {}, {0,0})
-    UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
-
-    node:getChild("img"):getPostDrawLayer(0):removeSpriteAnimation()
-    if data.OnCreated ~= nil then
-        data.OnCreated[1](node, index, table.unpack(data.OnCreated[2]))
-    end
-end
-
-function GridView:setSelected(index)
-    if self._selectIndex == index then
-        return
-    end
-    self._selectIndex = index
-    local nodes = UIUtil.getAllValidElements(self._sv)
-    for _, node in ipairs(nodes) do
-        UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
-    end
-end
-
-function GridView:_onElementMouseEnter(node, _)
-    local index = node.tag
-    UIUtil.setPanelDisplay(node, index == self._selectIndex, true, nil, "A")
-end
-
-function GridView:_onElementMouseLeave(node, _)
-    local index = node.tag
-    UIUtil.setPanelDisplay(node, index == self._selectIndex, false, nil, "A")
-end
-
-function GridView:_onElementClicked(node, _)
-    local index = node.tag
-    self:setSelected(index)
-end
+--function GridView:_setTableElement(node, index)
+--    --print("GridView:_setTableElement", index, node.position, node.size)
+--    local data = self._mappingList[index]
+--    local cap = UIText.cast(node:getChild("cap"))
+--    cap.text = data.Text
+--
+--    node:getChild("sd").visible = false
+--
+--    node:applyMargin(true)
+--    node:addMousePointedEnterListener({ self._onElementMouseEnter, self })
+--    node:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
+--    node:addTouchDownListener({ self._onElementClicked, self })
+--
+--    if index == 1 then
+--        UIRenderTargetNode.cast(node:getChild("rt")):addRenderTargetListener({ self._testRT, self })
+--    end
+--
+--    --local treeNode = TreeNode.new(self, node, {}, {0,0})
+--    UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
+--
+--    node:getChild("img"):getPostDrawLayer(0):removeSpriteAnimation()
+--    if data.OnCreated ~= nil then
+--        data.OnCreated[1](node, index, table.unpack(data.OnCreated[2]))
+--    end
+--end
 
 return GridView

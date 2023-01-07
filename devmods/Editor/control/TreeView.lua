@@ -1,97 +1,42 @@
 ---@class TCE.TreeView:TCE.ScrollContainer
 local TreeView = class("TreeView", require("ScrollContainer"))
+---@class TCE.TreeViewElement:TCE.ScrollContainer
+local TreeViewElement = class("TreeViewElement", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
 
-function TreeView:__init(name, parent, parentRoot, data, location)
-    TreeView.super.__init(self, name, parent, parentRoot, data, {})
-    self._mappingList = {}
-    self._selectIndex = 0
-    self:_initContent(location)
+function TreeViewElement:__init(root, parent, data, index, level)
+    TreeViewElement.super.__init(self, "", parent, nil, data)
+    self._index = index
+    self._level = level
+    self._root = root
+    self:_initContent()
 end
 
-function TreeView:onDestroy()
-    self._mappingList = {}
-    TreeView.super.onDestroy(self)
-end
-
----@return TCE.TreeData
-function TreeView:getData()
+---@return TCE.TreeElementData
+function TreeViewElement:getData()
     return self._data
 end
 
-function TreeView:_reloadMappingList()
-    self._mappingList = {}
+function TreeViewElement:_initContent()
+    self:adjustLayout(true)
+    self._root:addMousePointedEnterListener({ self._onElementMouseEnter, self })
+    self._root:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
+    self._root:addTouchDownListener({ self._onElementClicked, self })
+end
+
+function TreeViewElement:adjustLayout(isInitializing, _)
     local data = self:getData()
+    ---@type TCE.TreeData
+    local treeData = self._parent:getData()
 
-    ---@param _subData TCE.TreeElementData
-    ---@param _level number
-    local function _loadRecursively(_subData, _level)
-        table.insert(self._mappingList, {_subData, _level})
-        print("sssssss", _subData:getText())
-        for _, _nextData in ipairs(_subData:getElements()) do
-            _loadRecursively(_nextData, _level + 1)
-        end
-    end
+    local arr = UIPanel.cast(self._root:getChild("img_arr"))
+    local icon = UIPanel.cast(self._root:getChild("img_icon"))
+    local cap = UIText.cast(self._root:getChild("cap"))
 
-    for _, subData in ipairs(data:getElements()) do
-        _loadRecursively(subData, 0)
-    end
-end
-
-function TreeView:_initContent(location)
-    self:adjustLayout(true, { location[1], location[2], 200, 400 })
-end
-
-function TreeView:adjustLayout(isInitializing, location)
-    self:_adjustLayoutBegin(isInitializing, location)
-    self:_reloadMappingList()
-    self:_adjustLayoutEnd(isInitializing)
-end
-
-function TreeView:_onCreatePanelItem()
-    local panelItem = TreeView.super._onCreatePanelItem(self)
-    UIUtil.newPanel(panelItem, "sd", nil, {
-        layout = "FULL",
-        bgColor = "BD",
-    }, false, false)
-    panelItem:getChild("sd").visible = false
-
-    UIUtil.newPanel(panelItem, "img_arr", { 0, 0, 16, 16 }, {
-        layout = "CENTER_H",
-    }, false, false)
-    UIUtil.newPanel(panelItem, "img_icon", { 0, 0, 16, 16 }, {
-        layout = "CENTER_H",
-    }, false, false)
-    UIUtil.newText(panelItem, "cap", nil, "1", {
-        layout = "CENTER_H",
-    })
-
-    return panelItem
-end
-
-function TreeView:_getTableElementCount()
-    return #self._mappingList
-end
-
----_setTableElement
----@param node UINode
----@param index number
-function TreeView:_setTableElement(node, index)
-    --print("TreeView:_setTableElement", index, node.position, node.size)
-    local mapping = self._mappingList[index]
-    ---@type TCE.TreeElementData
-    local data = mapping[1]
-    local level = mapping[2]
-    local treeData = self:getData()
-
-    local arr = UIPanel.cast(node:getChild("img_arr"))
-    local icon = UIPanel.cast(node:getChild("img_icon"))
-    local cap = UIText.cast(node:getChild("cap"))
-
-    local curX = level * 10
+    local curX = self._level * 10
     local isParentNode = false
     if data:getCanExpand() then
         arr.sprite = UISpritePool.getInstance():get("icon_arr_folded")
@@ -131,41 +76,115 @@ function TreeView:_setTableElement(node, index)
     cap.text = data:getText()
     cap.positionX = curX
 
-    node:getChild("sd").visible = false
-
-    node:applyMargin(true)
-    node:addMousePointedEnterListener({ self._onElementMouseEnter, self })
-    node:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
-    node:addTouchDownListener({ self._onElementClicked, self })
-
-    --local treeNode = TreeNode.new(self, node, {}, {0,0})
-    UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
-end
-
-function TreeView:setSelected(index)
-    if self._selectIndex == index then
-        return
+    if isInitializing then
+        self._root:getChild("sd").visible = false
     end
-    self._selectIndex = index
-    local nodes = UIUtil.getAllValidElements(self._sv)
-    for _, node in ipairs(nodes) do
-        UIUtil.setPanelDisplay(node, node.tag == self._selectIndex, false)
+
+    self._root:applyMargin(true)
+    if isInitializing then
+        self:_updateSelectedState(false)
     end
 end
 
-function TreeView:_onElementMouseEnter(node, _)
-    local index = node.tag
-    UIUtil.setPanelDisplay(node, index == self._selectIndex, true, nil, "A")
+function TreeViewElement:_onElementMouseEnter(_, _)
+    self:_updateSelectedState(true)
 end
 
-function TreeView:_onElementMouseLeave(node, _)
-    local index = node.tag
-    UIUtil.setPanelDisplay(node, index == self._selectIndex, false, nil, "A")
+function TreeViewElement:_onElementMouseLeave(_, _)
+    self:_updateSelectedState(false)
 end
 
-function TreeView:_onElementClicked(node, _)
-    local index = node.tag
-    self:setSelected(index)
+function TreeViewElement:_updateSelectedState(pointed)
+    UIUtil.setPanelDisplay(self._root, self._index == self._parent:getSelectedIndex(),
+            pointed, nil, "A")
+end
+
+function TreeViewElement:_onElementClicked(_, _)
+    self._parent:setSelected(self._index)
+end
+
+function TreeView:__init(name, parent, parentRoot, data, location)
+    TreeView.super.__init(self, name, parent, parentRoot, data, {})
+    self._mappingList = {}
+    self:_initContent(location)
+end
+
+function TreeView:onDestroy()
+    self._mappingList = {}
+    TreeView.super.onDestroy(self)
+end
+
+---@return TCE.TreeData
+function TreeView:getData()
+    return self._data
+end
+
+function TreeView:_reloadMappingList()
+    self._mappingList = {}
+    local data = self:getData()
+
+    ---@param _subData TCE.TreeElementData
+    ---@param _level number
+    local function _loadRecursively(_subData, _level)
+        table.insert(self._mappingList, {_subData, _level})
+        for _, _nextData in ipairs(_subData:getElements()) do
+            _loadRecursively(_nextData, _level + 1)
+        end
+    end
+
+    for _, subData in ipairs(data:getElements()) do
+        _loadRecursively(subData, 0)
+    end
+end
+
+function TreeView:_initContent(location)
+    self:adjustLayout(true, { location[1], location[2], 200, 400 })
+end
+
+function TreeView:adjustLayout(isInitializing, location)
+    self:_adjustLayoutBegin(isInitializing, location)
+    self:_reloadMappingList()
+    self:_adjustLayoutEnd(isInitializing)
+end
+
+function TreeView:_onEnsurePanelItem()
+    local panelItem = TreeView.super._onEnsurePanelItem(self)
+    UIUtil.ensurePanel(panelItem, "sd", nil, {
+        layout = "FULL",
+        bgColor = "BD",
+    }, false, false)
+    panelItem:getChild("sd").visible = false
+
+    UIUtil.ensurePanel(panelItem, "img_arr", { 0, 0, 16, 16 }, {
+        layout = "CENTER_H",
+    }, false, false)
+    UIUtil.ensurePanel(panelItem, "img_icon", { 0, 0, 16, 16 }, {
+        layout = "CENTER_H",
+    }, false, false)
+    UIUtil.ensureText(panelItem, "cap", nil, "1", {
+        layout = "CENTER_H",
+    })
+
+    return panelItem
+end
+
+function TreeView:_getTableElementCount()
+    return #self._mappingList
+end
+
+function TreeView:_onCreateElement(node, index)
+    local mapping = self._mappingList[index]
+    local data = mapping[1]
+    local level = mapping[2]
+
+    return TreeViewElement.new(node, self, data, index, level)
+end
+
+function TreeView:onDataChanged(names)
+    --print(self:getData():save())
+    if names["elements"] then
+        self:adjustLayout(false)
+    end
 end
 
 return TreeView

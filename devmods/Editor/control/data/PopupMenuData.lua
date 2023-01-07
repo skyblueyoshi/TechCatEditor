@@ -23,6 +23,11 @@ function PopupMenuData:addToElements(element)
     self:_listAppend("elements", element)
 end
 
+---@param value table
+function PopupMenuData:addCfgToElements(value)
+    self:_listAppendCfg("elements", value)
+end
+
 function PopupMenuData:clearElements()
     self:_listClear("elements")
 end

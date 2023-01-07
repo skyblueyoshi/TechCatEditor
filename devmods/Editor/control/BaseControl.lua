@@ -49,8 +49,10 @@ function BaseControl:onDestroy()
     self:removeAllChildren()
     self:removeAllChildrenMap()
 
-    self._parentRoot:removeChild(self._root)
-    self._parentRoot = nil
+    if self._parentRoot ~= nil then
+        self._parentRoot:removeChild(self._root)
+        self._parentRoot = nil
+    end
     self._parent = nil
     self._root = nil
 
@@ -89,8 +91,7 @@ function BaseControl:addChildToMap(key, child)
     if self._childrenMap[key] == nil then
         self._childrenMap[key] = child
     else
-        print("fail map:", key)
-        assert(false)
+        assert(false, "fail to add control key:" .. key)
     end
 end
 
@@ -140,6 +141,11 @@ function BaseControl:requestParentChangeLayout(key)
 end
 
 function BaseControl:onDataChanged(names)
+end
+
+---@param isInitializing boolean
+---@param location table
+function BaseControl:adjustLayout(isInitializing, location)
 end
 
 return BaseControl

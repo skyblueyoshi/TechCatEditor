@@ -7,7 +7,7 @@ local DataMembers = {
 }
 
 function TreeElementData:__init(cfg)
-    self:initData(DataMembers, cfg, true)
+    self:initData(DataMembers, cfg, false)
 end
 
 ---@param value string
@@ -43,6 +43,11 @@ end
 ---@param element TCE.TreeElementData
 function TreeElementData:addToElements(element)
     self:_listAppend("elements", element)
+end
+
+---@param value table
+function TreeElementData:addCfgToElements(value)
+    self:_listAppendCfg("elements", value)
 end
 
 function TreeElementData:clearElements()

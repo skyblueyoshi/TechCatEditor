@@ -4,6 +4,9 @@ local DataMembers = {
     isSide = { false },
     menuBar = { nil, "MenuBarData" },
     tree = { nil, "TreeData" },
+    tab = { nil, "TabData" },
+    grid = { nil, "GridData" },
+    layouts = { {}, "ContainerLayoutData", "list" },
 }
 
 function ContainerData:__init(cfg)
@@ -38,6 +41,50 @@ end
 ---@return TCE.TreeData
 function ContainerData:getTree()
     return self:_get("tree")
+end
+
+---@param value TCE.TabData
+function ContainerData:setTab(value)
+    self:_set("tab", value)
+end
+
+---@return TCE.TabData
+function ContainerData:getTab()
+    return self:_get("tab")
+end
+
+---@param value TCE.GridData
+function ContainerData:setGrid(value)
+    self:_set("grid", value)
+end
+
+---@return TCE.GridData
+function ContainerData:getGrid()
+    return self:_get("grid")
+end
+
+---@param value table
+function ContainerData:setLayouts(value)
+    self:_set("layouts", value)
+end
+
+---@return TCE.ContainerLayoutData[]
+function ContainerData:getLayouts()
+    return self:_get("layouts")
+end
+
+---@param element TCE.ContainerLayoutData
+function ContainerData:addToLayouts(element)
+    self:_listAppend("layouts", element)
+end
+
+---@param value table
+function ContainerData:addCfgToLayouts(value)
+    self:_listAppendCfg("layouts", value)
+end
+
+function ContainerData:clearLayouts()
+    self:_listClear("layouts")
 end
 
 return ContainerData

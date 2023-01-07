@@ -84,6 +84,10 @@ local function getInfoUIName(info)
     return info[2]
 end
 
+local function getDefaultValue(info)
+    return info[1]
+end
+
 function BaseData:initData(DataMembers, cfg, needParentHooked)
     -- 父数据
     self._parent = nil
@@ -98,7 +102,7 @@ function BaseData:initData(DataMembers, cfg, needParentHooked)
     self._needParentHooked = needParentHooked
 
     for name, info in pairs(self._memberInfo) do
-        self[name] = info[1]
+        self[name] = getDefaultValue(info)
     end
     self:load(cfg)
 end
@@ -140,7 +144,7 @@ end
 function BaseData:clear()
     local changedMemberNames = {}
     for name, info in pairs(self._memberInfo) do
-        local changed = self:_set(name, info[1], false)
+        local changed = self:_set(name, getDefaultValue(info), false)
         if changed then
             table.insert(changedMemberNames, name)
         end
@@ -149,8 +153,12 @@ function BaseData:clear()
 end
 
 ---将所有数据保存到纯数据表。
+---@param ignoreDefaultValue boolean
 ---@return table
-function BaseData:save()
+function BaseData:save(ignoreDefaultValue)
+    if ignoreDefaultValue == nil then
+        ignoreDefaultValue = false
+    end
     local result = {}
     for memberName, info in pairs(self._memberInfo) do
         local uiName = getInfoUIName(info)
@@ -159,21 +167,35 @@ function BaseData:save()
             local isList, isDict = isInfoListOrDict(info)
             if isList then
                 local tempList = {}
+                local ok = false
                 for i, curObjElement in ipairs(curObj) do
-                    tempList[i] = curObjElement:save()
+                    ok = true
+                    tempList[i] = curObjElement:save(ignoreDefaultValue)
                 end
-                result[memberName] = tempList
+                if ok then
+                    result[memberName] = tempList
+                end
             elseif isDict then
                 local tempDict = {}
+                local ok = false
                 for k, curObjElement in pairs(curObj) do
-                    tempDict[k] = curObjElement:save()
+                    ok = true
+                    if ok then
+                        tempDict[k] = curObjElement:save(ignoreDefaultValue)
+                    end
                 end
                 result[memberName] = tempDict
             elseif curObj ~= nil then
-                result[memberName] = curObj:save()
+                result[memberName] = curObj:save(ignoreDefaultValue)
             end
         else
-            result[memberName] = curObj
+            local ok = true
+            if ignoreDefaultValue then
+                ok = not isBaseTypeEqualTo(curObj, getDefaultValue(info))
+            end
+            if ok then
+                result[memberName] = curObj
+            end
         end
     end
     return result
@@ -220,6 +242,13 @@ function BaseData:_listClear(memberName)
     end
     self:_set(memberName, {})
     return true
+end
+
+function BaseData:_listAppendCfg(memberName, value)
+    local info = self._memberInfo[memberName]
+    local uiName = getInfoUIName(info)
+    local element = createElementByCfg(uiName, value)
+    return self:_listAppend(memberName, element)
 end
 
 function BaseData:_listAppend(memberName, element)

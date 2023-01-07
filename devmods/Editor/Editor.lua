@@ -4,7 +4,6 @@ local UISpritePool = require("core.UISpritePool")
 local EditorDebug = require("ui_debug.EditorDebug")
 
 function Editor:__init()
-
     TextureManager.setGcEnabled(false)
 
     self._cameraGo = GameObject.instantiate()
@@ -22,6 +21,7 @@ function Editor:__init()
 end
 
 function Editor:start()
+    IntegratedClient.main.isMaxFPS = true
 end
 
 function Editor:destroy()

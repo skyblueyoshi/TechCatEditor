@@ -7,10 +7,9 @@ local Container = require("Container")
 
 local VIEW_CONTAINER_KEY = "ViewContainer"
 
-function TabView:__init(parent, parentRoot, data, location)
-    TabView.super.__init(self, parent, parentRoot, data, location)
+function TabView:__init(name, parent, parentRoot, data, location)
+    TabView.super.__init(self, name, parent, parentRoot, data, location)
     self._selectedIndex = 0
-    self._tabCount = 0
     self._panelTab = nil  ---@type UINode
     self._panelContainer = nil  ---@type UINode
     self._panelInnerContainer = nil  ---@type UINode
@@ -26,36 +25,62 @@ function TabView:onDestroy()
     TabView.super.onDestroy(self)
 end
 
+---@return TCE.TabData
+function TabView:getData()
+    return self._data
+end
+
 function TabView:_initContent(location)
-    self._tabCount = #self._data
-    self._root = UIUtil.newPanel(self._parentRoot, "tab_view", location, {
+    self:adjustLayout(true, location)
+end
+
+function TabView:adjustLayout(isInitializing, location)
+    local data = self:getData()
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, location, {
         layout = "FULL",
-        --bgColor = "B",
+        bgColor = "B",
     }, true)
 
-    self._panelTab = UIUtil.newPanel(self._root, "panel_tab", { 0, 0, 32, Constant.DEFAULT_BAR_HEIGHT }, {
+    self._panelTab = UIUtil.ensurePanel(self._root, "panel_tab", { 0, 0, 32, Constant.DEFAULT_BAR_HEIGHT }, {
         layout = "FULL_W"
     }, true)
 
-    self._panelContainer = UIUtil.newPanel(self._root, "panel_container", {}, {
+    self._panelContainer = UIUtil.ensurePanel(self._root, "panel_container", {}, {
         margins = { 0, Constant.DEFAULT_BAR_HEIGHT, 0, 0, true, true },
         bgColor = "A",
     })
 
-    self._panelInnerContainer = UIUtil.newPanel(self._panelContainer, "inner", {}, {
+    self._panelInnerContainer = UIUtil.ensurePanel(self._panelContainer, "inner", {}, {
         margins = { Constant.TAB_VIEW_SIDE_OFFSET, Constant.TAB_VIEW_SIDE_OFFSET, Constant.TAB_VIEW_SIDE_OFFSET, Constant.TAB_VIEW_SIDE_OFFSET, true, true },
         bgColor = "B",
     })
 
+    self:removeAllChildren()
     local elementX, elementY = 0, 0
-    for idx, data in ipairs(self._data) do
-        local tabData = data.Tab
+    for idx, elementData in ipairs(data:getElements()) do
+        local tabData = elementData:getTabButton()
         local elementLocation = { elementX, elementY, Constant.ELEMENT_MIN_WIDTH, Constant.DEFAULT_BAR_HEIGHT }
-        local tab = Button.new(self, self._panelTab, tabData, elementLocation, { tag = idx, style = "Tab", selectedColor = "A" })
+        local tab = Button.new("tab_" .. tostring(idx), self, self._panelTab, tabData, elementLocation,
+                { tag = idx, style = "Tab", selectedColor = "A" })
         elementX = elementX + tab:getRoot().width
         self:addChild(tab)
     end
 
+    if isInitializing then
+        self:setSelected(1)
+    else
+        self:checkSelectedValid()
+    end
+end
+
+function TabView:checkSelectedValid()
+    if not self:hasAnyTab() then
+        return
+    end
+    local total = #self:getData():getElements()
+    if self._selectedIndex <= total then
+        return
+    end
     self:setSelected(1)
 end
 
@@ -71,7 +96,7 @@ function TabView:setSelected(index)
 end
 
 function TabView:hasAnyTab()
-    return self._tabCount > 0
+    return #self:getData():getElements() > 0
 end
 
 function TabView:updateSelect()
@@ -80,14 +105,12 @@ function TabView:updateSelect()
         child:setSelected(selected)
     end
 
-    local data = self._data[self._selectedIndex]
-    local containerData = data.Container
+    local data = self:getData()
+    local elementData = data:getElements()[self._selectedIndex]
+    local containerData = elementData:getContainer()
 
-    if self:getChildFromMap(VIEW_CONTAINER_KEY) ~= nil then
-        self:removeChildFromMap(VIEW_CONTAINER_KEY)
-        self._viewContainer = nil
-    end
-    self._viewContainer = Container.new(self, self._panelInnerContainer, containerData, {})
+    self:removeChildFromMap(VIEW_CONTAINER_KEY)
+    self._viewContainer = Container.new("view", self, self._panelInnerContainer, containerData, {})
     self:addChildToMap(VIEW_CONTAINER_KEY, self._viewContainer)
 end
 

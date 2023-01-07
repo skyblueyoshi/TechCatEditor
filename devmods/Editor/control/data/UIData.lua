@@ -8,9 +8,21 @@ local DataDict = {
     TreeElementData = require("TreeElementData"),
     TreeData = require("TreeData"),
     ContainerData = require("ContainerData"),
+    ContainerLayoutData = require("ContainerLayoutData"),
+    TabElementData = require("TabElementData"),
+    TabData = require("TabData"),
+    GridElementData = require("GridElementData"),
+    GridData = require("GridData"),
+    PropertyListElementData = require("PropertyListElementData"),
+    PropertyListData = require("PropertyListData"),
+    PropertyListConfigElementData = require("PropertyListConfigElementData"),
+    PropertyListConfigData = require("PropertyListConfigData"),
 }
 
 function UIData.create(uiName, cfg)
+    if DataDict[uiName] == nil then
+        assert(false, "missing data type: " .. uiName)
+    end
     return DataDict[uiName].new(cfg)
 end
 

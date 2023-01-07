@@ -6,8 +6,8 @@ local Constant = require("config.Constant")
 ---__init
 ---@param parent TCE.BaseControl
 ---@param parentRoot UINode
-function DraggableArea:__init(parent, parentRoot, isVertical, callback)
-    DraggableArea.super.__init(self, parent, parentRoot, {})
+function DraggableArea:__init(name, parent, parentRoot, isVertical, callback)
+    DraggableArea.super.__init(self, name, parent, parentRoot, {})
     self._isVertical = isVertical
     self._lastTouchPos = nil  ---@type Vector2
     self._curTouchPos = nil  ---@type Vector2
@@ -20,7 +20,13 @@ function DraggableArea:onDestroy()
 end
 
 function DraggableArea:_initContent()
-    local name = self._isVertical and "drag_v" or "drag_h"
+    self:adjustLayout(true)
+    self._root:addTouchDownListener({ self._onTouchDown, self })
+    self._root:addTouchUpAfterMoveListener({ self._onTouchUp, self })
+    self._root:addTouchMoveListener({ self._onTouchMove, self })
+end
+
+function DraggableArea:adjustLayout(isInitializing, location)
     local margins
     if self._isVertical then
         margins = { nil, 1, 1, 1, false, true }
@@ -28,7 +34,7 @@ function DraggableArea:_initContent()
         margins = { 1, nil, 1, 1, true, false }
     end
 
-    self._root = UIUtil.newPanel(self._parentRoot, name, { 0, 0, Constant.DRAG_AREA_SIZE, Constant.DRAG_AREA_SIZE }, {
+    self._root = UIUtil.ensurePanel(self._parentRoot, self._name, { 0, 0, Constant.DRAG_AREA_SIZE, Constant.DRAG_AREA_SIZE }, {
         margins = margins,
         bgColor = "B",
     }, false, true)
@@ -39,15 +45,13 @@ function DraggableArea:_initContent()
     else
         marginSD = { 2, 0, 2, 0, true, false }
     end
-    local sd = UIUtil.newPanel(self._root, "sd", { 0, 0, 64, 64 }, {
+    local sd = UIUtil.ensurePanel(self._root, "sd", { 0, 0, 64, 64 }, {
         margins = marginSD,
         bgColor = "SD",
     })
-    sd.visible = false
-
-    self._root:addTouchDownListener({ self._onTouchDown, self })
-    self._root:addTouchUpAfterMoveListener({ self._onTouchUp, self })
-    self._root:addTouchMoveListener({ self._onTouchMove, self })
+    if isInitializing then
+        sd.visible = false
+    end
 end
 
 ---_onTouchDown

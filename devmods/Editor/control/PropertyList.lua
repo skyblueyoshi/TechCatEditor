@@ -66,29 +66,29 @@ function PropertyList:_initContent(location)
     self:addEventListener(EventDef.ALL_POPUP_CLOSE, { self._onPopupOutsideEvent, self })
 end
 
-function PropertyList:_onCreatePanelItem()
-    local panelItem = PropertyList.super._onCreatePanelItem(self)
-    UIUtil.newPanel(panelItem, "sd", nil, {
+function PropertyList:_onEnsurePanelItem()
+    local panelItem = PropertyList.super._onEnsurePanelItem(self)
+    UIUtil.ensurePanel(panelItem, "sd", nil, {
         layout = "FULL",
         bgColor = "BD",
     }, false, false)
     panelItem:getChild("sd").visible = false
 
-    local panelElement = UIUtil.newPanel(panelItem, "panel_element", nil, {
+    local panelElement = UIUtil.ensurePanel(panelItem, "panel_element", nil, {
         layout = "FULL",
     }, false, false)
 
     local function _makeSubPanel(subPanelName)
-        local panelCheck = UIUtil.newPanel(panelElement, subPanelName, nil, {
+        local panelCheck = UIUtil.ensurePanel(panelElement, subPanelName, nil, {
             layout = "FULL",
         }, false, false)
-        UIUtil.newText(panelCheck, "cap", { 4, 0, 32, 32 }, "Cap", {
+        UIUtil.ensureText(panelCheck, "cap", { 4, 0, 32, 32 }, "Cap", {
             layout = "CENTER_H",
             widthRate = 0.38,
             autoAdaptSize = false,
             horizontalOverflow = TextHorizontalOverflow.Discard,
         })
-        local subPanel = UIUtil.newPanel(panelCheck, "sub", { 0, 0, 140, 32 }, {
+        local subPanel = UIUtil.ensurePanel(panelCheck, "sub", { 0, 0, 140, 32 }, {
             margins = { nil, 0, 0, 0, false, true },
             widthRate = 0.6,
         }, false, false)
@@ -98,7 +98,7 @@ function PropertyList:_onCreatePanelItem()
 
     do
         local subPanel = _makeSubPanel(TYPE_TO_PANEL_NAME.Boolean)
-        local checkBox = UIUtil.newPanel(subPanel, "check", { 0, 0, 16, 16 }, {
+        local checkBox = UIUtil.ensurePanel(subPanel, "check", { 0, 0, 16, 16 }, {
             layout = "CENTER_H",
         })
         checkBox.sprite = UISpritePool.getInstance():get("check_box_false")
@@ -106,14 +106,14 @@ function PropertyList:_onCreatePanelItem()
 
     do
         local subPanel = _makeSubPanel(TYPE_TO_PANEL_NAME.ComboBox)
-        local combo = UIUtil.newPanel(subPanel, "combo", nil, {
+        local combo = UIUtil.ensurePanel(subPanel, "combo", nil, {
             margins = { 1, 1, 1, 1, true, true },
             bgColor = "A",
         })
-        UIUtil.newText(combo, "cap", { 4, 0, 32, 32 }, "Cap", {
+        UIUtil.ensureText(combo, "cap", { 4, 0, 32, 32 }, "Cap", {
             layout = "CENTER_H",
         })
-        local arr = UIUtil.newPanel(combo, "arr", { 0, 0, 16, 16 }, {
+        local arr = UIUtil.ensurePanel(combo, "arr", { 0, 0, 16, 16 }, {
             margins = { nil, 0, 4, 0, false, false },
         }, false, false)
         arr.sprite = UISpritePool.getInstance():get("icon_arr_down")
@@ -122,16 +122,16 @@ function PropertyList:_onCreatePanelItem()
 
     local function _makeValueInputPanel(typeName)
         local subPanel = _makeSubPanel(TYPE_TO_PANEL_NAME[typeName])
-        local panelInput = UIUtil.newPanel(subPanel, "panel_input", nil, {
+        local panelInput = UIUtil.ensurePanel(subPanel, "panel_input", nil, {
             margins = { 1, 1, 1, 1, true, true },
             bgColor = "B",
         })
-        UIUtil.newPanel(panelInput, "sd", nil, {
+        UIUtil.ensurePanel(panelInput, "sd", nil, {
             layout = "FULL",
             bgColor = "A2",
             borderColor = "SD",
         })
-        UIUtil.newInputField(panelInput, "in", nil, "123", {
+        UIUtil.ensureInputField(panelInput, "in", nil, "123", {
             margins = { 8, 0, 8, 0, true, true },
             isSelectAllFirstClicked = true,
         })

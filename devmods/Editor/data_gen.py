@@ -13,7 +13,7 @@ def cap_str(key: str):
 
 
 def is_base_type(type_name: str):
-    return type_name in ("number", "string", "boolean", "table")
+    return type_name in ("number", "string", "boolean", "table", "any")
 
 
 def read_file_to_lines(file_name: str):
@@ -134,6 +134,11 @@ end
 ---@param element {3}
 function {0}:addTo{2}(element)
     self:_listAppend("{1}", element)
+end
+
+---@param value table
+function {0}:addCfgTo{2}(value)
+    self:_listAppendCfg("{1}", value)
 end
 
 function {0}:clear{2}()

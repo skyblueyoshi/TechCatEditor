@@ -380,78 +380,78 @@ local TestTree2 = {
 }
 
 local TestGrid = {
-    Children = {
+    elements = {
         {
-            Text = "AAA",
+            text = "AAA",
         },
         {
-            Text = "bbb",
+            text = "bbb",
         },
         {
-            Text = "cc cc",
+            text = "cc cc",
         },
         {
-            Text = "DDD dd",
+            text = "DDD dd",
         },
         {
-            Text = "AAA",
+            text = "AAA",
         },
         {
-            Text = "bbb",
+            text = "bbb",
         },
         {
-            Text = "cc cc",
+            text = "cc cc",
         },
         {
-            Text = "DDD dd",
+            text = "DDD dd",
         },
         {
-            Text = "AAA",
+            text = "AAA",
         },
         {
-            Text = "bbb",
+            text = "bbb",
         },
         {
-            Text = "cc cc",
+            text = "cc cc",
         },
         {
-            Text = "DDD dd",
+            text = "DDD dd",
         },
         {
-            Text = "AAA",
+            text = "AAA",
         },
         {
-            Text = "bbb",
+            text = "bbb",
         },
         {
-            Text = "cc cc",
+            text = "cc cc",
         },
         {
-            Text = "DDD dd",
+            text = "DDD dd",
         },
         {
-            Text = "AAA",
+            text = "AAA",
         },
         {
-            Text = "bbb",
+            text = "bbb",
         },
         {
-            Text = "cc cc",
+            text = "cc cc",
         },
         {
-            Text = "DDD dd",
+            text = "DDD dd",
         },
         {
-            Text = "AAA",
+            text = "AAA",
         },
         {
-            Text = "bbb",
+            text = "bbb",
         },
         {
-            Text = "cc cc",
+            text = "cc cc",
         },
         {
-            Text = "DDD dd",
+            text = "DDD dd",
         },
     }
 }
@@ -565,7 +565,7 @@ local windowOld = {
             Container = ContainerR,
         },
         {
-            Place = {2},
+            Place = { 2 },
             Container = ContainerT,
         },
     }
@@ -573,59 +573,103 @@ local windowOld = {
 
 local PopupMenu = {
     elements = {
-        {
-            text = "Element 0",
-        },
-        {
-            text = "Element 1",
-        },
+        { text = "Element 0", },
+        { text = "Element 1", },
     },
 }
 
 local MenuBarData = {
     elements = {
-        {
-            text = "File",
-            popupMenu = PopupMenu,
-        },
-        {
-            text = "Edit",
-            popupMenu = PopupMenu,
-        },
-        {
-            text = "Edit22",
-            popupMenu = PopupMenu,
-        },
+        { text = "File", popupMenu = PopupMenu, },
+        { text = "Edit", popupMenu = PopupMenu, },
+        { text = "Edit22", popupMenu = PopupMenu, },
     }
 }
 
 local TreeData = {
-    iconList = {
-        "icon_go",
-        "icon_go",
-    },
+    iconList = { "icon_go", "icon_go", },
     elements = {
         {
             text = "GameObject",
             elements = {
-                {
-                    text = "Cup",
-                },
-                {
-                    text = "Cup2",
-                    canExpand = true,
-                },
-                {
-                    text = "Cup3",
-                },
+                { text = "Cup", },
+                { text = "Cup2", canExpand = true, },
+                { text = "Cup3", },
             }
         },
     }
 }
 
+local PropertyData = {
+
+    config = {
+        elements = {
+            [1] = { propertyType = "Boolean", },
+            [2] = {
+                propertyType = "ComboBox",
+                params = {
+                    { text = "Blend", },
+                    { text = "Alpha", },
+                    { text = "Probe", },
+                    { text = "Canvas", },
+                },
+            },
+            [3] = { propertyType = "Int", },
+            [4] = { propertyType = "Float", },
+        }
+    },
+    elements = {
+        { text = "启用", configIndex = 1, value = true, },
+        { text = "设置", configIndex = 1, value = false, },
+        { text = "效果", configIndex = 2, value = 2, },
+        { text = "动画", configIndex = 3, value = 1, params = { 1, 100 } },
+        { text = "Speed", configIndex = 4, value = 3.14159, params = { 1, 100 } },
+    }
+}
+
+local EditorLeft = {
+    isSide = true,
+    tab = {
+        elements = {
+            {
+                tabButton = { text = "Class", icon = "icon_go", },
+                container = { tree = TreeData, },
+            },
+        },
+    },
+}
+
+local EditorBottom = {
+    isSide = true,
+    tab = {
+        elements = {
+            {
+                tabButton = { text = "Resource", icon = "icon_folder_16", },
+                container = {
+                    layouts = {
+                        { place = { 1, 4 }, container = EditorLeft, },
+                        { place = { 2, 3, 5, 6 }, container = { grid = TestGrid, }, },
+                    }
+                },
+            },
+        },
+    },
+}
+
 local EditorWindowData = {
     menuBar = MenuBarData,
-    tree = TreeData,
+    layouts = {
+        { place = { 1 }, container = EditorLeft, },
+        { place = { 4, 5 }, container = EditorBottom, },
+        --{
+        --    place = { 3, 6 },
+        --    container = EditorLeft,
+        --},
+        --{
+        --    place = { 2 },
+        --    container = EditorLeft,
+        --},
+    }
 }
 
 return EditorWindowData

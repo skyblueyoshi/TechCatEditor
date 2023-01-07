@@ -59,16 +59,41 @@ end
 ---@return UIInputField
 function UIUtil.newInputField(parent, name, location, content, cfg)
     local node = UIInputField.new(name)
+    parent:addChild(node)
+    UIUtil.setInputField(node, location, content, cfg)
+    return node
+end
+
+---@param parent UINode
+---@param name string
+---@param location table
+---@param content string
+---@param cfg table
+---@return UIInputField
+function UIUtil.ensureInputField(parent, name, location, content, cfg)
+    local node = parent:getChild(name)
+    if not node:valid() then
+        return UIUtil.newInputField(parent, name, location, content, cfg)
+    else
+        UIUtil.setInputField(node, location, content, cfg)
+    end
+    return node
+end
+
+---newInputField
+---@param nodeParam UINode
+---@param location table
+---@param content string
+---@param cfg table
+function UIUtil.setInputField(nodeParam, location, content, cfg)
+    local node = UIInputField.cast(nodeParam)
     UIUtil.setLocation(node, location)
     node.text = content
     node.color = ThemeUtil.getColor("FONT_COLOR")
     node.fontSize = Constant.DEFAULT_FONT_SIZE
-
-    parent:addChild(node)
     UIUtil.setCommonByCfg(node, cfg)
     UIUtil.setTextByCfg(node, cfg)
     UIUtil.setInputFieldByCfg(node, cfg)
-    return node
 end
 
 ---newPanel
@@ -245,8 +270,12 @@ function UIUtil.setImageByCfg(node, cfg)
         node.sprite.color = ThemeUtil.getColor(cfg.bgColor)
     end
 
+    local imgBorder = node:getChild("__border")
     if cfg.borderColor ~= nil then
-        local imgBorder = UIImage.new("__border")
+        if not imgBorder:valid() then
+            imgBorder = UIImage.new("__border")
+            node:addChild(imgBorder)
+        end
         imgBorder:setLeftMargin(0, true)
         imgBorder:setRightMargin(0, true)
         imgBorder:setTopMargin(0, true)
@@ -254,7 +283,10 @@ function UIUtil.setImageByCfg(node, cfg)
         imgBorder:setAutoStretch(true, true)
         imgBorder.sprite = UISpritePool.getInstance():get("white_border")
         imgBorder.sprite.color = ThemeUtil.getColor(cfg.borderColor)
-        node:addChild(imgBorder)
+    else
+        if imgBorder:valid() then
+            node:removeChild(imgBorder)
+        end
     end
 end
 
@@ -591,6 +623,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
         tempNode:setSize(w, h)
         tempNode:setPosition(x, y)
         tempNode:applyMargin()
+        tempNode:removeAllListeners()
 
         return tempNode
     end
@@ -663,7 +696,8 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     local showIndexStart, showIndexEnd = 0, 0
     if isReload or not existAny then
         for i = 1, innerPanel:getChildrenCount() do
-            _saveNode(i, innerPanel:getChildByIndex(i - 1))
+            local temp = innerPanel:getChildByIndex(i - 1)
+            _saveNode(temp.tag, temp)
         end
 
         local refX, refY, refWidth, refHeight = 0, 0, 0, 0
