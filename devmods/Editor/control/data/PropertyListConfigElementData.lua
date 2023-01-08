@@ -3,6 +3,7 @@ local PropertyListConfigElementData = class("PropertyListConfigElementData", req
 local DataMembers = {
     propertyType = { "" },
     params = { {} },
+    popupMenu = { nil, "PopupMenuData" },
 }
 
 function PropertyListConfigElementData:__init(cfg)
@@ -27,6 +28,16 @@ end
 ---@return table
 function PropertyListConfigElementData:getParams()
     return self:_get("params")
+end
+
+---@param value TCE.PopupMenuData
+function PropertyListConfigElementData:setPopupMenu(value)
+    self:_set("popupMenu", value)
+end
+
+---@return TCE.PopupMenuData
+function PropertyListConfigElementData:getPopupMenu()
+    return self:_get("popupMenu")
 end
 
 return PropertyListConfigElementData

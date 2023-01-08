@@ -16,7 +16,7 @@ function RenderTargetView:__init(parent, parentRoot, data, location)
 
     local i = self.sa:getRoot():addChild()
     local child = self.sa:getRoot():getChild(i)
-    child.textureLocation = UISpritePool.getInstance():get("icon_go").textureLocation
+    child.textureLocation = UISpritePool.getInstance():get("icon_16_go").textureLocation
     child.sourceRect = TextureManager.getSourceRect(child.textureLocation)
     child.offset = Vector2.new(0, 16)
     child.scale = Vector2.new(2, 2)

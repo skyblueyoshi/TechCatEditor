@@ -5,6 +5,8 @@ local PopupMenu = class("PopupMenu", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 local EventDef = require("config.EventDef")
+local UISpritePool = require("core.UISpritePool")
+local Locale = require("locale.Locale")
 
 local RIGHT_RESERVE_SIZE = 16
 local HK_RESERVE_SIZE = 32
@@ -31,6 +33,7 @@ function PopupMenuElement:adjustLayout(isInitializing, location)
 
     local data = self:getData()
     local text = data:getText()
+    local icon = data:getIcon()
 
     local selectBg = UIUtil.ensurePanel(self._root, "sd", nil, {
         margins = { 3, 3, 3, 3, true, true },
@@ -41,7 +44,17 @@ function PopupMenuElement:adjustLayout(isInitializing, location)
     end
 
     local rx = 16
-    local lbText = UIUtil.ensureText(self._root, "cap", { rx, 0 }, text, {
+
+    if icon ~= "" then
+        rx = 8
+        local img = UIUtil.ensurePanel(self._root, "icon", { rx, 0, 16, 16 }, {
+            layout = "CENTER_H",
+        }, false, false)
+        img.sprite = UISpritePool.getInstance():get(icon)
+        rx = rx + img.width + 4
+    end
+
+    local lbText = UIUtil.ensureText(self._root, "cap", { rx, 0 }, Locale.get(text), {
         margins = { nil, 0, nil, 0, false, false },
     })
     rx = rx + lbText.width

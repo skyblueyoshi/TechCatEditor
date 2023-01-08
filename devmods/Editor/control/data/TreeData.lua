@@ -39,6 +39,11 @@ function TreeData:addCfgToElements(value)
     self:_listAppendCfg("elements", value)
 end
 
+---@param values table
+function TreeData:addCfgsToElements(values)
+    self:_listAppendCfgs("elements", values)
+end
+
 function TreeData:clearElements()
     self:_listClear("elements")
 end

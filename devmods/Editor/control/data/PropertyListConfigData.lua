@@ -28,6 +28,11 @@ function PropertyListConfigData:addCfgToElements(value)
     self:_listAppendCfg("elements", value)
 end
 
+---@param values table
+function PropertyListConfigData:addCfgsToElements(values)
+    self:_listAppendCfgs("elements", values)
+end
+
 function PropertyListConfigData:clearElements()
     self:_listClear("elements")
 end

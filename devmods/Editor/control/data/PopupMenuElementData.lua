@@ -2,6 +2,7 @@
 local PopupMenuElementData = class("PopupMenuElementData", require("BaseData"))
 local DataMembers = {
     text = { "" },
+    icon = { "" },
     hotKeys = { "" },
     popupMenu = { nil, "PopupMenuData" },
 }
@@ -18,6 +19,16 @@ end
 ---@return string
 function PopupMenuElementData:getText()
     return self:_get("text")
+end
+
+---@param value string
+function PopupMenuElementData:setIcon(value)
+    self:_set("icon", value)
+end
+
+---@return string
+function PopupMenuElementData:getIcon()
+    return self:_get("icon")
 end
 
 ---@param value string

@@ -1,5 +1,6 @@
 ---@class TCE.BaseData
 local BaseData = class("BaseData")
+local Listener = require("core.Listener")
 
 local function isTableCountSame(t1, t2)
     -- 数组数量
@@ -100,11 +101,23 @@ function BaseData:initData(DataMembers, cfg, needParentHooked)
     self._onDataChangedListeners = {}
     self._maxListenerID = 0
     self._needParentHooked = needParentHooked
+    self._ignoreChangedData = false
+    self._requestListener = nil  ---@type TCE.Listener
+    self._destroyed = false
 
     for name, info in pairs(self._memberInfo) do
         self[name] = getDefaultValue(info)
     end
     self:load(cfg)
+end
+
+function BaseData:destroy()
+    if self._destroyed then
+        return
+    end
+    self:_removeParent()
+
+    self._destroyed = true
 end
 
 ---设置当前数据的父亲数据。
@@ -122,6 +135,14 @@ end
 
 function BaseData:isNeedParentHooked()
     return self._needParentHooked
+end
+
+function BaseData:setRequestListener(listener)
+    self._requestListener = listener
+end
+
+function BaseData:removeRequestListener()
+    self._requestListener = nil
 end
 
 ---加入一个数据变化监听。
@@ -213,6 +234,12 @@ function BaseData:load(cfg)
             table.insert(changedMemberNames, memberName)
         end
     end
+    if cfg._request ~= nil then
+        self:setRequestListener(Listener.new(cfg._request))
+    end
+    if cfg._post ~= nil then
+
+    end
     return self:_checkChangedMemberNames(changedMemberNames)
 end
 
@@ -235,6 +262,14 @@ function BaseData:_checkChangedMemberNames(changedMemberNames)
     return false
 end
 
+function BaseData:_ignoreChangedDataBegin()
+    self._ignoreChangedData = true
+end
+
+function BaseData:_ignoreChangedDataEnd()
+    self._ignoreChangedData = false
+end
+
 function BaseData:_listClear(memberName)
     local arr = self:_get(memberName)
     if #arr == 0 then
@@ -242,6 +277,18 @@ function BaseData:_listClear(memberName)
     end
     self:_set(memberName, {})
     return true
+end
+
+function BaseData:_listAppendCfgs(memberName, values)
+    if #values == 0 then
+        return
+    end
+    self:_ignoreChangedDataBegin()
+    for _, value in ipairs(values) do
+        self:_listAppendCfg(memberName, value)
+    end
+    self:_ignoreChangedDataEnd()
+    self:_onDataChanged({ [memberName] = true })
 end
 
 function BaseData:_listAppendCfg(memberName, value)
@@ -349,13 +396,16 @@ function BaseData:_get(memberName)
 end
 
 function BaseData:_onDataChanged(changedNames)
+    if self._ignoreChangedData then
+        return
+    end
     if self._needParentHooked then
         if self._parent ~= nil then
-            names = nil
+            changedNames = nil
             if not self._parent:isNeedParentHooked() then
-                names = { [self._parentMemberName] = true }
+                changedNames = { [self._parentMemberName] = true }
             end
-            self._parent:_onDataChanged(names)
+            self._parent:_onDataChanged(changedNames)
         end
         return
     end
@@ -363,6 +413,12 @@ function BaseData:_onDataChanged(changedNames)
         if listener.onDataChanged then
             listener:onDataChanged(changedNames)
         end
+    end
+end
+
+function BaseData:request(memberName, value)
+    if self._requestListener ~= nil then
+        self._requestListener:run(self, memberName, value)
     end
 end
 

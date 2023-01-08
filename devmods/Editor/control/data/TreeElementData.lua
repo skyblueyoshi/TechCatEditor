@@ -2,6 +2,7 @@
 local TreeElementData = class("TreeElementData", require("BaseData"))
 local DataMembers = {
     text = { "" },
+    icon = { "" },
     canExpand = { false },
     elements = { {}, "TreeElementData", "list" },
 }
@@ -18,6 +19,16 @@ end
 ---@return string
 function TreeElementData:getText()
     return self:_get("text")
+end
+
+---@param value string
+function TreeElementData:setIcon(value)
+    self:_set("icon", value)
+end
+
+---@return string
+function TreeElementData:getIcon()
+    return self:_get("icon")
 end
 
 ---@param value boolean
@@ -48,6 +59,11 @@ end
 ---@param value table
 function TreeElementData:addCfgToElements(value)
     self:_listAppendCfg("elements", value)
+end
+
+---@param values table
+function TreeElementData:addCfgsToElements(values)
+    self:_listAppendCfgs("elements", values)
 end
 
 function TreeElementData:clearElements()

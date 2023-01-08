@@ -37,7 +37,7 @@ function ScrollBar:_initContent()
     self:_onScrollDataChanged()
 end
 
-function ScrollBar:adjustLayout(isInitializing, location)
+function ScrollBar:adjustLayout(isInitializing, _)
     local margins
     if self._isVertical then
         margins = { nil, 1, 1, 1, false, true }

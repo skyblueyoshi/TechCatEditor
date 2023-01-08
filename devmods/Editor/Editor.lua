@@ -2,9 +2,16 @@
 local Editor = class("Editor")
 local UISpritePool = require("core.UISpritePool")
 local EditorDebug = require("ui_debug.EditorDebug")
+local Locale = require("locale.Locale")
 
 function Editor:__init()
+    Locale.reload()
     TextureManager.setGcEnabled(false)
+    local path = "C:/Users/FGA/Documents/TerraCraft/devmods/TerraCraft/items/misc2"
+    local paths = File.getAllFiles(path, ".png", false, true, true)
+    for _, p in ipairs(paths) do
+        require("core.TexturePool").getInstance():load(p)
+    end
 
     self._cameraGo = GameObject.instantiate()
     self._cameraGo.camera:init()
@@ -66,7 +73,7 @@ function Editor:_initCanvas()
     --rt:addRenderTargetListener(_testRender)
     --
     --local img = UIImage.new("img")
-    --img.sprite = UISpritePool.getInstance():get("icon_go")
+    --img.sprite = UISpritePool.getInstance():get("icon_16_go")
     --self:getRoot():addChild(img)
 end
 

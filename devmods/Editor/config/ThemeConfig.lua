@@ -6,17 +6,26 @@ local ThemeConfig = {
         --A2 = "#252C3B",     -- light 2
         --B = "#1D1F33",      -- middle
         --C = "#151626",      -- dark
-        BASE_COLOR = "#3C414F",
-        FONT_COLOR = "#D4D4D4",
-        ICON_COLOR = "#82A0D2",
-
-        ACCENT_COLOR = "#4E5164",
+        --BASE_COLOR = "#3C414F",
+        --FONT_COLOR = "#D4D4D4",
+        --ICON_COLOR = "#82A0D2",
 
         --BASE_COLOR = "#FFFFFF",
         --FONT_COLOR = "#555555",
         --ICON_COLOR = "#999999",
 
-        BD = 25,
+        --BD = 25,
+        --SD = -20,
+        --A = 0,
+        --A2 = 20,
+        --B = 31,
+        --C = 61,
+
+        BASE_COLOR = "#3C414F",
+        FONT_COLOR = "#D4D4D4",
+        ICON_COLOR = "#808593",
+
+        BD = 48,
         SD = -20,
         A = 0,
         A2 = 20,

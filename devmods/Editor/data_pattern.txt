@@ -8,6 +8,7 @@ class MenuBarData
 
 class PopupMenuElementData
     string text = ""
+    string icon = ""
     string hotKeys = ""
     PopupMenuData popupMenu = nil
 
@@ -16,6 +17,7 @@ class PopupMenuData
 
 class TreeElementData
     string text = ""
+    string icon = ""
     boolean canExpand = false
     TreeElementData[] elements = {}
 
@@ -33,6 +35,7 @@ class ContainerData
     TreeData tree = nil
     TabData tab = nil
     GridData grid = nil
+    PropertyListData propertyList = nil
     ContainerLayoutData[] layouts = {}
 
 class TabElementData
@@ -51,6 +54,7 @@ class GridData
 class PropertyListConfigElementData @needParentHooked
     string propertyType = ""
     table params = {}
+    PopupMenuData popupMenu = nil
 
 class PropertyListConfigData @needParentHooked
     PropertyListConfigElementData[] elements = {}

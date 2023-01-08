@@ -141,6 +141,11 @@ function {0}:addCfgTo{2}(value)
     self:_listAppendCfg("{1}", value)
 end
 
+---@param values table
+function {0}:addCfgsTo{2}(values)
+    self:_listAppendCfgs("{1}", values)
+end
+
 function {0}:clear{2}()
     self:_listClear("{1}")
 end

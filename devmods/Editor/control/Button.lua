@@ -4,7 +4,7 @@ local UIUtil = require("core.UIUtil")
 local Constant = require("config.Constant")
 local EventDef = require("config.EventDef")
 local UISpritePool = require("core.UISpritePool")
-local ThemeUtil = require("core.ThemeUtil")
+local Locale = require("locale.Locale")
 
 function Button:__init(name, parent, parentRoot, data, location, params)
     Button.super.__init(self, name, parent, parentRoot, data, location)
@@ -55,13 +55,12 @@ function Button:adjustLayout(isInitializing, location)
     if icon ~= "" then
         local img = UIUtil.ensurePanel(self._root, "icon", { curX, 0, 16, 16 }, {
             layout = "CENTER_H",
-        })
+        }, false, false)
         img.sprite = UISpritePool.getInstance():get(icon)
-        img.sprite.color = ThemeUtil.getColor("ICON_COLOR")
         curX = curX + img.width + Constant.BTN_SIDE_OFFSET
     end
     if text ~= "" then
-        local lbText = UIUtil.ensureText(self._root, "cap", { curX, 0 }, text, {
+        local lbText = UIUtil.ensureText(self._root, "cap", { curX, 0 }, Locale.get(text), {
             layout = "CENTER_H",
         })
         curX = curX + lbText.width

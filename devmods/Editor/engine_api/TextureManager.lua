@@ -27,6 +27,30 @@ end
 function TextureManager.loadAsynchronousWhenAwake(filePath)
 end
 
+---从文件系统中加载纹理，为降低GPU显存占用，默认调用TextureManager.loadAsynchronousWhenAwake。
+---@param filePath string 资源路径。
+---@return TextureLocation 纹理位置。
+function TextureManager.loadFromFile(filePath)
+end
+
+---从文件系统中立即加载纹理。主线程将会阻塞直到纹理加载完成。
+---@param filePath string 资源路径。
+---@return TextureLocation 纹理位置。
+function TextureManager.loadFromFileImmediately(filePath)
+end
+
+---从文件系统中异步加载纹理。
+---@param filePath string 资源路径。
+---@return TextureLocation 纹理位置。
+function TextureManager.loadFromFileAsynchronous(filePath)
+end
+
+---从文件系统中仅纹理被使用时，异步加载纹理。
+---@param filePath string 资源路径。
+---@return TextureLocation 纹理位置。
+function TextureManager.loadFromFileAsynchronousWhenAwake(filePath)
+end
+
 ---获取指定纹理位置所指向的纹理。如果纹理位置描述的是单独的纹理，则返回整个纹理对象；如果纹理位置描述的是图集里的区域，则返回这个图集的纹理对象。
 ---@param textureLocation TextureLocation 纹理位置。
 ---@return Texture 纹理对象。

@@ -6,6 +6,9 @@ local ColorUtil = require("core.ColorUtil")
 local s_cache = {}
 
 function ThemeUtil.getColor(name)
+    if type(name) ~= "string" then
+        return name
+    end
     if s_cache[name] ~= nil then
         return s_cache[name]
     end

@@ -233,8 +233,8 @@ local TestProperty = {
 
 local TestTree = {
     IconList = {
-        "icon_go",
-        "icon_go",
+        "icon_16_go",
+        "icon_16_go",
     },
     Children = {
         {
@@ -540,7 +540,7 @@ local ContainerR = {
         {
             Tab = {
                 Text = "Class",
-                Icon = "icon_go",
+                Icon = "icon_16_go",
             },
             Container = {
                 TreeView = TestTree2,
@@ -571,6 +571,16 @@ local windowOld = {
     }
 }
 
+local PopupMenu_Edit = {
+    elements = {
+        { text = "@Undo",icon = "icon_16_undo", hotKeys = { "Ctrl", "Z" } },
+        { text = "@Redo",icon = "icon_16_redo", hotKeys = { "Ctrl", "Y" } },
+        { text = "@Cut", icon = "icon_16_cut", hotKeys = { "Ctrl", "X" } },
+        { text = "@Copy", icon = "icon_16_copy", hotKeys = { "Ctrl", "C" } },
+        { text = "@Paste", icon = "icon_16_paste", hotKeys = { "Ctrl", "V" } },
+    },
+}
+
 local PopupMenu = {
     elements = {
         { text = "Element 0", },
@@ -580,25 +590,78 @@ local PopupMenu = {
 
 local MenuBarData = {
     elements = {
-        { text = "File", popupMenu = PopupMenu, },
-        { text = "Edit", popupMenu = PopupMenu, },
-        { text = "Edit22", popupMenu = PopupMenu, },
+        { text = "@File", icon = "icon_16_folder", popupMenu = PopupMenu, },
+        { text = "@Edit", icon = "icon_16_copy", popupMenu = PopupMenu_Edit, },
+        { text = "Edit22", icon = "icon_16_paste", popupMenu = PopupMenu, },
     }
 }
 
 local TreeData = {
-    iconList = { "icon_go", "icon_go", },
+    iconList = { "icon_16_go", "icon_16_go" },
     elements = {
         {
-            text = "GameObject",
+            text = "@All Mods",
             elements = {
-                { text = "Cup", },
-                { text = "Cup2", canExpand = true, },
-                { text = "Cup3", },
+                { text = "@Items", icon = "icon_16_diamond" },
+                { text = "@Blocks", icon = "icon_16_block", canExpand = true, },
+                { text = "@Recipes", icon = "icon_16_recipe", },
+                { text = "@Npcs", icon = "icon_16_npc", },
+                { text = "@Projectiles", icon = "icon_16_projectile", },
+                { text = "@Effects", icon = "icon_16_effect", },
+                { text = "@Buffs", icon = "icon_16_buff", },
+                { text = "@Buildings", icon = "icon_16_building", },
+                { text = "@Liquids", icon = "icon_16_liquid", },
+                { text = "@Skins", icon = "icon_16_skin", },
+                { text = "@Languages", icon = "icon_16_locale", },
+                { text = "@Sounds", icon = "icon_16_sound", },
+                { text = "@Music", icon = "icon_16_music", },
+            }
+        },
+        {
+            text = "TerraCraft",
+            elements = {
+                { text = "@Items", icon = "icon_16_diamond" },
+                { text = "@Blocks", icon = "icon_16_block", canExpand = true, },
+                { text = "@Recipes", icon = "icon_16_recipe", },
+                { text = "@Npcs", icon = "icon_16_npc", },
+                { text = "@Projectiles", icon = "icon_16_projectile", },
+                { text = "@Effects", icon = "icon_16_effect", },
+                { text = "@Buffs", icon = "icon_16_buff", },
+                { text = "@Buildings", icon = "icon_16_building", },
+                { text = "@Liquids", icon = "icon_16_liquid", },
+                { text = "@Skins", icon = "icon_16_skin", },
+                { text = "@Languages", icon = "icon_16_locale", },
+                { text = "@Sounds", icon = "icon_16_sound", },
+                { text = "@Music", icon = "icon_16_music", },
             }
         },
     }
 }
+
+local CM = require("command.CommandManager")
+local TestPropertyElement = {
+    text = "动画", configIndex = 3, value = 1, params = { 1, 100 }
+}
+TestPropertyElement._post = function(data, t, mem)
+    if mem == "value" then
+        data:setValue(t[mem])
+    end
+end
+TestPropertyElement._postAll = function(t, mm)
+    if t._postDataList == nil then
+        return
+    end
+    for _, d in ipairs(t._postDataList) do
+        t._post(d, t, mm)
+    end
+end
+TestPropertyElement._request = function(data, mem, v)
+    if mem == "value" then
+        CM.runChangeInt(TestPropertyElement, "value", v, function(_mem, _v)
+            TestPropertyElement._post(data, _mem, _v)
+        end)
+    end
+end
 
 local PropertyData = {
 
@@ -607,14 +670,16 @@ local PropertyData = {
             [1] = { propertyType = "Boolean", },
             [2] = {
                 propertyType = "ComboBox",
-                params = {
-                    { text = "Blend", },
-                    { text = "Alpha", },
-                    { text = "Probe", },
-                    { text = "Canvas", },
+                popupMenu = {
+                    elements = {
+                        { text = "Blend", },
+                        { text = "Alpha", },
+                        { text = "Probe", },
+                        { text = "Canvas", },
+                    }
                 },
             },
-            [3] = { propertyType = "Int", },
+            [3] = { propertyType = "Int", params = { limits = { 1, 100 } } },
             [4] = { propertyType = "Float", },
         }
     },
@@ -622,7 +687,8 @@ local PropertyData = {
         { text = "启用", configIndex = 1, value = true, },
         { text = "设置", configIndex = 1, value = false, },
         { text = "效果", configIndex = 2, value = 2, },
-        { text = "动画", configIndex = 3, value = 1, params = { 1, 100 } },
+        { text = "效果", configIndex = 2, value = 3, },
+        TestPropertyElement,
         { text = "Speed", configIndex = 4, value = 3.14159, params = { 1, 100 } },
     }
 }
@@ -632,7 +698,7 @@ local EditorLeft = {
     tab = {
         elements = {
             {
-                tabButton = { text = "Class", icon = "icon_go", },
+                tabButton = { text = "@Mod Resource", icon = "icon_16_go", },
                 container = { tree = TreeData, },
             },
         },
@@ -652,6 +718,26 @@ local EditorBottom = {
                     }
                 },
             },
+            {
+                tabButton = { text = "Resource222", icon = "icon_folder_16", },
+                container = { grid = TestGrid, }
+            },
+            {
+                tabButton = { text = "qwer", icon = "icon_folder_16", },
+                container = { propertyList = PropertyData, },
+            },
+        },
+    },
+}
+
+local EditorRight = {
+    isSide = true,
+    tab = {
+        elements = {
+            {
+                tabButton = { text = "Class", icon = "icon_16_go", },
+                container = { propertyList = PropertyData, },
+            },
         },
     },
 }
@@ -661,14 +747,22 @@ local EditorWindowData = {
     layouts = {
         { place = { 1 }, container = EditorLeft, },
         { place = { 4, 5 }, container = EditorBottom, },
-        --{
-        --    place = { 3, 6 },
-        --    container = EditorLeft,
-        --},
-        --{
-        --    place = { 2 },
-        --    container = EditorLeft,
-        --},
+        { place = { 3, 6 }, container = EditorRight, },
+        {
+            place = { 2 },
+            container = {
+                menuBar = MenuBarData,
+                layouts = {
+                    { place = { 1 }, container = EditorLeft, },
+                    { place = { 4, 5 }, container = EditorBottom, },
+                    { place = { 3, 6 }, container = EditorRight, },
+                    {
+                        place = { 2 },
+                        container = EditorLeft,
+                    },
+                },
+            }
+        },
     }
 }
 

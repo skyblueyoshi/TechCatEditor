@@ -6,6 +6,14 @@ local UIUtil = require("core.UIUtil")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
 
+local path = "C:/Users/FGA/Documents/TerraCraft/devmods/TerraCraft/items/misc2"
+local paths = File.getAllFiles(path, ".png", false, true, true)
+local ts = {}
+for _, p in ipairs(paths) do
+    local textureLocation = require("core.TexturePool").getInstance():getLocationByPath(p)
+    table.insert(ts, textureLocation)
+end
+
 function GridViewElement:__init(root, parent, data, index)
     GridViewElement.super.__init(self, "", parent, nil, data)
     self._root = root
@@ -23,6 +31,18 @@ function GridViewElement:_initContent()
     self._root:addMousePointedEnterListener({ self._onElementMouseEnter, self })
     self._root:addMousePointedLeaveListener({ self._onElementMouseLeave, self })
     self._root:addTouchDownListener({ self._onElementClicked, self })
+
+    local i = 1
+    if self._index <= #ts then
+        i = self._index
+    end
+    local textureLocation = ts[i]
+
+    local sa = SpriteAnimation.new()
+    sa:getRoot().textureLocation = textureLocation
+    sa:getRoot().sourceRect = Rect.new(0, 0, 16, 16)
+    sa:getRoot().scale = Vector2.new(4, 4)
+    self._root:getChild("img"):getPostDrawLayer(0):setSpriteAnimation(sa)
 
     --if self._index == 1 then
     --    UIRenderTargetNode.cast(self._root:getChild("rt")):addRenderTargetListener({ self._testRT, self })
@@ -42,7 +62,6 @@ function GridViewElement:adjustLayout(isInitializing, _)
 
     UIUtil.setPanelDisplay(self._root, self._index == self._parent:getSelectedIndex(), false)
 
-    self._root:getChild("img"):getPostDrawLayer(0):removeSpriteAnimation()
     --if data.OnCreated ~= nil then
     --    data.OnCreated[1](node, index, table.unpack(data.OnCreated[2]))
     --end
@@ -102,8 +121,7 @@ function GridView:_onEnsurePanelItem()
     local img = UIUtil.ensurePanel(panelItem, "img", { 0, 8, 64, 64 }, {
         layout = "CENTER_W",
     }, false, false)
-    img.sprite = UISpritePool.getInstance():get("icon_folder")
-    img.sprite.color = ThemeUtil.getColor("ICON_COLOR")
+    --img.sprite = UISpritePool.getInstance():get("icon_folder")
 
     UIUtil.ensureText(panelItem, "cap", { 0, 80, 32, 32 }, "1", {
         layout = "CENTER_W",

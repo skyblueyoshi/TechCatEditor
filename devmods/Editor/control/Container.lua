@@ -79,14 +79,8 @@ function Container:adjustLayout(isInitializing, location)
     ensureElement(KEY_TREE_VIEW, "TreeView", "tree_view", data:getTree(), { 0, 0, 32, 32 })
     ensureElement(KEY_TAB_VIEW, "TabView", "tab_view", data:getTab(), { 0, 0, 32, 32 })
     ensureElement(KEY_GRID_VIEW, "GridView", "grid", data:getGrid(), { 0, 0, 32, 32 })
+    ensureElement(KEY_PROPERTY_LIST, "PropertyList", "property_view", data:getPropertyList(), { 0, 0, 32, 32 })
 
-    --
-    --if data.PropertyList then
-    --    local ui = require("PropertyList").new(self, self._root,
-    --            data.PropertyList, { 0, 0, 32, 32 }
-    --    )
-    --    self:addChildToMap(KEY_PROPERTY_LIST, ui)
-    --end
     --
     --if data.RenderTargetView then
     --    local ui = require("RenderTargetView").new(self, self._root,
@@ -293,10 +287,10 @@ function Container:_updateLayout()
             local drag = self:getChildFromMap(dragKey)
 
             if numStr == "36" then
-                UIUtil.setMargins(drag:getRoot(), nil, 0, self._rightAreaSize, 0,
+                UIUtil.setMargins(drag:getRoot(), nil, self._areaTop, self._rightAreaSize, 0,
                         false, true)
             elseif numStr == "1" then
-                UIUtil.setMargins(drag:getRoot(), self._leftAreaSize, 0, nil, self._bottomAreaSize + Constant.DRAG_AREA_SIZE,
+                UIUtil.setMargins(drag:getRoot(), self._leftAreaSize, self._areaTop, nil, self._bottomAreaSize + Constant.DRAG_AREA_SIZE,
                         false, true)
             elseif numStr == "45" then
                 UIUtil.setMargins(drag:getRoot(), 0, nil, self._rightAreaSize + Constant.DRAG_AREA_SIZE, self._bottomAreaSize,

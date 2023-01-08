@@ -14,8 +14,24 @@ function TexturePool:__init()
     self._pool = {}
 end
 
-function TexturePool:loadTexture(path)
+function TexturePool:load(path)
+    path = Path.fix(path)
+    assert(self._pool[path] == nil)
+    local loc = TextureManager.loadFromFile(path)
+    local texture = TextureManager.getTargetTextureByLocation(loc)
+    local id = texture.id
+    self._pool[path] = id
+    return id
+end
 
+function TexturePool:getLocationByPath(path)
+    path = Path.fix(path)
+    local id = self._pool[path]
+    return self:getLocationByID(id)
+end
+
+function TexturePool:getLocationByID(id)
+    return TextureManager.getTextureByID(id):getTextureLocation()
 end
 
 return TexturePool

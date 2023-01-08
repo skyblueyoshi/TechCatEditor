@@ -3,9 +3,9 @@ local TreeView = class("TreeView", require("ScrollContainer"))
 ---@class TCE.TreeViewElement:TCE.ScrollContainer
 local TreeViewElement = class("TreeViewElement", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
-local Constant = require("config.Constant")
 local UISpritePool = require("core.UISpritePool")
 local ThemeUtil = require("core.ThemeUtil")
+local Locale = require("locale.Locale")
 
 function TreeViewElement:__init(root, parent, data, index, level)
     TreeViewElement.super.__init(self, "", parent, nil, data)
@@ -35,6 +35,7 @@ function TreeViewElement:adjustLayout(isInitializing, _)
     local arr = UIPanel.cast(self._root:getChild("img_arr"))
     local icon = UIPanel.cast(self._root:getChild("img_icon"))
     local cap = UIText.cast(self._root:getChild("cap"))
+    local line = UIText.cast(self._root:getChild("line"))
 
     local curX = self._level * 10
     local isParentNode = false
@@ -53,18 +54,24 @@ function TreeViewElement:adjustLayout(isInitializing, _)
     curX = curX + 16
 
     local iconName
-    local iconList = treeData:getIconList()
-    if #iconList >= 2 then
-        if isParentNode then
-            iconName = iconList[1]
-        else
-            iconName = iconList[2]
+    if data:getIcon() ~= "" then
+        iconName = data:getIcon()
+    end
+
+    if iconName == nil then
+        local iconList = treeData:getIconList()
+        if #iconList >= 2 then
+            if isParentNode then
+                iconName = iconList[1]
+            else
+                iconName = iconList[2]
+            end
         end
     end
 
+    line:setLeftMargin(curX, true)
     if iconName ~= nil then
         icon.sprite = UISpritePool.getInstance():get(iconName)
-        icon.sprite.color = ThemeUtil.getColor("ICON_COLOR")
         icon.visible = true
         icon.positionX = curX
         curX = curX + 16
@@ -73,7 +80,7 @@ function TreeViewElement:adjustLayout(isInitializing, _)
     end
     curX = curX + 2
 
-    cap.text = data:getText()
+    cap.text = Locale.get(data:getText())
     cap.positionX = curX
 
     if isInitializing then
@@ -126,7 +133,7 @@ function TreeView:_reloadMappingList()
     ---@param _subData TCE.TreeElementData
     ---@param _level number
     local function _loadRecursively(_subData, _level)
-        table.insert(self._mappingList, {_subData, _level})
+        table.insert(self._mappingList, { _subData, _level })
         for _, _nextData in ipairs(_subData:getElements()) do
             _loadRecursively(_nextData, _level + 1)
         end
@@ -164,6 +171,10 @@ function TreeView:_onEnsurePanelItem()
     UIUtil.ensureText(panelItem, "cap", nil, "1", {
         layout = "CENTER_H",
     })
+    UIUtil.ensurePanel(panelItem, "line", { 0, 0, 32, 1 }, {
+        margins = { 0, nil, 8, 0, true, false },
+        bgColor = Color.new(255, 255, 255, 24),
+    }, false, false)
 
     return panelItem
 end

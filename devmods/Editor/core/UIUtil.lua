@@ -88,7 +88,9 @@ end
 function UIUtil.setInputField(nodeParam, location, content, cfg)
     local node = UIInputField.cast(nodeParam)
     UIUtil.setLocation(node, location)
-    node.text = content
+    if content ~= nil then
+        node.text = content
+    end
     node.color = ThemeUtil.getColor("FONT_COLOR")
     node.fontSize = Constant.DEFAULT_FONT_SIZE
     UIUtil.setCommonByCfg(node, cfg)
@@ -222,6 +224,8 @@ function UIUtil.setCommonByCfg(node, cfg)
     end
 end
 
+---@param node UIText
+---@param cfg table
 function UIUtil.setTextByCfg(node, cfg)
     if cfg == nil then
         return
@@ -240,6 +244,12 @@ function UIUtil.setTextByCfg(node, cfg)
     end
     if cfg.horizontalOverflow ~= nil then
         node.horizontalOverflow = cfg.horizontalOverflow
+    end
+    if cfg.horizontalAlignment ~= nil then
+        node.horizontalAlignment = cfg.horizontalAlignment
+    end
+    if cfg.verticalAlignment ~= nil then
+        node.verticalAlignment = cfg.verticalAlignment
     end
     if cfg.autoAdaptSize == nil then
         node.autoAdaptSize = true

@@ -6,6 +6,7 @@ local DataMembers = {
     tree = { nil, "TreeData" },
     tab = { nil, "TabData" },
     grid = { nil, "GridData" },
+    propertyList = { nil, "PropertyListData" },
     layouts = { {}, "ContainerLayoutData", "list" },
 }
 
@@ -63,6 +64,16 @@ function ContainerData:getGrid()
     return self:_get("grid")
 end
 
+---@param value TCE.PropertyListData
+function ContainerData:setPropertyList(value)
+    self:_set("propertyList", value)
+end
+
+---@return TCE.PropertyListData
+function ContainerData:getPropertyList()
+    return self:_get("propertyList")
+end
+
 ---@param value table
 function ContainerData:setLayouts(value)
     self:_set("layouts", value)
@@ -81,6 +92,11 @@ end
 ---@param value table
 function ContainerData:addCfgToLayouts(value)
     self:_listAppendCfg("layouts", value)
+end
+
+---@param values table
+function ContainerData:addCfgsToLayouts(values)
+    self:_listAppendCfgs("layouts", values)
 end
 
 function ContainerData:clearLayouts()

@@ -28,6 +28,11 @@ function TabData:addCfgToElements(value)
     self:_listAppendCfg("elements", value)
 end
 
+---@param values table
+function TabData:addCfgsToElements(values)
+    self:_listAppendCfgs("elements", values)
+end
+
 function TabData:clearElements()
     self:_listClear("elements")
 end

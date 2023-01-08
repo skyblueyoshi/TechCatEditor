@@ -2,6 +2,15 @@ local Editor = require("Editor")
 local s_editor = nil  ---@type TCE.Editor
 
 function init()
+
+    local list = require("core.Deque").new()
+    for i = 1, 10 do
+        list:push(i)
+    end
+    while not list:empty() do
+        print(list:popLast())
+    end
+
     -- Init default font.
     FontManager.load("mods/Editor/font/msyh.ttf", "msyh")
     s_editor = Editor.new()

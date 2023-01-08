@@ -71,10 +71,10 @@ function ScrollContainer:_onUpdateScrollContainer(isInitializing)
     local innerSize = UIUtil.getTableViewInnerSize(self._sv, self, self._isSvVertical, cfg)
     if innerSize.height > self._sv.height then
         self._canScrollVertical = true
-        self._sv:setRightMargin(Constant.SCROLL_BAR_WIDTH, true)
+        self._sv:setRightMargin(Constant.SCROLL_BAR_WIDTH + 1, true)
     else
         self._canScrollVertical = false
-        self._sv:setRightMargin(0, true)
+        self._sv:setRightMargin(1, true)
     end
     self._sv:applyMargin()
     --print(innerSize, self._sv.size, self._canScrollVertical, isInitializing)
@@ -84,7 +84,9 @@ function ScrollContainer:_onUpdateScrollContainer(isInitializing)
         self._sv:addResizeListener({ self._onResize, self })
     else
         UIUtil._updateTableView(self._sv, self, true, self._isSvVertical, cfg)
-        self._scrollBar:setVisible(self._canScrollVertical)
+        if self._scrollBar ~= nil then
+            self._scrollBar:setVisible(self._canScrollVertical)
+        end
     end
     self._lastSize = self._sv.size
 end
