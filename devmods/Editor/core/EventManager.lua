@@ -1,5 +1,6 @@
 ---@class TCE.EventManager
 local EventManager = class("EventManager")
+local Listener = require("Listener")
 
 local s_instance
 ---@return TCE.EventManager
@@ -16,9 +17,9 @@ function EventManager:__init()
     self._eventToIds = {}
 end
 
-function EventManager:addListener(eventID, func)
+function EventManager:addListener(eventID, listenerInput)
     local id = 0
-    local data = { eventID, func }
+    local data = { eventID, Listener.new(listenerInput) }
     if #self._freeIds > 0 then
         id = self._freeIds[#self._freeIds]
         table.remove(self._freeIds, #self._freeIds)
@@ -54,10 +55,8 @@ function EventManager:triggerEvent(eventID, args)
         return
     end
     for _, id in ipairs(eventIDs) do
-        local data = self._eventListeners[id]
-        local callFunc = data[2][1]
-        local caller = data[2][2]
-        callFunc(caller, args)
+        local listener = self._eventListeners[id][2]
+        listener:run(args)
     end
 end
 
