@@ -13,8 +13,10 @@ function Listener:__init(func, params)
         for i = 2, #func do
             table.insert(self._params, func[i])
         end
-        for i = 1, #params do
-            table.insert(self._params, params[i])
+        if params then
+            for i = 1, #params do
+                table.insert(self._params, params[i])
+            end
         end
     end
 end
@@ -35,7 +37,7 @@ function Listener:run(...)
     for _, v in ipairs(argList) do
         table.insert(params, v)
     end
-    return self._func(table.unpack(params))
+    return self._func(unpack(params))
 end
 
 return Listener

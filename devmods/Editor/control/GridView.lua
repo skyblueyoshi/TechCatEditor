@@ -4,13 +4,12 @@ local GridView = class("GridView", require("ScrollContainer"))
 local GridViewElement = class("GridViewElement", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local UISpritePool = require("core.UISpritePool")
-local ThemeUtil = require("core.ThemeUtil")
 
 local path = "C:/Users/FGA/Documents/TerraCraft/devmods/TerraCraft/items/misc2"
 local paths = File.getAllFiles(path, ".png", false, true, true)
 local ts = {}
 for _, p in ipairs(paths) do
-    local textureLocation = require("core.TexturePool").getInstance():getLocationByPath(p)
+    local textureLocation = require("core.ResTexturePool").getInstance():getByPath(p).textureLocation
     table.insert(ts, textureLocation)
 end
 

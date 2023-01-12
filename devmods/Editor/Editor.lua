@@ -10,7 +10,7 @@ function Editor:__init()
     local path = "C:/Users/FGA/Documents/TerraCraft/devmods/TerraCraft/items/misc2"
     local paths = File.getAllFiles(path, ".png", false, true, true)
     for _, p in ipairs(paths) do
-        require("core.TexturePool").getInstance():load(p)
+        require("core.ResTexturePool").getInstance():load(p)
     end
 
     self._cameraGo = GameObject.instantiate()
