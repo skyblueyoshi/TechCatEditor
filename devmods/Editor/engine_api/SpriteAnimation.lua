@@ -10,6 +10,9 @@
 ---@field color Color 渲染颜色。
 ---@field flipHorizontal boolean 是否左右翻转。
 ---@field flipVertical boolean 是否竖直翻转。
+---@field slices9 UISlices9 九宫格数据。
+---@field slices9Enabled boolean 是否启用九宫格。
+---@field slices9DisplaySize Size 启用九宫格时显示的实际大小。
 local SpriteAnimationElement = {}
 
 ---返回子节点。

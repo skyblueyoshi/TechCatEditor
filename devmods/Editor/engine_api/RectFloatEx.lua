@@ -20,4 +20,40 @@ local RectFloatEx = {}
 function RectFloatEx.new(x, y, width, height)
 end
 
+---当前矩形区域是否为空。
+---@return boolean
+function RectFloatEx:empty()
+end
+
+---当前矩形区域是否与另一个矩形区域重叠。
+---@param other RectFloatEx
+---@return boolean
+function RectFloatEx:isOverlapping(other)
+end
+
+---当前矩形区域是否完全包含另一个矩形区域。
+---@param other RectFloatEx
+---@return boolean
+function RectFloatEx:isFullyContains(other)
+end
+
+---当前矩形区域是否包含指定点。
+---@param pointX number
+---@param pointY number
+---@return boolean
+function RectFloatEx:isPointIn(pointX, pointY)
+end
+
+---获取完全包含当前矩形区域和另一个矩形区域并集的最小矩形区域。
+---@param other RectFloatEx
+---@return RectFloatEx
+function RectFloatEx:union(other)
+end
+
+---获取当前矩形区域和另外一个矩形区域的相交部分。
+---@param other RectFloatEx
+---@return RectFloatEx
+function RectFloatEx:intersect(other)
+end
+
 return RectFloatEx

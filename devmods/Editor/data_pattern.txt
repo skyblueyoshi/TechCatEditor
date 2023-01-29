@@ -36,6 +36,7 @@ class ContainerData
     TabData tab = nil
     GridData grid = nil
     PropertyListData propertyList = nil
+    RenderTargetData renderTarget = nil
     ContainerLayoutData[] layouts = {}
 
 class TabElementData
@@ -68,3 +69,6 @@ class PropertyListElementData
 class PropertyListData
     PropertyListConfigData config = nil
     PropertyListElementData[] elements = {}
+
+class RenderTargetData
+    string text = ""

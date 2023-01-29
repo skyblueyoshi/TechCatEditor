@@ -17,6 +17,7 @@ local DataDict = {
     PropertyListData = require("PropertyListData"),
     PropertyListConfigElementData = require("PropertyListConfigElementData"),
     PropertyListConfigData = require("PropertyListConfigData"),
+    RenderTargetData = require("RenderTargetData"),
 }
 
 function UIData.create(uiName, cfg)

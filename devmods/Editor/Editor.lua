@@ -7,7 +7,7 @@ local Locale = require("locale.Locale")
 function Editor:__init()
     Locale.reload()
     TextureManager.setGcEnabled(false)
-    local path = "C:/Users/FGA/Documents/TerraCraft/devmods/TerraCraft/items/misc2"
+    local path = "G:/TechCat/TechCat/TechCatGame/assets_sources/UI"
     local paths = File.getAllFiles(path, ".png", false, true, true)
     for _, p in ipairs(paths) do
         require("core.ResTexturePool").getInstance():load(p)

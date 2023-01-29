@@ -2,7 +2,7 @@ local Editor = require("Editor")
 local s_editor = nil  ---@type TCE.Editor
 
 function init()
-
+    
     local list = require("core.Deque").new()
     for i = 1, 10 do
         list:push(i)

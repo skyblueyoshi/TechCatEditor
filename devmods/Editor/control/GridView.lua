@@ -5,7 +5,7 @@ local GridViewElement = class("GridViewElement", require("BaseControl"))
 local UIUtil = require("core.UIUtil")
 local UISpritePool = require("core.UISpritePool")
 
-local path = "C:/Users/FGA/Documents/TerraCraft/devmods/TerraCraft/items/misc2"
+local path = "G:/TechCat/TechCat/TechCatGame/assets_sources/UI"
 local paths = File.getAllFiles(path, ".png", false, true, true)
 local ts = {}
 for _, p in ipairs(paths) do

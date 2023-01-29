@@ -80,15 +80,7 @@ function Container:adjustLayout(isInitializing, location)
     ensureElement(KEY_TAB_VIEW, "TabView", "tab_view", data:getTab(), { 0, 0, 32, 32 })
     ensureElement(KEY_GRID_VIEW, "GridView", "grid", data:getGrid(), { 0, 0, 32, 32 })
     ensureElement(KEY_PROPERTY_LIST, "PropertyList", "property_view", data:getPropertyList(), { 0, 0, 32, 32 })
-
-    --
-    --if data.RenderTargetView then
-    --    local ui = require("RenderTargetView").new(self, self._root,
-    --            data.RenderTargetView, { 0, 0, 32, 32 }
-    --    )
-    --    self:addChildToMap(KEY_RENDER_TARGET_VIEW, ui)
-    --end
-    --
+    ensureElement(KEY_RENDER_TARGET_VIEW, "RenderTargetView", "render_target_view", data:getRenderTarget(), { 0, 0, 32, 32 })
 
     local layoutEnsureKeys = {}
     for _, layoutData in ipairs(data:getLayouts()) do

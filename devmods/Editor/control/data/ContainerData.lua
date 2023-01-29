@@ -7,6 +7,7 @@ local DataMembers = {
     tab = { nil, "TabData" },
     grid = { nil, "GridData" },
     propertyList = { nil, "PropertyListData" },
+    renderTarget = { nil, "RenderTargetData" },
     layouts = { {}, "ContainerLayoutData", "list" },
 }
 
@@ -72,6 +73,16 @@ end
 ---@return TCE.PropertyListData
 function ContainerData:getPropertyList()
     return self:_get("propertyList")
+end
+
+---@param value TCE.RenderTargetData
+function ContainerData:setRenderTarget(value)
+    self:_set("renderTarget", value)
+end
+
+---@return TCE.RenderTargetData
+function ContainerData:getRenderTarget()
+    return self:_get("renderTarget")
 end
 
 ---@param value table

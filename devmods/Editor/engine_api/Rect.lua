@@ -20,4 +20,40 @@ local Rect = {}
 function Rect.new(x, y, width, height)
 end
 
+---当前矩形区域是否为空。
+---@return boolean
+function Rect:empty()
+end
+
+---当前矩形区域是否与另一个矩形区域重叠。
+---@param other Rect
+---@return boolean
+function Rect:isOverlapping(other)
+end
+
+---当前矩形区域是否完全包含另一个矩形区域。
+---@param other Rect
+---@return boolean
+function Rect:isFullyContains(other)
+end
+
+---当前矩形区域是否包含指定点。
+---@param pointX number
+---@param pointY number
+---@return boolean
+function Rect:isPointIn(pointX, pointY)
+end
+
+---获取完全包含当前矩形区域和另一个矩形区域并集的最小矩形区域。
+---@param other Rect
+---@return Rect
+function Rect:union(other)
+end
+
+---获取当前矩形区域和另外一个矩形区域的相交部分。
+---@param other Rect
+---@return Rect
+function Rect:intersect(other)
+end
+
 return Rect
