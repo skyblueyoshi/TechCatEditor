@@ -18,31 +18,69 @@ function BlueprintNode:__init(graph, position)
     self.rounding = 12
     self.borderThickness = 2
     self.pointedBorderColor = Color.new(63, 145, 199)
+    self.selectedBorderColor = Color.new(199, 145, 63)
 
+    self.selected = false
     self.pointed = false
+    self.lastMovePos = nil
+    self.pointedLinkIndex = 0
+
     self._hasSlotPointed = false
     self._slotPointedIsInput = false
     self._slotPointedIndex = 0
+    self._minLinkBound = nil
+    self._minLinkBoundForPointed = nil
+end
+
+function BlueprintNode:save()
+    local data = {
+        id = self:getGuid(),
+        pos = { self.posMin.x, self.posMin.y }
+    }
+    data.inputs = {}
+    data.outputs = {}
+    for i, slot in ipairs(self.inputs) do
+        data.inputs[i] = slot:save()
+    end
+    for i, slot in ipairs(self.outputs) do
+        data.outputs[i] = slot:save()
+    end
+    return data
+end
+
+function BlueprintNode:load(data)
+    if data.pos ~= nil then
+        self.posMin.x, self.posMin.y = data.pos[1], data.pos[2]
+    end
+    if data.inputs ~= nil then
+    end
 end
 
 function BlueprintNode:getGuid()
 	return self._guid
 end
 
-function BlueprintNode.same(node1, node2)
-    return node1._guid == node2._guid
+function BlueprintNode:sameTo(node)
+    return self._guid == node._guid
 end
 
 function BlueprintNode:addLink(nextNode, curIn, nextOut)
+    local oldHasLink = false
     if self:hasLink(curIn) then
+        oldHasLink = true
         self:removeLink(curIn)
     end
+    local changed = true
     self:_forceAddLink(nextNode, curIn, nextOut)
     local ok = self:_checkCanLink(self._guid)
     self._graph:_clearAllFlags()
     if not ok then
         self:removeLink(curIn)
+        if not oldHasLink then
+            changed = false
+        end
     end
+    return changed
 end
 
 function BlueprintNode:_checkCanLink(endGuid)
@@ -70,7 +108,7 @@ function BlueprintNode:_forceAddLink(nextNode, curIn, nextOut)
         local ok = false
         for _, data in ipairs(links) do
             local node, slotInfo = data[1], data[2]
-            if BlueprintNode.same(node, nextSideNode) then
+            if node:sameTo(nextSideNode) then
                 for _, slotPair in ipairs(slotInfo) do
                     if isInOut then
                         -- 一个输入口只能对应一个输出口
@@ -167,11 +205,83 @@ function BlueprintNode:updateLocation(posMin)
         for _, outAndIn in ipairs(outAndIns) do
             local curOut = outAndIn[1]
             local nextIn = outAndIn[2]
-            self.outputs[curOut].hasLinked = true
-            nextNode.inputs[nextIn].hasLinked = true
-            nextNode.inputs[nextIn].color = self.outputs[curOut].color:clone()
+            local curOutSlot = self.outputs[curOut]
+            local nextInSlot = nextNode.inputs[nextIn]
+            curOutSlot.hasLinked = true
+            nextInSlot.hasLinked = true
+            nextInSlot.color = curOutSlot.color:clone()
         end
     end
+end
+
+function BlueprintNode:updateLinkLocation(updateInputOnly)
+    local min = math.min
+    local max = math.max
+    local bx, by, bx2, by2
+    local bpx, bpy, bpx2, bpy2
+    -- 清除曲线缓存信息
+    for _, slot in ipairs(self.inputs) do
+        if not slot.hasLinked then
+            slot:clearBezierCache()
+        end
+    end
+    -- 输入口更新曲线缓存
+    for _, data in ipairs(self._inOutLinks) do
+        local nextNode = data[1] ---@type TCE.BlueprintNode
+        local inAndOuts = data[2]
+        for _, inAndOut in ipairs(inAndOuts) do
+            local curIn = inAndOut[1]
+            local nextOut = inAndOut[2]
+            local curInSlot = self.inputs[curIn]
+            local nextOutSlot = nextNode.outputs[nextOut]
+            assert(curInSlot.hasLinked and nextOutSlot.hasLinked)
+            local p0 = nextOutSlot.pos
+            local p3 = curInSlot.pos
+            local p1, p2 = self:getCurveControlPoints(p0, p3, false)
+            local bezier = curInSlot:setBezierCache(p0, p1, p2, p3)
+            local bound = bezier.bound
+            if bx == nil then
+                bx, by, bx2, by2 = bound.x, bound.y, bound.rightX, bound.bottomY
+            else
+                bx, by, bx2, by2 = min(bx, bound.x), min(by, bound.y), max(bx2, bound.rightX), max(by2, bound.bottomY)
+            end
+            bound = bezier.boundForPointed
+            if bpx == nil then
+                bpx, bpy, bpx2, bpy2 = bound.x, bound.y, bound.rightX, bound.bottomY
+            else
+                bpx, bpy, bpx2, bpy2 = min(bpx, bound.x), min(bpy, bound.y), max(bpx2, bound.rightX), max(bpy2, bound.bottomY)
+            end
+        end
+    end
+
+    if bx ~= nil then
+        self._minLinkBound = RectFloatEx.new(bx, by, bx2 - bx, by2 - by)
+        self._minLinkBoundForPointed = RectFloatEx.new(bpx, bpy, bpx2 - bpx, bpy2 - bpy)
+    else
+        self._minLinkBound = nil
+        self._minLinkBoundForPointed = nil
+    end
+
+    if not updateInputOnly then
+        for _, data in ipairs(self._outInLinks) do
+            local nextNode = data[1] ---@type TCE.BlueprintNode
+            nextNode:updateLinkLocation(true)
+        end
+    end
+end
+
+function BlueprintNode:setPointedLinkIndex(index)
+    if self.pointedLinkIndex ~= index then
+        if self.pointedLinkIndex ~= 0 then
+            self.inputs[self.pointedLinkIndex].isLinkPointed = false
+        end
+        if index ~= 0 then
+            self.inputs[index].isLinkPointed = true
+        end
+        self.pointedLinkIndex = index
+        return true
+    end
+    return false
 end
 
 function BlueprintNode:setPointed(pointed)
@@ -237,6 +347,44 @@ function BlueprintNode:isPointIn(pointX, pointY)
     return self.bound:isPointIn(pointX, pointY)
 end
 
+function BlueprintNode:isOverlapping(bound)
+    return self.bound:isOverlapping(bound)
+end
+
+function BlueprintNode:getPointedLinkIndex(pointX, pointY)
+    if self._minLinkBoundForPointed == nil then
+        return 0
+    end
+    if not self._minLinkBoundForPointed:isPointIn(pointX, pointY) then
+        return 0
+    end
+    for i, slot in ipairs(self.inputs) do
+        if slot:isLinkPointIn(pointX, pointY) then
+            return i
+        end
+    end
+    return 0
+end
+
+function BlueprintNode:findLinkOverlappingWithBound(bound)
+    if self._minLinkBound == nil then
+        return nil
+    end
+    if not self._minLinkBound:isOverlapping(bound) then
+        return nil
+    end
+    local res = {}
+    for i, slot in ipairs(self.inputs) do
+        if slot:isLinkOverlappingWithBound(bound) then
+            table.insert(res, i)
+        end
+    end
+    if #res == 0 then
+        return nil
+    end
+    return res
+end
+
 function BlueprintNode:findTouchedSlot(posX, posY)
     for i, slot in ipairs(self.inputs) do
         if slot:isPointIn(posX, posY) then
@@ -267,17 +415,8 @@ end
 
 ---@param drawList DrawList
 function BlueprintNode:renderLink(drawList)
-    for _, data in ipairs(self._outInLinks) do
-        local nextNode = data[1] ---@type TCE.BlueprintNode
-        local outAndIns = data[2]
-        for _, outAndIn in ipairs(outAndIns) do
-            local curOut, nextIn = outAndIn[1], outAndIn[2]
-            local color = self.outputs[curOut].color
-            local p0 = self.outputs[curOut].pos
-            local p3 = nextNode.inputs[nextIn].pos
-            local p1, p2 = self:getCurveControlPoints(p0, p3, false)
-            drawList:addBezierCubic(p0, p1, p2, p3, color, 4, 0)
-        end
+    for _, slot in ipairs(self.inputs) do
+        slot:renderLink(drawList)
     end
 end
 
@@ -293,7 +432,11 @@ function BlueprintNode:render(drawList)
     drawList:addRectRoundFilledEx(Vector2.new(posMin.x, posMin.y + capHeight), posMax, self.bgColor, 0, 0, rounding, rounding)
     drawList:addRectRound(posMin, posMax, self.borderColor, rounding, borderThickness)
 
-    if self.pointed then
+    if self.selected then
+        local diff = 2
+        local diffs = Vector2.new(diff, diff)
+        drawList:addRectRound(posMin - diffs, posMax + diffs, self.selectedBorderColor, rounding + diff, borderThickness)
+    elseif self.pointed then
         local diff = 2
         local diffs = Vector2.new(diff, diff)
         drawList:addRectRound(posMin - diffs, posMax + diffs, self.pointedBorderColor, rounding + diff, borderThickness)

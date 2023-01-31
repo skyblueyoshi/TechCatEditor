@@ -35,7 +35,7 @@ function RenderTargetView:__init(name, parent, parentRoot, data, location)
     
 
     local ShaderGraph = require("shaderlab.ShaderLab")
-    local g = ShaderGraph.new()
+    local g = ShaderGraph.new(require("core.Listener").new({ self._onDisplayChanged, self }))
     local nno = g:addNode(Operation.VertexShaderOutput, Vector2.new(10, 10))
     local nn = g:addNode(Operation.VertexTextureCoordinate, Vector2.new(101, 10))
     local dd = g:addNode(Operation.Dot, Vector2.new(210, 10))
@@ -80,16 +80,18 @@ function RenderTargetView:_initContent(location)
     self._rtNode:addTouchMoveListener({ self._onTouchMove, self })
 end
 
+function RenderTargetView:_onDisplayChanged()
+    self._rtNode:flushRender()
+    --print(JsonUtil.toJson(self.g:save()))
+end
+
 function RenderTargetView:_onMouseMove(_)
     local pos = Input.mouse.position - self._rtNode.positionInCanvas
     if self._lastMousePos ~= nil and self._lastMousePos == pos then
         return
     end
     self._lastMousePos = pos
-    local changed = self.g:onMouseMove(pos.x, pos.y)
-    if changed then
-        self._rtNode:flushRender()
-    end
+    self.g:onMouseMove(pos.x, pos.y)
 end
 
 ---@param touch Touch
@@ -97,7 +99,7 @@ function RenderTargetView:_onTouchDown(_, touch)
     local pos = touch.position - self._rtNode.positionInCanvas
     local changed = self.g:onTouchDown(pos.x, pos.y)
     if changed then
-        self._rtNode:flushRender()
+        self:_onDisplayChanged()
     end
 end
 
@@ -106,7 +108,7 @@ function RenderTargetView:_onTouchUp(_, touch)
     local pos = touch.position - self._rtNode.positionInCanvas
     local changed = self.g:onTouchUp(pos.x, pos.y)
     if changed then
-        self._rtNode:flushRender()
+        self:_onDisplayChanged()
     end
 end
 
@@ -115,7 +117,7 @@ function RenderTargetView:_onTouchMove(_, touch)
     local pos = touch.position - self._rtNode.positionInCanvas
     local changed = self.g:onTouchMove(pos.x, pos.y)
     if changed then
-        self._rtNode:flushRender()
+        self:_onDisplayChanged()
     end
 end
 

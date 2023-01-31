@@ -744,29 +744,32 @@ local EditorRight = {
 
 local EditorWindowData = {
     menuBar = MenuBarData,
-    layouts = {
-        { place = { 1 }, container = EditorLeft, },
-        { place = { 4, 5 }, container = EditorBottom, },
-        { place = { 3, 6 }, container = EditorRight, },
-        {
-            place = { 2 },
-            container = {
-                -- menuBar = MenuBarData,
-                -- layouts = {
-                --     { place = { 1 }, container = EditorLeft, },
-                --     { place = { 4, 5 }, container = EditorBottom, },
-                --     { place = { 3, 6 }, container = EditorRight, },
-                --     {
-                --         place = { 2 },
-                --         container = EditorLeft,
-                --     },
-                -- },
-                renderTarget = {
-                    text = "123"
-                },
-            }
-        },
-    }
+    --layouts = {
+    --    { place = { 1 }, container = EditorLeft, },
+    --    { place = { 4, 5 }, container = EditorBottom, },
+    --    { place = { 3, 6 }, container = EditorRight, },
+    --    {
+    --        place = { 2 },
+    --        container = {
+    --            -- menuBar = MenuBarData,
+    --            -- layouts = {
+    --            --     { place = { 1 }, container = EditorLeft, },
+    --            --     { place = { 4, 5 }, container = EditorBottom, },
+    --            --     { place = { 3, 6 }, container = EditorRight, },
+    --            --     {
+    --            --         place = { 2 },
+    --            --         container = EditorLeft,
+    --            --     },
+    --            -- },
+    --            renderTarget = {
+    --                text = "123"
+    --            },
+    --        }
+    --    },
+    --},
+    renderTarget = {
+        text = "123"
+    },
 }
 
 return EditorWindowData

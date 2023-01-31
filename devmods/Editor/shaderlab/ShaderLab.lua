@@ -347,8 +347,8 @@ local SolveFuncDict = {
     [Operation.VertexShaderOutput] = ShaderGraph.solveVertexShaderOutput,
 }
 
-function ShaderGraph:__init()
-    ShaderGraph.super.__init(self)
+function ShaderGraph:__init(displayChangedCallback)
+    ShaderGraph.super.__init(self, displayChangedCallback)
     self.cache = nil
 end
 

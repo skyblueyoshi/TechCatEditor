@@ -23,13 +23,16 @@ end
 
 ---@param command TCE.BaseCommand
 function CommandManager:execute(command)
-    command:execute()
+    local ok = command:execute()
+    if not ok then
+        return
+    end
     print("run:", command:getInfo())
-    self:register(command)
+    self:_register(command)
 end
 
 ---@param command TCE.BaseCommand
-function CommandManager:register(command)
+function CommandManager:_register(command)
     self._redoStack:clear()
     if self._undoDeque:size() == self._maxCommandCount then
         self._undoDeque:popFirst()
