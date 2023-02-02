@@ -1,74 +1,75 @@
-class ButtonData
+class Button
     string text = ""
     string icon = ""
-    PopupMenuData popupMenu = nil
+    string clickCallback = ""
+    PopupMenu popupMenu = nil
 
-class MenuBarData
-    ButtonData[] elements = {}
+class MenuBar
+    Button[] elements = {}
 
-class PopupMenuElementData
+class PopupMenuElement
     string text = ""
     string icon = ""
     string hotKeys = ""
-    PopupMenuData popupMenu = nil
+    PopupMenu popupMenu = nil
 
-class PopupMenuData
-    PopupMenuElementData[] elements = {}
+class PopupMenu
+    PopupMenuElement[] elements = {}
 
-class TreeElementData
+class TreeElement
     string text = ""
     string icon = ""
     boolean canExpand = false
-    TreeElementData[] elements = {}
+    TreeElement[] elements = {}
 
-class TreeData
+class Tree
     table iconList = {}
-    TreeElementData[] elements = {}
+    TreeElement[] elements = {}
 
-class ContainerLayoutData @needParentHooked
+class ContainerLayout @notifyParent
     table place = {}
-    ContainerData container = nil
+    Container container = nil
 
-class ContainerData
+class Container
     boolean isSide = false
-    MenuBarData menuBar = nil
-    TreeData tree = nil
-    TabData tab = nil
-    GridData grid = nil
-    PropertyListData propertyList = nil
-    RenderTargetData renderTarget = nil
-    ContainerLayoutData[] layouts = {}
+    MenuBar menuBar = nil
+    Tree tree = nil
+    Tab tab = nil
+    Grid grid = nil
+    PropertyList propertyList = nil
+    RenderTarget renderTarget = nil
+    ContainerLayout[] layouts = {}
 
-class TabElementData
-    ButtonData tabButton = nil
-    ContainerData container = nil
+class TabElement
+    Button tabButton = nil
+    Container container = nil
 
-class TabData
-    TabElementData[] elements = {}
+class Tab
+    TabElement[] elements = {}
 
-class GridElementData
+class GridElement
     string text = ""
 
-class GridData
-    GridElementData[] elements = {}
+class Grid
+    GridElement[] elements = {}
 
-class PropertyListConfigElementData @needParentHooked
+class PropertyListConfigElement @notifyParent
     string propertyType = ""
     table params = {}
-    PopupMenuData popupMenu = nil
+    PopupMenu popupMenu = nil
 
-class PropertyListConfigData @needParentHooked
-    PropertyListConfigElementData[] elements = {}
+class PropertyListConfig @notifyParent
+    PropertyListConfigElement[] elements = {}
 
-class PropertyListElementData
+class PropertyListElement
     string text = ""
     number configIndex = 0
     any value = nil
     table params = {}
 
-class PropertyListData
-    PropertyListConfigData config = nil
-    PropertyListElementData[] elements = {}
+class PropertyList
+    PropertyListConfig config = nil
+    PropertyListElement[] elements = {}
 
-class RenderTargetData
+class RenderTarget
     string text = ""

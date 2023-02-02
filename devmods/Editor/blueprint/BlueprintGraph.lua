@@ -140,8 +140,10 @@ function BlueprintGraph:_clearAllFlags()
     end
 end
 
+---@param node TCE.BlueprintNode
 function BlueprintGraph:_addNode(node)
     local guid = self._guidGen:request()
+    node._guid = guid
     self._nodePool[guid] = node
     table.insert(self._sortedNodes, node)
     self._totalNodes = self._totalNodes + 1

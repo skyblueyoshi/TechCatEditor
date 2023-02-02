@@ -48,12 +48,12 @@ def to_lua_boolean_str(b_value):
 def gen_page(symbol_lists: List[List[str]], index: int):
     members = []
     if index >= len(symbol_lists):
-        return index
+        return index, ""
     if symbol_lists[index][0] == "class":
         class_name = symbol_lists[index][1]
-        need_parent_hooked = has_symbol(symbol_lists[index], "@needParentHooked")
+        need_parent_hooked = has_symbol(symbol_lists[index], "@notifyParent")
     else:
-        return index
+        return index, ""
     index += 1
     while symbol_lists[index][0] != "class":
         symbol_list = symbol_lists[index]
@@ -73,29 +73,30 @@ def gen_page(symbol_lists: List[List[str]], index: int):
             break
 
     print(members)
-    res = '''---@class TCE.{0}:TCE.BaseData
-local {0} = class("{0}", require("BaseData"))\n'''.format(class_name)
-
-    res += '''local DataMembers = {\n'''
+    res = '''local BaseWidget = require("BaseWidget")
+---@class TCE.{0}:TCE.BaseWidget
+local {0} = class("{0}", BaseWidget)\n'''.format(class_name)
+    res += '''local DataDefine = {{ notifyParent = {0}, }}\n'''.format(to_lua_boolean_str(need_parent_hooked))
+    res += '''local PropertyDefines = {\n'''
 
     for member in members:
         var_name = member[0]
         type_name = member[2]
         type_style = member[4]
-        res += '''    ''' + member[0] + " = { " + member[3]
+        res += '''    ''' + member[0] + " = BaseWidget.newPropDef({ " + member[3]
         if is_base_type(type_name):
-            res += " },\n"
+            res += " }),\n"
         else:
             res += ''', "{0}"'''.format(type_name)
             if type_style != TypeStyle.var:
                 if type_style == TypeStyle.list:
                     res += ''', "list"'''
-            res += " },\n"
+            res += " }),\n"
     res += "}\n"
 
     res += '''
-function {0}:__init(cfg)
-    self:initData(DataMembers, cfg, {1})
+function {0}:__init()
+    {0}.super.__init(self, DataDefine, PropertyDefines)
 end
 
 '''.format(class_name, to_lua_boolean_str(need_parent_hooked))
@@ -109,45 +110,46 @@ end
         if not is_base_type(type_name):
             comment_type_name = "TCE." + comment_type_name
         if type_style == TypeStyle.var:
-            res += '''---@param value {3}
-function {0}:set{2}(value)
-    self:_set("{1}", value)
+            res += '''---@param {1} {3}
+function {0}:set{2}({1})
+    self:_set("{1}", {1})
 end
 
 ---@return {3}
 function {0}:get{2}()
-    return self:_get("{1}")
+    return self["{1}"]
 end
 
 '''.format(class_name, var_name, var_name_cap, comment_type_name)
         elif type_style == TypeStyle.list:
-            res += '''---@param value table
-function {0}:set{2}(value)
-    self:_set("{1}", value)
-end
-
----@return {3}[]
+            res += '''---@return {3}[]
 function {0}:get{2}()
-    return self:_get("{1}")
+    return self["{1}"]
 end
 
----@param element {3}
-function {0}:addTo{2}(element)
-    self:_listAppend("{1}", element)
+---@param widget {3}
+function {0}:{1}Add(widget)
+    self:_propertyListAdd("{1}", widget)
 end
 
----@param value table
-function {0}:addCfgTo{2}(value)
-    self:_listAppendCfg("{1}", value)
+---@param index number
+---@param widget {3}
+function {0}:{1}Insert(index, widget)
+    self:_propertyListInsert("{1}", index, widget)
 end
 
----@param values table
-function {0}:addCfgsTo{2}(values)
-    self:_listAppendCfgs("{1}", values)
+---@param widget {3}
+function {0}:{1}Remove(widget)
+    self:_propertyListRemove("{1}", widget)
 end
 
-function {0}:clear{2}()
-    self:_listClear("{1}")
+---@param index number
+function {0}:{1}RemoveAt(index)
+    self:_propertyListRemoveAt("{1}", index)
+end
+
+function {0}:{1}Clear()
+    self:_propertyListClear("{1}")
 end
 
 '''.format(class_name, var_name, var_name_cap, comment_type_name)
@@ -156,10 +158,10 @@ end
 
     print(res)
 
-    with open("control/data/" + class_name + ".lua", "w") as output:
+    with open("widget/" + class_name + ".lua", "w") as output:
         output.write(res)
 
-    return index
+    return index, class_name
 
 
 def start_gen():
@@ -167,11 +169,30 @@ def start_gen():
     index = 0
     symbols = process_lines(lines)
     print("symbols", symbols)
+    classes = []
     while True:
-        new_index = gen_page(symbols, index)
+        new_index, class_name = gen_page(symbols, index)
+        if class_name:
+            classes.append(class_name)
         if new_index == index:
             break
         index = new_index
+
+    s = '''---@class TCE.WidgetPool
+local WidgetPool = class("WidgetPool")
+local WidgetPoolImpl = require("WidgetPoolImpl")'''
+
+    for class_name in classes:
+
+        s += '''\n\n---@return TCE.{0}
+function WidgetPool.load{0}(data)
+    return WidgetPoolImpl.load("{0}", data)
+end'''.format(class_name)
+
+    s += '''\n\nreturn WidgetPool'''
+
+    with open("widget/WidgetPool.lua", "w") as output:
+        output.write(s)
 
 
 if __name__ == '__main__':

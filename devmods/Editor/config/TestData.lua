@@ -590,7 +590,7 @@ local PopupMenu = {
 
 local MenuBarData = {
     elements = {
-        { text = "@File", icon = "icon_16_folder", popupMenu = PopupMenu, },
+        { text = "@File", icon = "icon_16_folder", popupMenu = PopupMenu },
         { text = "@Edit", icon = "icon_16_copy", popupMenu = PopupMenu_Edit, },
         { text = "Edit22", icon = "icon_16_paste", popupMenu = PopupMenu, },
     }

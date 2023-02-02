@@ -56,10 +56,15 @@ function Editor:_initCanvas()
     --panel.sprite.color = Color.new(45, 45, 48)
     self._canvas:addChild(panel)
 
-    local TestData = require("config.TestData")
-    local UIData = require("control.data.UIData")
-    self._wd = require("control.Window").new("win", self, self:getRoot(),
-            UIData.create("ContainerData", TestData), nil)
+    local TestWidget = require("example.TestWidget")
+    local WidgetPool = require("widget.WidgetPool")
+    local b = WidgetPool.loadContainer(TestWidget)
+    self._wd = require("widget.view.WindowView").new("win", b, nil, self:getRoot(), nil)
+
+    --local TestData = require("config.TestData")
+    --local UIData = require("control.data.UIData")
+    --self._wd = require("control.Window").new("win", self, self:getRoot(),
+    --        UIData.create("ContainerData", TestData), nil)
 
     --local rt = UIRenderTargetNode.new("rt", 0, 0, 128, 128)
     --self:getRoot():addChild(rt)

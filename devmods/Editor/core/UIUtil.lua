@@ -519,7 +519,6 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     local vw, vh = sv.width, sv.height
     local vx2, vy2 = vx + vw, vy + vh
 
-    --print(sv:getViewPosition())
     local isItemFillWidth = cfg.isItemFillWidth
     local isItemFillHeight = cfg.isItemFillHeight
     local isGrid = cfg.isGrid
@@ -593,7 +592,6 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     end
 
     local function _saveNode(index, node)
-        --print("del:", index)
         if proxy._recycleTableElement ~= nil then
             proxy:_recycleTableElement(node, index)
         end
@@ -624,7 +622,7 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
         local tempNode = _tryGetReserve()
         if tempNode == nil then
             tempNode = panelItem:clone()
-            tempNode.name = "__item"
+            tempNode.name = "__item" .. tostring(index)
             innerPanel:addChild(tempNode)
         end
         tempNode.tag = index
@@ -639,7 +637,6 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     end
 
     local function _setItem(index, x, y, w, h)
-        --print("new:", index)
         changed = true
         local tempItem = _ensureItem(index, x, y, w, h)
         if proxy._setTableElement ~= nil then
@@ -707,7 +704,9 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
     if isReload or not existAny then
         for i = 1, innerPanel:getChildrenCount() do
             local temp = innerPanel:getChildByIndex(i - 1)
-            _saveNode(temp.tag, temp)
+            if temp.tag > 0 then
+                _saveNode(temp.tag, temp)
+            end
         end
 
         local refX, refY, refWidth, refHeight = 0, 0, 0, 0
@@ -734,7 +733,6 @@ function UIUtil._updateTableView(panelList, proxy, isReload, isVertical, cfg)
             local fullWidth, fullHeight = refX + refWidth, refY + refHeight
             innerPanel:setSize(fullWidth, fullHeight)
             sv.viewSize = Size.new(fullWidth, fullHeight)
-            --print(sv.viewSize)
         end
     else
         if not showStart then
